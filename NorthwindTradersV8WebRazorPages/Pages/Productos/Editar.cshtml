@@ -1,0 +1,20 @@
+﻿@page "{id:int}"
+@model NorthwindTradersV8WebRazorPages.Pages.Productos.EditarModel
+@{
+}
+
+<h2>Editar Producto</h2>
+
+<form method="post" class="form">
+    <input type="hidden" asp-for="Id" />
+    <div class="mb-3">
+        <label asp-for="Nombre" class="form-label"></label>
+        <input asp-for="Nombre" class="form-control" />
+    </div>
+    <div class="mb-3">
+        <label asp-for="Precio" class="form-label"></label>
+        <input asp-for="Precio" class="form-control" />
+    </div>
+    <button type="submit" class="btn btn-sm btn-primary me-1"><i class="bi bi-save"></i> Actualizar</button>
+    <a asp-page="Index" class="btn btn-sm btn-secondary me-1"><i class="bi bi-x-circle"></i> Cancelar</a>
+</form>

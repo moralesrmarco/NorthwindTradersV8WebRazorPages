@@ -1,0 +1,39 @@
+﻿@page
+@model NorthwindTradersV8WebRazorPages.Pages.Productos.IndexModel
+
+<h2>Lista de Productos</h2>
+
+<a asp-page="Insertar" class="btn btn-sm btn-primary mb-3">
+    <i class="bi bi-plus-circle"></i> Nuevo Producto
+</a>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Nombre</th>
+            <th>Precio</th>
+            <th>Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (System.Data.DataRow row in Model.Productos.Rows)
+        {
+            <tr>
+                <td>@row["ProductID"]</td>
+                <td>@row["ProductName"]</td>
+                <td>@row["UnitPrice"]</td>
+                <td>
+                    <a asp-page="Consultar" asp-route-id="@row["ProductID"]" class="btn btn-sm btn-success me-1">
+                        <i class="bi bi-search"></i> Consultar
+                    </a>
+                    <a asp-page="Editar" asp-route-id="@row["ProductID"]" class="btn btn-sm btn-warning me-1">
+                        <i class="bi bi-pencil"></i> Editar
+                    </a>
+                    <a asp-page="Eliminar" asp-route-id="@row["ProductID"]" class="btn btn-sm btn-danger me-1">
+                        <i class="bi bi-trash"></i> Eliminar
+                    </a>
+                </tr>
+        }
+    </tbody>
+</table>

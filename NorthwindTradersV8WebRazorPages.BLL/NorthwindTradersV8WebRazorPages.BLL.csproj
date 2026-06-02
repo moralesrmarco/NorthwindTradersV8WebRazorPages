@@ -1,0 +1,15 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\NorthwindTradersV8WebRazorPages.Common\NorthwindTradersV8WebRazorPages.Common.csproj" />
+    <ProjectReference Include="..\NorthwindTradersV8WebRazorPages.DAL\NorthwindTradersV8WebRazorPages.DAL.csproj" />
+    <ProjectReference Include="..\NorthwindTradersV8WebRazorPages.Entities\NorthwindTradersV8WebRazorPages.Entities.csproj" />
+  </ItemGroup>
+
+</Project>
