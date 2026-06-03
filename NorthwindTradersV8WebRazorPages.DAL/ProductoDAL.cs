@@ -37,15 +37,14 @@ namespace NorthwindTradersV8WebRazorPages.DAL
                     cmd.Parameters.AddWithValue("@ProductName", producto.ProductName);
                     cmd.Parameters.AddWithValue("@SupplierID", producto.Proveedor?.SupplierID ?? (object)DBNull.Value);
                     cmd.Parameters.AddWithValue("@CategoryID", producto.Categoria?.CategoryID ?? (object)DBNull.Value);
-                    cmd.Parameters.AddWithValue("@QuantityPerUnit", (object)producto.QuantityPerUnit ?? DBNull.Value);
-                    cmd.Parameters.AddWithValue("@UnitPrice", (object)producto.UnitPrice ?? DBNull.Value);
-                    cmd.Parameters.AddWithValue("@UnitsInStock", (object)producto.UnitsInStock ?? DBNull.Value);
-                    cmd.Parameters.AddWithValue("@UnitsOnOrder", (object)producto.UnitsOnOrder ?? DBNull.Value);
-                    cmd.Parameters.AddWithValue("@ReorderLevel", (object)producto.ReorderLevel ?? DBNull.Value);
+                    cmd.Parameters.AddWithValue("@QuantityPerUnit", string.IsNullOrEmpty(producto.QuantityPerUnit) ? DBNull.Value : producto.QuantityPerUnit);
+                    cmd.Parameters.AddWithValue("@UnitPrice", producto.UnitPrice.HasValue ? producto.UnitPrice.Value : DBNull.Value);
+                    cmd.Parameters.AddWithValue("@UnitsInStock", producto.UnitsInStock.HasValue ? producto.UnitsInStock.Value : DBNull.Value);
+                    cmd.Parameters.AddWithValue("@UnitsOnOrder", producto.UnitsOnOrder.HasValue ? producto.UnitsOnOrder.Value : DBNull.Value);
+                    cmd.Parameters.AddWithValue("@ReorderLevel", producto.ReorderLevel.HasValue ? producto.ReorderLevel.Value : DBNull.Value);
                     cmd.Parameters.AddWithValue("@Discontinued", producto.Discontinued);
                     con.Open();
                     numRegs = cmd.ExecuteNonQuery();
-                    producto.ProductID = (int)cmd.Parameters["@ProductID"].Value;
                 }
             }
             catch (SqlException)

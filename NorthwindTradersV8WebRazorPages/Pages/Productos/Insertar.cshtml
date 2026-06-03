@@ -13,60 +13,72 @@
     }
 
     <div class="row">
-        <div class="col-md-6 mb-3">
-            <label asp-for="Producto.ProductID" class="form-label">ID</label>
-            <input asp-for="Producto.ProductID" class="form-control" readonly />
-        </div>
-        <div class="col-md-6 mb-3">
+        <div class="col-md-12 mb-3">
             <label asp-for="Producto.ProductName" class="form-label">Producto</label>
-            <input asp-for="Producto.ProductName" class="form-control" readonly />
+            <input asp-for="Producto.ProductName" class="form-control" />
+            <span asp-validation-for="Producto.ProductName" class="text-danger"></span>
         </div>
     </div>
 
     <div class="row">
         <div class="col-md-6 mb-3">
             <label class="form-label">Categoría</label>
-            <input value="@Model.Producto.Categoria?.CategoryName" class="form-control" readonly />
+            <select asp-for="Producto.Categoria.CategoryID"
+                    asp-items="Model.Categorias"
+                    class="form-select">
+            </select>
+            <span asp-validation-for="Producto.Categoria.CategoryID" class="text-danger"></span>
         </div>
         <div class="col-md-6 mb-3">
             <label class="form-label">Proveedor</label>
-            <input value="@Model.Producto.Proveedor?.CompanyName" class="form-control" readonly />
+            <select asp-for="Producto.Proveedor.SupplierID"
+                    asp-items="Model.Proveedores"
+                    class="form-select">
+            </select>
+            <span asp-validation-for="Producto.Proveedor.SupplierID" class="text-danger"></span>
         </div>
     </div>
 
     <div class="row">
         <div class="col-md-6 mb-3">
             <label asp-for="Producto.QuantityPerUnit" class="form-label">Cantidad por unidad</label>
-            <input asp-for="Producto.QuantityPerUnit" class="form-control" readonly />
+            <input asp-for="Producto.QuantityPerUnit" class="form-control" />
         </div>
         <div class="col-md-6 mb-3">
             <label asp-for="Producto.UnitPrice" class="form-label">Precio $</label>
-            <input value="@Model.Producto.UnitPrice?.ToString("N2")" class="form-control" readonly />
+            <input asp-for="Producto.UnitPrice" class="form-control" />
+            <span asp-validation-for="Producto.UnitPrice" class="text-danger"></span>
         </div>
     </div>
 
     <div class="row">
         <div class="col-md-6 mb-3">
             <label asp-for="Producto.UnitsInStock" class="form-label">Unidades en stock</label>
-            <input value="@Model.Producto.UnitsInStock?.ToString("N2")" class="form-control" readonly />
-        </div>
+            <input asp-for="Producto.UnitsInStock" class="form-control" />
+            <span asp-validation-for="Producto.UnitsInStock" class="text-danger"></span>
+    </div>
         <div class="col-md-6 mb-3">
             <label asp-for="Producto.UnitsOnOrder" class="form-label">Unidades en orden</label>
-            <input value="@Model.Producto.UnitsOnOrder?.ToString("N2")" class="form-control" readonly />
+            <input asp-for="Producto.UnitsOnOrder" class="form-control" />
+            <span asp-validation-for="Producto.UnitsOnOrder" class="text-danger"></span>
         </div>
     </div>
-
     <div class="row">
         <div class="col-md-6 mb-3">
             <label asp-for="Producto.ReorderLevel" class="form-label">Nivel de reorden</label>
-            <input value="@Model.Producto.ReorderLevel?.ToString("N2")" class="form-control" readonly />
-        </div>
-        <div class="col-md-6 mb-3">
-            <label class="form-label">Descontinuado</label>
-            <input value="@(Model.Producto.Discontinued ? "Sí" : "No")" class="form-control" readonly />
+            <input asp-for="Producto.ReorderLevel" class="form-control" />
+            <span asp-validation-for="Producto.ReorderLevel" class="text-danger"></span>
         </div>
     </div>
-    
+    <div class="row">
+        <div class="col-md-6 mb-3">
+            <div class="form-check">
+                <input asp-for="Producto.Discontinued" type="checkbox" class="form-check-input" />
+                <label asp-for="Producto.Discontinued" class="form-check-label">Descontinuado</label>
+            </div>
+        </div>
+    </div>
+
     <button type="submit" class="btn btn-sm btn-success me-1"><i class="bi bi-save"></i> Guardar</button>
     <a asp-page="Index" class="btn btn-sm btn-secondary me-1"><i class="bi bi-x-circle"></i> Cancelar</a>
 </form>

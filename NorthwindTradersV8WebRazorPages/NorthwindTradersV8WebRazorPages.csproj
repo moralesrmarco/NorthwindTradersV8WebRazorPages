@@ -7,14 +7,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="Pages\Productos\Editar.cshtml.cs" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Content Remove="Pages\Productos\Editar.cshtml" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\NorthwindTradersV8WebRazorPages.BLL\NorthwindTradersV8WebRazorPages.BLL.csproj" />
     <ProjectReference Include="..\NorthwindTradersV8WebRazorPages.Common\NorthwindTradersV8WebRazorPages.Common.csproj" />
     <ProjectReference Include="..\NorthwindTradersV8WebRazorPages.Entities\NorthwindTradersV8WebRazorPages.Entities.csproj" />
