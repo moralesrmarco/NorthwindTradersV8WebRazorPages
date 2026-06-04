@@ -54,18 +54,39 @@ namespace NorthwindTradersV8WebRazorPages.DAL
             return numRegs;
         }
 
-        public void Actualizar(int id, string nombre, decimal precio)
+        public int Actualizar(Producto producto)
         {
-            using var conn = new SqlConnection(_connectionString);
-            using var cmd = new SqlCommand("UPDATE Products SET ProductName=@nombre, UnitPrice=@precio WHERE ProductID=@id", conn);
-            cmd.Parameters.AddWithValue("@id", id);
-            cmd.Parameters.AddWithValue("@nombre", nombre);
-            cmd.Parameters.AddWithValue("@precio", precio);
-
-            conn.Open();
-            cmd.ExecuteNonQuery();
+            int numRegs = 0;
+            try
+            {
+                using (var con = new SqlConnection(_connectionString))
+                using (var cmd = new SqlCommand("SpProductoActualizar", con))
+                {
+                    cmd.CommandType = CommandType.StoredProcedure;
+                    cmd.Parameters.AddWithValue("@ProductID", producto.ProductID);
+                    cmd.Parameters.AddWithValue("@ProductName", producto.ProductName);
+                    cmd.Parameters.AddWithValue("@SupplierID", producto.Proveedor?.SupplierID ?? (object)DBNull.Value);
+                    cmd.Parameters.AddWithValue("@CategoryID", producto.Categoria?.CategoryID ?? (object)DBNull.Value);
+                    cmd.Parameters.AddWithValue("@QuantityPerUnit", string.IsNullOrEmpty(producto.QuantityPerUnit) ? DBNull.Value : producto.QuantityPerUnit);
+                    cmd.Parameters.AddWithValue("@UnitPrice", producto.UnitPrice.HasValue ? producto.UnitPrice.Value : DBNull.Value);
+                    cmd.Parameters.AddWithValue("@UnitsInStock", producto.UnitsInStock.HasValue ? producto.UnitsInStock.Value : DBNull.Value);
+                    cmd.Parameters.AddWithValue("@UnitsOnOrder", producto.UnitsOnOrder.HasValue ? producto.UnitsOnOrder.Value : DBNull.Value);
+                    cmd.Parameters.AddWithValue("@ReorderLevel", producto.ReorderLevel.HasValue ? producto.ReorderLevel.Value : DBNull.Value);
+                    cmd.Parameters.AddWithValue("@Discontinued", producto.Discontinued);
+                    cmd.Parameters.AddWithValue("@RowVersion", producto.RowVersion ?? (object)DBNull.Value);
+                    var returnParameter = cmd.Parameters.Add("@ReturnVal", SqlDbType.Int);
+                    returnParameter.Direction = ParameterDirection.ReturnValue;
+                    con.Open();
+                    cmd.ExecuteNonQuery();
+                    numRegs = (int)returnParameter.Value;
+                }
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+            return numRegs;
         }
-
         public int Eliminar(Producto producto)
         {
             int numRegs = 0;

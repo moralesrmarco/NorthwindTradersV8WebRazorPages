@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using NorthwindTradersV8WebRazorPages.BLL;
+using NorthwindTradersV8WebRazorPages.Common;
 using NorthwindTradersV8WebRazorPages.Entities;
 
 namespace NorthwindTradersV8WebRazorPages.Pages.Productos
@@ -10,7 +11,7 @@ namespace NorthwindTradersV8WebRazorPages.Pages.Productos
         private readonly ProductoBLL _productoBLL;
         
         [BindProperty]
-        public Producto Producto { get; set; } = new Producto();
+        public Producto? Producto { get; set; } = new Producto();
 
         public ConsultarModel(IConfiguration configuration)
         {
@@ -18,13 +19,14 @@ namespace NorthwindTradersV8WebRazorPages.Pages.Productos
                 ?? throw new InvalidOperationException("Connection string not found"); 
             _productoBLL = new ProductoBLL(connectionString);
         }
-        public void OnGet(int id)
+        public IActionResult OnGet(int id)
         {
             var producto = _productoBLL.ObtenerProductoPorId(id);
-            if (producto != null)
-            {
+            if (producto == null)
+                TempData["Error"] = "<p>Producto no encontrado</p>" + StringsCommons.Nefep;
+            else
                 Producto = producto;
-            }
+            return Page();
         }
     }
 }

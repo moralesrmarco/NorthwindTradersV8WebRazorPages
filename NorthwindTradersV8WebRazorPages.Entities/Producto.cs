@@ -12,6 +12,7 @@ namespace NorthwindTradersV8WebRazorPages.Entities
         //[Required(ErrorMessage = "Seleccione una categoría")]
         public Categoria? Categoria { get; set; }
         public string? QuantityPerUnit { get; set; }
+        [Required(ErrorMessage = "Ingrese precio")]
         [Range(typeof(decimal), "0.01", "922337203685477.5807", ErrorMessage = "Ingrese precio válido")]
         public decimal? UnitPrice { get; set; }
         [Range(0, short.MaxValue, ErrorMessage = "Ingrese un número válido")]

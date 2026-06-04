@@ -30,48 +30,33 @@ namespace NorthwindTradersV8WebRazorPages.Pages.Productos
         }
         public IActionResult OnPost()
         {
-            bool isValid = true;
             // Validciones manuales
-            if (Producto.Categoria == null || Producto.Categoria.CategoryID == 0)
-            {
+            if (Producto?.Categoria == null || Producto.Categoria.CategoryID == 0)
                 ModelState.AddModelError("Producto.Categoria.CategoryID", "Seleccione una categoría");
-                isValid = false;
-            }
 
-            if (Producto.Proveedor == null || Producto.Proveedor.SupplierID == 0)
-            {
+            if (Producto?.Proveedor == null || Producto.Proveedor.SupplierID == 0)
                 ModelState.AddModelError("Producto.Proveedor.SupplierID", "Seleccione un proveedor");
-                isValid = false;
-            }
 
-            if (string.IsNullOrWhiteSpace(Producto.ProductName))
-            {
-                ModelState.AddModelError("Producto.ProductName", "Ingrese producto");
-                isValid = false;
-            }
-
-            if (Producto.UnitPrice == null || Producto.UnitPrice == 0)
-            {
-                ModelState.AddModelError("Producto.UnitPrice", "Ingrese precio");
-                isValid = false;
-            }
-            if (!isValid)
+            if (!ModelState.IsValid)
             {
                 CargarCombos();
                 return Page();
             }
-            if (Producto != null)
+            try
             {
-                var resultado = productoBLL.Insertar(Producto);
-                if (resultado.Exito)
+                if (Producto != null)
                 {
-                    return RedirectToPage("Index");
-                }
-                else
-                {
+                    var resultado = productoBLL.Insertar(Producto);
+                    if (resultado.Exito)
+                        return RedirectToPage("Index");
                     TempData["Error"] = $"<p>El producto <strong>{Producto.ProductName}</strong>:</p>{resultado.Mensaje}";
                 }
             }
+            catch (Exception ex)
+            {
+                TempData["Error"] = $"<p>Error al insertar el producto <strong>{Producto?.ProductName}</strong>.</p><p>Detalles: {ex.Message}</p>";
+            }
+            CargarCombos();
             return Page();
         }
 

@@ -27,8 +27,20 @@ namespace NorthwindTradersV8WebRazorPages.BLL
                 resultado.Mensaje = StringsCommons.Nfrs;
             return resultado;
         }
-        public void Actualizar(int id, string nombre, decimal precio) => _productoDAL.Actualizar(id, nombre, precio);
-
+        public ResultadoOperacion Actualizar(Producto producto)
+        {
+            var resultado = new ResultadoOperacion();
+            int numRegs = _productoDAL.Actualizar(producto);
+            if (numRegs > 0)
+                resultado.Exito = true;
+            else if (numRegs == -1)
+                resultado.Mensaje = StringsCommons.Nfmfe;
+            else if (numRegs == -2)
+                resultado.Mensaje = StringsCommons.Nfmfm;
+            else
+                resultado.Mensaje = StringsCommons.Nfmmd;
+            return resultado;
+        }
         public ResultadoOperacion Eliminar(Producto producto)
         {
             var resultado = new ResultadoOperacion();

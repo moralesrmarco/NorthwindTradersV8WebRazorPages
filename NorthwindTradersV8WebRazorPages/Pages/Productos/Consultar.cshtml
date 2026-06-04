@@ -5,7 +5,10 @@
 <h2>Detalles del producto</h2>
 
 <form method="post" class="form">
-
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger">@Html.Raw(TempData["Error"])</div>
+    }
     <div class="row">
         <div class="col-md-6 mb-3">
             <label asp-for="Producto.ProductID" class="form-label">ID</label>
@@ -20,11 +23,11 @@
     <div class="row">
         <div class="col-md-6 mb-3">
             <label class="form-label">Categoría</label>
-            <input value="@Model.Producto.Categoria?.CategoryName" class="form-control" readonly />
+            <input value="@(Model.Producto?.Categoria?.CategoryName ?? string.Empty)" class="form-control" readonly />
         </div>
         <div class="col-md-6 mb-3">
             <label class="form-label">Proveedor</label>
-            <input value="@Model.Producto.Proveedor?.CompanyName" class="form-control" readonly />
+            <input value="@(Model.Producto?.Proveedor?.CompanyName ?? string.Empty)" class="form-control" readonly />
         </div>
     </div>
 
@@ -35,29 +38,29 @@
         </div>
         <div class="col-md-6 mb-3">
             <label asp-for="Producto.UnitPrice" class="form-label">Precio $</label>
-            <input value="@Model.Producto.UnitPrice?.ToString("N2")" class="form-control" readonly />
+            <input value="@(Model.Producto?.UnitPrice?.ToString("N2") ?? string.Empty)" class="form-control" readonly />
         </div>
     </div>
 
     <div class="row">
         <div class="col-md-6 mb-3">
             <label asp-for="Producto.UnitsInStock" class="form-label">Unidades en stock</label>
-            <input value="@Model.Producto.UnitsInStock?.ToString("N0")" class="form-control" readonly />
+            <input value="@(Model.Producto?.UnitsInStock?.ToString("N0") ?? string.Empty)" class="form-control" readonly />
         </div>
         <div class="col-md-6 mb-3">
             <label asp-for="Producto.UnitsOnOrder" class="form-label">Unidades en orden</label>
-            <input value="@Model.Producto.UnitsOnOrder?.ToString("N0")" class="form-control" readonly />
+            <input value="@(Model.Producto?.UnitsOnOrder?.ToString("N0") ?? string.Empty)" class="form-control" readonly />
         </div>
     </div>
 
     <div class="row">
         <div class="col-md-6 mb-3">
             <label asp-for="Producto.ReorderLevel" class="form-label">Nivel de reorden</label>
-            <input value="@Model.Producto.ReorderLevel?.ToString("N0")" class="form-control" readonly />
+            <input value="@(Model.Producto?.ReorderLevel?.ToString("N0") ?? string.Empty)" class="form-control" readonly />
         </div>
         <div class="col-md-6 mb-3">
             <label class="form-label">Descontinuado</label>
-            <input value="@(Model.Producto.Discontinued ? "Sí" : "No")" class="form-control" readonly />
+            <input value="@(Model.Producto?.Discontinued == true ? "Sí" : "No")" class="form-control" readonly />
         </div>
     </div>
 
