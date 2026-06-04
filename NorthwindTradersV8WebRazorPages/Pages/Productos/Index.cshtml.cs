@@ -8,14 +8,21 @@ namespace NorthwindTradersV8WebRazorPages.Pages.Productos
     {
         private readonly ProductoBLL _productoBLL;
         public DataTable Productos { get; set; }
+        public int PageIndex { get; set; } = 1;
+        public int TotalPages { get; set; }
+        private const int PageSize = 20;
         public IndexModel(IConfiguration configuration)
         {
-            var connectionString = configuration.GetConnectionString("NorthwindConnection");
+            var connectionString = configuration.GetConnectionString("NorthwindConnection")
+                ?? throw new InvalidOperationException("Connection string not found"); 
+
             _productoBLL = new ProductoBLL(connectionString);
         }
-        public void OnGet()
+        public void OnGet(int pageIndex = 1)
         {
-            Productos = _productoBLL.ObtenerProductos();
+            PageIndex = pageIndex;
+            Productos = _productoBLL.ObtenerProductosPaginados(PageIndex, PageSize, out int totalRegistros);
+            TotalPages = (int)Math.Ceiling(totalRegistros / (double)PageSize);
         }
     }
 }

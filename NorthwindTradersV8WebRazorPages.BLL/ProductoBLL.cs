@@ -7,20 +7,21 @@ namespace NorthwindTradersV8WebRazorPages.BLL
 {
     public class ProductoBLL
     {
-        private readonly ProductoDAL _productoDAL;
+        private readonly ProductoDAL productoDAL;
 
         public ProductoBLL(string connectionString)
         {
-            _productoDAL = new ProductoDAL(connectionString);
+            productoDAL = new ProductoDAL(connectionString);
         }
-
-        public DataTable ObtenerProductos() => _productoDAL.ObtenerProductos();
-
+        public DataTable ObtenerProductosPaginados(int pageIndex, int pageSize, out int totalRegistros)
+        {
+            return productoDAL.ObtenerProductosPaginados(pageIndex, pageSize, out totalRegistros);
+        }
         public ResultadoOperacion Insertar(Producto producto)
         {
             var resultado = new ResultadoOperacion();
                 
-            int numRegs = _productoDAL.Insertar(producto);
+            int numRegs = productoDAL.Insertar(producto);
             if (numRegs > 0)
                 resultado.Exito = true;
             else
@@ -30,7 +31,7 @@ namespace NorthwindTradersV8WebRazorPages.BLL
         public ResultadoOperacion Actualizar(Producto producto)
         {
             var resultado = new ResultadoOperacion();
-            int numRegs = _productoDAL.Actualizar(producto);
+            int numRegs = productoDAL.Actualizar(producto);
             if (numRegs > 0)
                 resultado.Exito = true;
             else if (numRegs == -1)
@@ -44,7 +45,7 @@ namespace NorthwindTradersV8WebRazorPages.BLL
         public ResultadoOperacion Eliminar(Producto producto)
         {
             var resultado = new ResultadoOperacion();
-            int numRegs = _productoDAL.Eliminar(producto);
+            int numRegs = productoDAL.Eliminar(producto);
             if (numRegs > 0)
                 resultado.Exito = true;
             else if (numRegs == -1)
@@ -57,7 +58,6 @@ namespace NorthwindTradersV8WebRazorPages.BLL
                 resultado.Mensaje = StringsCommons.Nfemd;
             return resultado;
         }
-
-        public Producto? ObtenerProductoPorId(int id) => _productoDAL.ObtenerProductoPorId(id);
+        public Producto? ObtenerProductoPorId(int id) => productoDAL.ObtenerProductoPorId(id);
     }
 }

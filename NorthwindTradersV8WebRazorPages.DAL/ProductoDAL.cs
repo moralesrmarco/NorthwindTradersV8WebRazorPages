@@ -7,15 +7,15 @@ namespace NorthwindTradersV8WebRazorPages.DAL
 {
     public class ProductoDAL
     {
-        private readonly string _connectionString;
+        private readonly string connectionString;
         public ProductoDAL(string connectionString)
         {
-            _connectionString = connectionString;
+            this.connectionString = connectionString;
         }
         public DataTable ObtenerProductos()
         {
-            using var conn = new SqlConnection(_connectionString);
-            using var cmd = new SqlCommand("SELECT ProductID, ProductName, UnitPrice FROM Products", conn);
+            using var conn = new SqlConnection(connectionString);
+            using var cmd = new SqlCommand("SELECT ProductID, ProductName, UnitPrice, UnitsInStock, Discontinued FROM Products order by productid desc", conn);
             using var adapter = new SqlDataAdapter(cmd);
 
             var table = new DataTable();
@@ -23,12 +23,32 @@ namespace NorthwindTradersV8WebRazorPages.DAL
             return table;
         }
 
+        public DataTable ObtenerProductosPaginados(int pageIndex, int pageSize, out int totalRegistros)
+        {
+            using var connection = new SqlConnection(connectionString);
+            using var cmd = new SqlCommand("SpProductosObtenerPaginados", connection);
+            cmd.CommandType = CommandType.StoredProcedure;
+            cmd.Parameters.AddWithValue("@PageIndex", pageIndex);
+            cmd.Parameters.AddWithValue("@PageSize", pageSize);
+
+            using var adapter = new SqlDataAdapter(cmd);
+            var ds = new DataSet();
+            adapter.Fill(ds);
+
+            // Primer resultset = total de registros
+            totalRegistros = Convert.ToInt32(ds.Tables[0].Rows[0]["TotalRegistros"]);
+
+            // Segundo resultset = productos paginados
+            return ds.Tables[1];
+        }
+
+
         public int Insertar(Producto producto)
         {
             int numRegs = 0;
             try
             {
-                using (var con = new SqlConnection(_connectionString))
+                using (var con = new SqlConnection(connectionString))
                 using (var cmd = new SqlCommand("SpProductoInsertar", con))
                 {
                     cmd.CommandType = CommandType.StoredProcedure;
@@ -59,7 +79,7 @@ namespace NorthwindTradersV8WebRazorPages.DAL
             int numRegs = 0;
             try
             {
-                using (var con = new SqlConnection(_connectionString))
+                using (var con = new SqlConnection(connectionString))
                 using (var cmd = new SqlCommand("SpProductoActualizar", con))
                 {
                     cmd.CommandType = CommandType.StoredProcedure;
@@ -92,7 +112,7 @@ namespace NorthwindTradersV8WebRazorPages.DAL
             int numRegs = 0;
             try
             {
-                using (var con = new SqlConnection(_connectionString))
+                using (var con = new SqlConnection(connectionString))
                 using (var cmd = new SqlCommand("SpProductoEliminar", con))
                 {
                     cmd.CommandType = CommandType.StoredProcedure;
@@ -117,7 +137,7 @@ namespace NorthwindTradersV8WebRazorPages.DAL
             Producto? producto = null;
             try
             {
-                using (var con = new SqlConnection(_connectionString))
+                using (var con = new SqlConnection(connectionString))
                 using (var cmd = new SqlCommand("SpProductoObtenerPorId", con))
                 {
                     cmd.CommandType = CommandType.StoredProcedure;

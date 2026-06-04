@@ -1,19 +1,40 @@
 ﻿@page
 @model NorthwindTradersV8WebRazorPages.Pages.Productos.IndexModel
 
-<h2>Lista de Productos</h2>
+<h2>Lista de productos</h2>
 
 <a asp-page="Insertar" class="btn btn-sm btn-primary mb-3">
-    <i class="bi bi-plus-circle"></i> Nuevo Producto
+    <i class="bi bi-plus-circle"></i> Nuevo producto
 </a>
+
+<nav aria-label="Page navigation">
+    <ul class="pagination justify-content-center">
+        <li class="page-item @(Model.PageIndex == 1 ? "disabled" : "")">
+            <a class="page-link" asp-page="Index" asp-route-pageIndex="@(Model.PageIndex - 1)">Anterior</a>
+        </li>
+
+        @for (int i = 1; i <= Model.TotalPages; i++)
+        {
+            <li class="page-item @(i == Model.PageIndex ? "active" : "")">
+                <a class="page-link" asp-page="Index" asp-route-pageIndex="@i">@i</a>
+            </li>
+        }
+
+        <li class="page-item @(Model.PageIndex == Model.TotalPages ? "disabled" : "")">
+            <a class="page-link" asp-page="Index" asp-route-pageIndex="@(Model.PageIndex + 1)">Siguiente</a>
+        </li>
+    </ul>
+</nav>
 
 <table class="table table-striped">
     <thead>
         <tr>
-            <th>ID</th>
+            <th class="text-center">ID</th>
             <th>Nombre</th>
-            <th>Precio</th>
-            <th>Acciones</th>
+            <th class="text-center">Precio</th>
+            <th class="text-center">Unidades en inventario</th>
+            <th class="text-center">Descontinuado</th>
+            <th class="text-center">Acciones</th>
         </tr>
     </thead>
     <tbody>
@@ -22,8 +43,19 @@
             <tr>
                 <td>@row["ProductID"]</td>
                 <td>@row["ProductName"]</td>
-                <td>@row["UnitPrice"]</td>
-                <td>
+                <td class="text-center">@string.Format("${0:N2}", row["UnitPrice"])</td>
+                <td class="text-center">@string.Format("{0:N0}", row["UnitsInStock"])</td>
+                <td class="text-center">
+                    @if ((bool)row["Discontinued"])
+                    {
+                        <span class="badge bg-danger">Sí</span>
+                    }
+                    else
+                    {
+                        <span class="badge bg-success">No</span>
+                    }
+                </td>
+                <td class="text-center">
                     <a asp-page="Consultar" asp-route-id="@row["ProductID"]" class="btn btn-sm btn-success me-1">
                         <i class="bi bi-search"></i> Consultar
                     </a>
@@ -37,3 +69,22 @@
         }
     </tbody>
 </table>
+
+<nav aria-label="Page navigation">
+    <ul class="pagination justify-content-center">
+        <li class="page-item @(Model.PageIndex == 1 ? "disabled" : "")">
+            <a class="page-link" asp-page="Index" asp-route-pageIndex="@(Model.PageIndex - 1)">Anterior</a>
+        </li>
+
+        @for (int i = 1; i <= Model.TotalPages; i++)
+        {
+            <li class="page-item @(i == Model.PageIndex ? "active" : "")">
+                <a class="page-link" asp-page="Index" asp-route-pageIndex="@i">@i</a>
+            </li>
+        }
+
+        <li class="page-item @(Model.PageIndex == Model.TotalPages ? "disabled" : "")">
+            <a class="page-link" asp-page="Index" asp-route-pageIndex="@(Model.PageIndex + 1)">Siguiente</a>
+        </li>
+    </ul>
+</nav>
