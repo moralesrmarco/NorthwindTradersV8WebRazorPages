@@ -4,28 +4,26 @@ using NorthwindTradersV8WebRazorPages.BLL;
 using NorthwindTradersV8WebRazorPages.Common;
 using NorthwindTradersV8WebRazorPages.Entities;
 
-namespace NorthwindTradersV8WebRazorPages.Pages.Productos
+namespace NorthwindTradersV8WebRazorPages.Pages.Empleados
 {
     public class ConsultarModel : PageModel
     {
-        private readonly ProductoBLL productoBLL;
-        
+        private readonly EmpleadoBLL empleadoBLL;
         [BindProperty]
-        public Producto? Producto { get; set; } = new Producto();
-
+        public Empleado? Empleado { get; set; } = new Empleado();
         public ConsultarModel(IConfiguration configuration)
         {
             var connectionString = configuration.GetConnectionString("NorthwindConnection")
-                ?? throw new InvalidOperationException("Connection string not found"); 
-            productoBLL = new ProductoBLL(connectionString);
+                ?? throw new InvalidOperationException("Connection string not found");
+            empleadoBLL = new EmpleadoBLL(connectionString);
         }
         public IActionResult OnGet(int id)
         {
-            var producto = productoBLL.ObtenerProductoPorId(id);
-            if (producto == null)
-                TempData["Error"] = "<p>Producto no encontrado</p>" + StringsCommons.Nefep;
+            var empleado = empleadoBLL.ObtenerEmpleadoPorId(id);
+            if (empleado == null)
+                TempData["Error"] = "<p>Empleado no encontrado</p>" + StringsCommons.Nefep;
             else
-                Producto = producto;
+                Empleado = empleado;
             return Page();
         }
     }

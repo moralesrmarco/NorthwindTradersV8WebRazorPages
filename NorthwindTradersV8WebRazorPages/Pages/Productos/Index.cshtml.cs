@@ -6,7 +6,7 @@ namespace NorthwindTradersV8WebRazorPages.Pages.Productos
 {
     public class IndexModel : PageModel
     {
-        private readonly ProductoBLL _productoBLL;
+        private readonly ProductoBLL productoBLL;
         public DataTable Productos { get; set; }
         public int PageIndex { get; set; } = 1;
         public int TotalPages { get; set; }
@@ -16,12 +16,12 @@ namespace NorthwindTradersV8WebRazorPages.Pages.Productos
             var connectionString = configuration.GetConnectionString("NorthwindConnection")
                 ?? throw new InvalidOperationException("Connection string not found"); 
 
-            _productoBLL = new ProductoBLL(connectionString);
+            productoBLL = new ProductoBLL(connectionString);
         }
         public void OnGet(int pageIndex = 1)
         {
             PageIndex = pageIndex;
-            Productos = _productoBLL.ObtenerProductosPaginados(PageIndex, PageSize, out int totalRegistros);
+            Productos = productoBLL.ObtenerProductosPaginados(PageIndex, PageSize, out int totalRegistros);
             TotalPages = (int)Math.Ceiling(totalRegistros / (double)PageSize);
         }
     }

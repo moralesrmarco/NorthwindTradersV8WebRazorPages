@@ -1,4 +1,6 @@
-﻿namespace NorthwindTradersV8WebRazorPages.Entities
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace NorthwindTradersV8WebRazorPages.Entities
 {
     public class Empleado
     {

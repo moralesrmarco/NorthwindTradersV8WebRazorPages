@@ -1,4 +1,5 @@
 ﻿using NorthwindTradersV8WebRazorPages.DAL;
+using NorthwindTradersV8WebRazorPages.Entities;
 using System.Data;
 
 namespace NorthwindTradersV8WebRazorPages.BLL
@@ -15,9 +16,14 @@ namespace NorthwindTradersV8WebRazorPages.BLL
         {
             return empleadoDAL.ObtenerEmpleadosPaginados(pageIndex, pageSize, out totalRegistros);
         }
-        public byte[]? ObtenerEmpleadoFotoPorId(int employeeId)
+        public byte[]? ObtenerEmpleadoFotoPorId(int id)
         {
-            return empleadoDAL.ObtenerEmpleadoFotoPorId(employeeId);
+            return empleadoDAL.ObtenerEmpleadoFotoPorId(id);
+        }
+
+        public Empleado? ObtenerEmpleadoPorId(int id)
+        {
+            return empleadoDAL.ObtenerEmpleadoPorId(id);
         }
     }
 }

@@ -10,7 +10,7 @@ namespace NorthwindTradersV8WebRazorPages.Pages.Productos
 {
     public class EditarModel : PageModel
     {
-        private readonly ProductoBLL _productoBLL;
+        private readonly ProductoBLL productoBLL;
         private readonly CategoriaService categoriaService;
         private readonly ProveedorService proveedorService;
         [BindProperty]
@@ -23,14 +23,14 @@ namespace NorthwindTradersV8WebRazorPages.Pages.Productos
         {
             var connectionString = configuration.GetConnectionString("NorthwindConnection")
                 ?? throw new InvalidOperationException("Connection string not found");
-            _productoBLL = new ProductoBLL(connectionString);
+            productoBLL = new ProductoBLL(connectionString);
             categoriaService = new CategoriaService(connectionString);
             proveedorService = new ProveedorService(connectionString);
         }
 
         public void OnGet(int id)
         {
-            Producto = _productoBLL.ObtenerProductoPorId(id);
+            Producto = productoBLL.ObtenerProductoPorId(id);
             if (Producto == null)
             {
                 TempData["Error"] = "<p>Producto no encontrado</p>" + StringsCommons.Nefep;
@@ -57,7 +57,7 @@ namespace NorthwindTradersV8WebRazorPages.Pages.Productos
             {
                 if (Producto != null)
                 {
-                    var resultado = _productoBLL.Actualizar(Producto);
+                    var resultado = productoBLL.Actualizar(Producto);
                     if (resultado.Exito)
                         return RedirectToPage("Index");
                     TempData["Error"] = $"<p>El producto <strong>{Producto.ProductName}</strong>:</p>{resultado.Mensaje}";
