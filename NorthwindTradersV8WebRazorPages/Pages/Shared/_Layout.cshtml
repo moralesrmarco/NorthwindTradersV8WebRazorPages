@@ -25,13 +25,68 @@
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-page="/Index">Home</a>
                         </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-page="/Productos/Index">Productos</a>
+
+                        <!-- Menú  empleados con submenús -->
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle text-dark" href="#" id="empleadosDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                Empleados
+                            </a>
+                            <ul class="dropdown-menu" aria-labelledby="empleadosDropdown">
+
+                                <!-- Gestión de empleados -->
+                                <li><a class="dropdown-item" asp-area="" asp-page="/Empleados/Index">Gestión de empleados</a></li>
+                                <li><hr class="dropdown-divider" /></li>
+
+                                <!-- Reportes con submenú -->
+                                <li class="dropdown-submenu">
+                                    <a class="dropdown-item dropdown-toggle" href="#">Reportes</a>
+                                    <ul class="dropdown-menu">
+                                        <li><a class="dropdown-item" asp-page="/Empleados/ReporteDeEmpleados">Reporte de empleados</a></li>
+                                        <li><a class="dropdown-item" asp-page="/Empleados/ReporteDeEmpleadosConFoto">Reporte de empleados con foto</a></li>
+                                        <li><a class="dropdown-item" asp-page="/Empleados/ReporteDeEmpleadosConFoto2">Reporte de empleados con foto 2</a></li>
+                                    </ul>
+                                </li>
+                            </ul>
                         </li>
+
+                        <!-- Menú Productos con submenús -->
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle text-dark" href="#" id="productosDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                Productos
+                            </a>
+                            <ul class="dropdown-menu" aria-labelledby="productosDropdown">
+
+                                <!-- Gestión de productos -->
+                                <li><a class="dropdown-item" asp-area="" asp-page="/Productos/Index">Gestión de productos</a></li>
+                                <li><hr class="dropdown-divider" /></li>
+
+                                <!-- Consultas con submenú -->
+                                <li class="dropdown-submenu">
+                                    <a class="dropdown-item dropdown-toggle" href="#">Consultas</a>
+                                    <ul class="dropdown-menu">
+                                        <li><a class="dropdown-item" asp-page="/Productos/ConsultarPorCategoria">Por categoría</a></li>
+                                        <li><a class="dropdown-item" asp-page="/Productos/ConsultarPorProveedor">Por proveedor</a></li>
+                                        <li><a class="dropdown-item" asp-page="/Productos/ConsultarStock">Stock</a></li>
+                                    </ul>
+                                </li>
+
+                                <!-- Reportes con submenú -->
+                                <li class="dropdown-submenu">
+                                    <a class="dropdown-item dropdown-toggle" href="#">Reportes</a>
+                                    <ul class="dropdown-menu">
+                                        <li><a class="dropdown-item" asp-page="/Productos/ReporteVentas">Ventas</a></li>
+                                        <li><a class="dropdown-item" asp-page="/Productos/ReporteInventario">Inventario</a></li>
+                                        <li><a class="dropdown-item" asp-page="/Productos/ReporteReorden">Nivel de reorden</a></li>
+                                    </ul>
+                                </li>
+                            </ul>
+                        </li>
+
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-page="/Privacy">Privacy</a>
                         </li>
                     </ul>
+
                 </div>
             </div>
         </nav>

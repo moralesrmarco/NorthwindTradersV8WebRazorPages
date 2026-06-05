@@ -29,3 +29,23 @@ body {
 .form-floating > .form-control-plaintext:focus::placeholder, .form-floating > .form-control:focus::placeholder {
   text-align: start;
 }
+
+/* Submenús dentro de dropdown */
+.dropdown-submenu {
+    position: relative;
+}
+
+    .dropdown-submenu > .dropdown-menu {
+        top: 0;
+        left: 100%;
+        margin-top: -1px;
+    }
+
+/* Ajuste para móviles: submenús se muestran debajo */
+@media (max-width: 991px) {
+    .dropdown-submenu > .dropdown-menu {
+        left: 0;
+        margin-left: 1rem;
+        margin-top: 0.5rem;
+    }
+}

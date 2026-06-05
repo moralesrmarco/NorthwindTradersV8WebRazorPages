@@ -12,16 +12,6 @@ namespace NorthwindTradersV8WebRazorPages.DAL
         {
             this.connectionString = connectionString;
         }
-        public DataTable ObtenerProductos()
-        {
-            using var conn = new SqlConnection(connectionString);
-            using var cmd = new SqlCommand("SELECT ProductID, ProductName, UnitPrice, UnitsInStock, Discontinued FROM Products order by productid desc", conn);
-            using var adapter = new SqlDataAdapter(cmd);
-
-            var table = new DataTable();
-            adapter.Fill(table);
-            return table;
-        }
 
         public DataTable ObtenerProductosPaginados(int pageIndex, int pageSize, out int totalRegistros)
         {

@@ -19,6 +19,7 @@
         public byte[]? Photo { get; set; }
         public string? Notes { get; set; }
         public string? PhotoPath { get; set; }
+        public string? ReportsToName { get; set; }
         public byte[]? RowVersion { get; set; }
 
         // Clave foránea hacia otro empleado
