@@ -1,5 +1,7 @@
-﻿using NorthwindTradersV8WebRazorPages.DAL;
+﻿using NorthwindTradersV8WebRazorPages.Common;
+using NorthwindTradersV8WebRazorPages.DAL;
 using NorthwindTradersV8WebRazorPages.Entities;
+using NorthwindTradersV8WebRazorPages.Entities.DTOs;
 using System.Data;
 
 namespace NorthwindTradersV8WebRazorPages.BLL
@@ -11,6 +13,23 @@ namespace NorthwindTradersV8WebRazorPages.BLL
         public EmpleadoBLL(string connectionString)
         {
             empleadoDAL = new EmpleadoDAL(connectionString);
+        }
+
+        public ResultadoOperacion Eliminar(Empleado empleado)
+        {
+            var resultado = new ResultadoOperacion();
+            int numRegs = empleadoDAL.Eliminar(empleado);
+            if (numRegs > 0)
+                resultado.Exito = true;
+            else if (numRegs == -1)
+                resultado.Mensaje = StringsCommons.Nfefe;
+            else if (numRegs == -2)
+                resultado.Mensaje = StringsCommons.Nfefm;
+            else if (numRegs == -3)
+                resultado.Mensaje = StringsCommons.Nferr;
+            else
+                resultado.Mensaje = StringsCommons.Nfemd;
+            return resultado;
         }
         public DataTable ObtenerEmpleadosPaginados(int pageIndex, int pageSize, out int totalRegistros)
         {
@@ -25,5 +44,8 @@ namespace NorthwindTradersV8WebRazorPages.BLL
         {
             return empleadoDAL.ObtenerEmpleadoPorId(id);
         }
+        public EmpleadoRptDto? ObtenerEmpleadoPorIdRptDto(int id) =>
+            empleadoDAL.ObtenerEmpleadoPorIdRptDto(id);
+
     }
 }

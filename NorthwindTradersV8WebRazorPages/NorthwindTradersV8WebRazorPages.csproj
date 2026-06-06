@@ -6,10 +6,37 @@
     <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
 
+  <PropertyGroup>
+    <IsTransformWebConfigDisabled>true</IsTransformWebConfigDisabled>
+  </PropertyGroup>
+
   <ItemGroup>
+    
+    <!-- Paquetes NuGet -->
+    <PackageReference Include="ReportViewerCore.NETCore" Version="15.1.33" />
+
+    <!-- Referencias a proyectos -->
     <ProjectReference Include="..\NorthwindTradersV8WebRazorPages.BLL\NorthwindTradersV8WebRazorPages.BLL.csproj" />
     <ProjectReference Include="..\NorthwindTradersV8WebRazorPages.Common\NorthwindTradersV8WebRazorPages.Common.csproj" />
     <ProjectReference Include="..\NorthwindTradersV8WebRazorPages.Entities\NorthwindTradersV8WebRazorPages.Entities.csproj" />
+
+    <!-- Archivos de configuración -->
+    <Content Update="web.config">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+
+    <!-- Carpeta y archivos de logs -->
+    <Content Include="logs\**">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Folder Include="logs\" />
+
+    <!-- Copiar todos los archivos RDLC en cualquier carpeta -->
+    <Content Include="Pages\**\*.rdlc">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <CopyToPublishDirectory>Always</CopyToPublishDirectory>
+    </Content>
+
   </ItemGroup>
 
 </Project>

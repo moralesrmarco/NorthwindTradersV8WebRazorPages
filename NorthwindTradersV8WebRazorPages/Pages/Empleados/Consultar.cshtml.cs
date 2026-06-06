@@ -1,8 +1,10 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.Reporting.NETCore;
 using NorthwindTradersV8WebRazorPages.BLL;
 using NorthwindTradersV8WebRazorPages.Common;
 using NorthwindTradersV8WebRazorPages.Entities;
+using NorthwindTradersV8WebRazorPages.Entities.DTOs;
 
 namespace NorthwindTradersV8WebRazorPages.Pages.Empleados
 {
@@ -25,6 +27,33 @@ namespace NorthwindTradersV8WebRazorPages.Pages.Empleados
             else
                 Empleado = empleado;
             return Page();
+        }
+
+        // 🔹 Nuevo método para generar el reporte en PDF
+        public IActionResult OnGetReporte(int id)
+        {
+            var empleado = empleadoBLL.ObtenerEmpleadoPorIdRptDto(id);
+            if (empleado == null)
+                return NotFound();
+
+            // Construir la ruta al archivo físico publicado
+            string reportPath = Path.Combine(Directory.GetCurrentDirectory(),
+                                             "Pages", "Empleados", "Reportes", "RptEmpleado.rdlc");
+
+            var localReport = new LocalReport();
+            localReport.ReportPath = reportPath;
+
+            localReport.DataSources.Add(new ReportDataSource("DataSet1", new List<EmpleadoRptDto> { empleado }));
+
+            string mimeType, encoding, fileNameExtension;
+            string[] streams;
+            Warning[] warnings;
+
+            byte[] pdfBytes = localReport.Render(
+                "PDF", null, out mimeType, out encoding,
+                out fileNameExtension, out streams, out warnings);
+
+            return new FileStreamResult(new MemoryStream(pdfBytes), "application/pdf");
         }
     }
 }

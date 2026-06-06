@@ -1,9 +1,11 @@
 ﻿@page "{id:int}"
-@model NorthwindTradersV8WebRazorPages.Pages.Empleados.ConsultarModel
+@model NorthwindTradersV8WebRazorPages.Pages.Empleados.EliminarModel
 @{
 }
-<h2>Detalles del empleado</h2>
+<h2>Eliminar empleado</h2>
 <form method="post" class="form">
+    <p>¿Está seguro de eliminar el empleado con ID: <strong>@Model.Empleado?.EmployeeID</strong> - Nombre de empleado: <strong>@Model.Empleado?.NameByFirstName</strong>?</p>
+
     @if (TempData["Error"] != null)
     {
         <div class="alert alert-danger">@Html.Raw(TempData["Error"])</div>
@@ -95,11 +97,9 @@
         </div>
         <div class="col-md-6 mb-3">
             <label class="form-label">Reporta a</label>
-            @if (Model.Empleado?.ReportsTo != null)
+            @if (!string.IsNullOrEmpty(Model.Empleado?.ReportsToName))
             {
-                <a asp-page="Consultar" asp-route-id="@Model.Empleado.ReportsTo" class="form-control">
-                    @Model.Empleado.ReportsToName
-                </a>
+                <input class="form-control" value="@Model.Empleado.ReportsToName" readonly />
             }
             else
             {
@@ -119,52 +119,38 @@
         </div>
     </div>
 
-    <a href="javascript:history.back()" class="btn btn-sm btn-success me-1">
-        <i class="bi bi-check-circle"></i> Volver
-    </a>
-
     @if (TempData["Error"] != null)
     {
-        <a class="btn btn-sm btn-primary me-1 disabled">
-            <i class="bi bi-printer"></i> Imprimir
+        <a class="btn btn-sm btn-danger me-1 disabled">
+            <i class="bi bi-trash"></i> Eliminar
         </a>
     }
     else
     {
-        <a href="javascript:void(0)"
+        <button type="submit" class="btn btn-sm btn-danger me-1"><i class="bi bi-trash"></i> Eliminar</button>
+
+@*         <a href="javascript:void(0)"
            onclick="disableAndOpen(this, '@Url.Page("Consultar", "Reporte", new { id = Model.Empleado?.EmployeeID })')"
            class="btn btn-sm btn-primary me-1">
             <i class="bi bi-printer"></i> Imprimir
         </a>
+ *@    
     }
+
+    <a asp-page="Index" class="btn btn-sm btn-secondary me-1"><i class="bi bi-x-circle"></i> Cancelar</a>
+
+    <input type="hidden" asp-for="Empleado.RowVersion" />
+
     @section Scripts {
         <script>
-                function openCenteredPopup(url, title, w, h) {
-                    var dualScreenLeft = window.screenLeft !== undefined ? window.screenLeft : window.screenX;
-                    var dualScreenTop = window.screenTop !== undefined ? window.screenTop : window.screenY;
-
-                    var width = window.innerWidth || document.documentElement.clientWidth || screen.width;
-                    var height = window.innerHeight || document.documentElement.clientHeight || screen.height;
-
-                    var left = ((width / 2) - (w / 2)) + dualScreenLeft;
-                    var top = ((height / 2) - (h / 2)) + dualScreenTop;
-
-                    var newWindow = window.open(url, title,
-                        'scrollbars=yes,resizable=yes,toolbar=no,location=no,status=no,menubar=no,width=' + w + ',height=' + h + ',top=' + top + ',left=' + left);
-
-                    if (window.focus) {
-                        newWindow.focus();
-                    }
+            function disableDeleteButton() {
+                var btn = document.getElementById("btnEliminar");
+                if (btn) {
+                    btn.disabled = true; // deshabilita el botón
+                    btn.innerHTML = '<i class="bi bi-trash"></i> Eliminando...'; // opcional: cambia el texto
                 }
-
-                function disableAndOpen(button, url) {
-                    // Quitar el onclick para evitar más clics
-                    button.onclick = null;
-                    // Agregar clase Bootstrap disabled
-                    button.classList.add("disabled");
-                    // Abrir el popup
-                    openCenteredPopup(url, 'ReporteEmpleado', 900, 700);
-                }
+                return true; // permite que el formulario se envíe
+            }        
         </script>
     }
 </form>
