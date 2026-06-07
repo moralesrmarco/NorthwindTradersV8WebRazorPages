@@ -32,6 +32,14 @@ namespace NorthwindTradersV8WebRazorPages.DAL.Helpers
                     Value = "0",
                     Text = "»--- Seleccione ---«"
                 });
+                if (storedProcedure == "SpEmpleadoObtenerEmpleadosCbo")
+                {
+                    items.Add(new ComboItemDto
+                    {
+                        Value = "-1",
+                        Text = "N/A"
+                    });
+                }
 
                 // Tomamos la primera y segunda columna sin importar el nombre
                 foreach (DataRow row in dtTemp.Rows)

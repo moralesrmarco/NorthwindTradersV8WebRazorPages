@@ -7,7 +7,7 @@ namespace NorthwindTradersV8WebRazorPages.Pages.Empleados
     public class IndexModel : PageModel
     {
         private readonly EmpleadoBLL empleadoBLL;
-        public DataTable Empleados { get; set; }
+        public DataTable Empleados { get; set; } = new DataTable();
         public int PageIndex { get; set; } = 1;
         public int TotalPages { get; set; }
         private const int PageSize = 20;

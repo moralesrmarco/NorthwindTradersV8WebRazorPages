@@ -1,10 +1,8 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using Microsoft.Reporting.NETCore;
 using NorthwindTradersV8WebRazorPages.BLL;
 using NorthwindTradersV8WebRazorPages.Common;
 using NorthwindTradersV8WebRazorPages.Entities;
-using NorthwindTradersV8WebRazorPages.Entities.DTOs;
 
 namespace NorthwindTradersV8WebRazorPages.Pages.Empleados
 {

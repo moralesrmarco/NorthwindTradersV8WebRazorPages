@@ -5,18 +5,39 @@ namespace NorthwindTradersV8WebRazorPages.Entities
     public class Empleado
     {
         public int EmployeeID { get; set; }
+        [Required(ErrorMessage = "Ingrese apellido")]
+        [StringLength(20, ErrorMessage = "Los apellidos no puede exceder de 20 caracteres")] 
         public string? LastName { get; set; }
+        [Required(ErrorMessage = "Ingrese nombre")]
+        [StringLength(10, ErrorMessage = "El nombre no puede exceder de 10 caracteres")] 
         public string? FirstName { get; set; }
+        [Required(ErrorMessage = "Ingrese título")]
+        [StringLength(30, ErrorMessage = "El título no puede exceder de 30 caracteres")] 
         public string? Title { get; set; }
+        [Required(ErrorMessage = "Ingrese título de cortesía")]
+        [StringLength(25, ErrorMessage = "El título de cortesía no puede exceder de 25 caracteres")] 
         public string? TitleOfCourtesy { get; set; }
+        [Required(ErrorMessage = "Ingrese la fecha de nacimiento")] 
         public DateTime? BirthDate { get; set; }
+        [Required(ErrorMessage = "Ingrese la fecha de contratación")] 
         public DateTime? HireDate { get; set; }
+        [Required(ErrorMessage = "Ingrese domicilio")]
+        [StringLength(60, ErrorMessage = "El domicilio no puede exceder de 60 caracteres")] 
         public string? Address { get; set; }
+        [Required(ErrorMessage = "Ingrese ciudad")]
+        [StringLength(15, ErrorMessage = "La ciudad no puede exceder de 15 caracteres")] 
         public string? City { get; set; }
+        [StringLength(15, ErrorMessage = "La región no puede exceder de 15 caracteres")] 
         public string? Region { get; set; }
+        [StringLength(10, ErrorMessage = "El código postal no puede exceder de 10 caracteres")] 
         public string? PostalCode { get; set; }
+        [Required(ErrorMessage = "Ingrese o seleccione el país")]
+        [StringLength(15, ErrorMessage = "El país no puede exceder de 15 caracteres")]
         public string? Country { get; set; }
+        [Required(ErrorMessage = "Ingrese teléfono")]
+        [StringLength(24, ErrorMessage = "El teléfono no puede exceder de 24 caracteres")] 
         public string? HomePhone { get; set; }
+        [StringLength(4, ErrorMessage = "La extensión no puede exceder de 4 caracteres")] 
         public string? Extension { get; set; }
         public byte[]? Photo { get; set; }
         public string? Notes { get; set; }

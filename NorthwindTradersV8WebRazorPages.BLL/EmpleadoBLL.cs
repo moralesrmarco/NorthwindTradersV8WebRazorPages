@@ -14,7 +14,16 @@ namespace NorthwindTradersV8WebRazorPages.BLL
         {
             empleadoDAL = new EmpleadoDAL(connectionString);
         }
-
+        public ResultadoOperacion Insertar(Empleado empleado)
+        {
+            var resultado = new ResultadoOperacion();
+            int numRegs = empleadoDAL.Insertar(empleado);
+            if (numRegs > 0)
+                resultado.Exito = true;
+            else
+                resultado.Mensaje = StringsCommons.Nfrs;
+            return resultado;
+        }
         public ResultadoOperacion Eliminar(Empleado empleado)
         {
             var resultado = new ResultadoOperacion();
