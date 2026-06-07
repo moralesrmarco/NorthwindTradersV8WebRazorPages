@@ -1,8 +1,8 @@
-﻿@page
-@model NorthwindTradersV8WebRazorPages.Pages.Empleados.InsertarModel
+﻿@page "{id:int}"
+@model NorthwindTradersV8WebRazorPages.Pages.Empleados.EditarModel
 @{
 }
-<h2>Nuevo empleado</h2>
+<h2>Editar empleado</h2>
 <form method="post" class="form" enctype="multipart/form-data">
     @if (TempData["Error"] != null)
     {
@@ -12,33 +12,50 @@
         <div class="col-md-12 mb-3 d-flex align-items-end">
             <!-- Imagen por defecto o previa -->
             <img id="previewFoto"
-                 src="@(Model.FotoTemporalBase64 != null
-                              ? $"data:{Model.FotoMime};base64,{Model.FotoTemporalBase64}"
-                              : Url.Content("~/images/FotoPerfil.png"))"
+                 src="@(!string.IsNullOrEmpty(Model.FotoTemporalBase64)
+                            ? $"data:{Model.FotoMime};base64,{Model.FotoTemporalBase64}"
+                            : $"/Empleados/Foto?id={Model.Empleado?.EmployeeID}" )"
                  alt="Foto del empleado"
                  class="img-thumbnail"
                  style="max-width:150px; max-height:150px;" />
-
+                 
             <!-- Campo oculto para subir archivo -->
-            <input type="file" asp-for="Foto" id="fileFoto" class="d-none" accept="image/*" />
-
+             <input type="file" asp-for="Foto" id="fileFoto" class="d-none" accept="image/*" />
+ 
             <!-- Botón que dispara el input file -->
-            <button type="button"
-                    class="btn btn-primary ms-2"
-                    style="padding:2px 6px; font-size:0.7rem;"
-                    onclick="document.getElementById('fileFoto').click();">
-                <i class="bi bi-camera"></i>
-                Cargar imagen...
-            </button>
+            @if (Model.Empleado?.EmployeeID <= 9)
+            {
+                <button type="button"
+                        class="btn btn-secondary ms-2"
+                        style="padding:2px 6px; font-size:0.7rem;"
+                        disabled>
+                    <i class="bi bi-camera"></i>
+                    Imagen protegida
+                </button>
+            }
+            else
+            {
+                <button type="button"
+                        class="btn btn-primary ms-2"
+                        style="padding:2px 6px; font-size:0.7rem;"
+                        onclick="document.getElementById('fileFoto').click();">
+                    <i class="bi bi-camera"></i>
+                    Cargar imagen...
+                </button>
+            }
         </div>
     </div>
     <div class="row">
-        <div class="col-md-6 mb-3">
+        <div class="col-md-2 mb-3">
+            <label asp-for="Empleado.EmployeeID" class="form-label">ID</label>
+            <input asp-for="Empleado.EmployeeID" class="form-control" readonly />
+        </div>
+        <div class="col-md-5 mb-3">
             <label asp-for="Empleado.FirstName" class="form-label">Nombres</label>
             <input asp-for="Empleado.FirstName" class="form-control" />
             <span asp-validation-for="Empleado.FirstName" class="text-danger"></span>
         </div>
-        <div class="col-md-6 mb-3">
+        <div class="col-md-5 mb-3">
             <label asp-for="Empleado.LastName" class="form-label">Apellidos</label>
             <input asp-for="Empleado.LastName" class="form-control" />
             <span asp-validation-for="Empleado.LastName" class="text-danger"></span>
@@ -125,6 +142,7 @@
                       style="resize:none; overflow-y:auto; max-height:200px;"></textarea>
         </div>
     </div>
+    <input type="hidden" asp-for="Empleado.RowVersion" />
     <input type="hidden" asp-for="FotoTemporalBase64" />
     <input type="hidden" asp-for="FotoMime" />
     <button type="submit" class="btn btn-sm btn-success me-1"><i class="bi bi-save"></i> Guardar</button>

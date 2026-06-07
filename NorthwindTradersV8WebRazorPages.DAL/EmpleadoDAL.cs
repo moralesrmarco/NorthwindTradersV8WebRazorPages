@@ -32,7 +32,6 @@ namespace NorthwindTradersV8WebRazorPages.DAL
                     cmd.Parameters.AddWithValue("@Ciudad", empleado.City ?? (object)DBNull.Value);
                     cmd.Parameters.AddWithValue("@Region", empleado.Region ?? (object)DBNull.Value);
                     cmd.Parameters.AddWithValue("@CodigoP", empleado.PostalCode ?? (object)DBNull.Value);
-                    //cmd.Parameters.AddWithValue("@Pais", empleado.Country ?? (object)DBNull.Value);
                     cmd.Parameters.AddWithValue("@Pais",
                         string.IsNullOrWhiteSpace(empleado.Country) || empleado.Country == "0"
                             ? (object)DBNull.Value
@@ -40,7 +39,6 @@ namespace NorthwindTradersV8WebRazorPages.DAL
                     cmd.Parameters.AddWithValue("@Telefono", empleado.HomePhone ?? (object)DBNull.Value);
                     cmd.Parameters.AddWithValue("@Extension", empleado.Extension ?? (object)DBNull.Value);
                     cmd.Parameters.AddWithValue("@Notas", empleado.Notes ?? (object)DBNull.Value);
-                    //cmd.Parameters.AddWithValue("@Reportaa", empleado.ReportsTo ?? (object)DBNull.Value);
                     cmd.Parameters.AddWithValue("@Reportaa", string.IsNullOrWhiteSpace(empleado.ReportsTo.ToString()) || empleado.ReportsTo == -1
                         ? (object)DBNull.Value
                         : empleado.ReportsTo);
@@ -57,7 +55,54 @@ namespace NorthwindTradersV8WebRazorPages.DAL
             }
             return numRegs;
         }
-
+        public int Actualizar(Empleado empleado)
+        {
+            int numRegs = 0;
+            try
+            {
+                using (var con = new SqlConnection(connectionString))
+                using (var cmd = new SqlCommand("SpEmpleadoActualizar", con))
+                {
+                    cmd.CommandType = CommandType.StoredProcedure;
+                    cmd.Parameters.AddWithValue("@Id", empleado.EmployeeID);
+                    cmd.Parameters.AddWithValue("@Nombres", empleado.FirstName ?? (object)DBNull.Value);
+                    cmd.Parameters.AddWithValue("@Apellidos", empleado.LastName ?? (object)DBNull.Value);
+                    cmd.Parameters.AddWithValue("@Titulo", empleado.Title ?? (object)DBNull.Value);
+                    cmd.Parameters.AddWithValue("@TitCortesia", empleado.TitleOfCourtesy ?? (object)DBNull.Value);
+                    cmd.Parameters.AddWithValue("@FNacimiento", empleado.BirthDate ?? (object)DBNull.Value);
+                    cmd.Parameters.AddWithValue("@FContratacion", empleado.HireDate ?? (object)DBNull.Value);
+                    cmd.Parameters.AddWithValue("@Domicilio", empleado.Address ?? (object)DBNull.Value);
+                    cmd.Parameters.AddWithValue("@Ciudad", empleado.City ?? (object)DBNull.Value);
+                    cmd.Parameters.AddWithValue("@Region", empleado.Region ?? (object)DBNull.Value);
+                    cmd.Parameters.AddWithValue("@CodigoP", empleado.PostalCode ?? (object)DBNull.Value);
+                    cmd.Parameters.AddWithValue("@Pais",
+                        string.IsNullOrWhiteSpace(empleado.Country) || empleado.Country == "0"
+                            ? (object)DBNull.Value
+                            : empleado.Country);
+                    cmd.Parameters.AddWithValue("@Telefono", empleado.HomePhone ?? (object)DBNull.Value);
+                    cmd.Parameters.AddWithValue("@Extension", empleado.Extension ?? (object)DBNull.Value);
+                    cmd.Parameters.AddWithValue("@Notas", empleado.Notes ?? (object)DBNull.Value);
+                    cmd.Parameters.AddWithValue("@Reportaa", string.IsNullOrWhiteSpace(empleado.ReportsTo.ToString()) || empleado.ReportsTo == -1
+                        ? (object)DBNull.Value
+                        : empleado.ReportsTo);
+                    var pPhoto = cmd.Parameters.Add("@Foto", SqlDbType.VarBinary, -1);
+                    pPhoto.Value = empleado.Photo ?? (object)DBNull.Value;
+                    var pRrowVersion = cmd.Parameters.Add("@RowVersion", SqlDbType.Binary, 8);
+                    pRrowVersion.Value = empleado.RowVersion ?? (object)DBNull.Value;
+                    // Parámetro de retorno
+                    var returnParameter = cmd.Parameters.Add("@ReturnVal", SqlDbType.Int);
+                    returnParameter.Direction = ParameterDirection.ReturnValue;
+                    con.Open();
+                    cmd.ExecuteNonQuery();
+                    numRegs = (int)returnParameter.Value;
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Error al actualizar el empleado." + ex.Message);
+            }
+            return numRegs;
+        }
         public int Eliminar(Empleado empleado)
         {
             int numRegs = 0;
