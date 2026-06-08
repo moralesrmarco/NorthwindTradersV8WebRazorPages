@@ -28,6 +28,7 @@ namespace NorthwindTradersV8WebRazorPages.BLL
         {
             var resultado = new ResultadoOperacion();
             int numRegs = empleadoDAL.Actualizar(empleado);
+            resultado.Codigo = numRegs;
             if (numRegs > 0)
                 resultado.Exito = true;
             else if (numRegs == -1)

@@ -3,11 +3,18 @@
 @{
 }
 <h2>Editar empleado</h2>
-<form method="post" class="form" enctype="multipart/form-data">
+<form method="post"
+      class="form"
+      enctype="multipart/form-data"
+      onsubmit="return disableSaveButton();">
+
     @if (TempData["Error"] != null)
     {
         <div class="alert alert-danger">@Html.Raw(TempData["Error"])</div>
     }
+
+    <fieldset @(Model.BloquearEdicion ? "disabled" : "")>
+
     <div class="row">
         <div class="col-md-12 mb-3 d-flex align-items-end">
             <!-- Imagen por defecto o previa -->
@@ -98,11 +105,12 @@
     <div class="row">
         <div class="col-md-4 mb-3">
             <label asp-for="Empleado.Country" class="form-label">País</label>
-            <select id="cboPais" asp-for="Empleado.Country"
-                    asp-items="Model.Paises"
-                    class="form-select">
-            </select>
-            <span asp-validation-for="Empleado.Country" class="text-danger"></span>
+                <select id="cboPais"
+                        asp-for="Empleado.Country"
+                        asp-items="Model.Paises"
+                        class="form-select"
+                        disabled="@Model.BloquearEdicion">
+                </select>            <span asp-validation-for="Empleado.Country" class="text-danger"></span>
         </div>
         <div class="col-md-4 mb-3">
             <label asp-for="Empleado.HomePhone" class="form-label">Teléfono</label>
@@ -145,45 +153,63 @@
     <input type="hidden" asp-for="Empleado.RowVersion" />
     <input type="hidden" asp-for="FotoTemporalBase64" />
     <input type="hidden" asp-for="FotoMime" />
-    <button type="submit" class="btn btn-sm btn-success me-1"><i class="bi bi-save"></i> Guardar</button>
-    <a asp-page="Index" class="btn btn-sm btn-secondary me-1"><i class="bi bi-x-circle"></i> Cancelar</a>
+
+    </fieldset>
+
+    <button id="btnGuardar"
+            type="submit"
+            class="btn btn-sm btn-success me-1"
+            disabled="@Model.BloquearEdicion">
+        <i class="bi bi-save"></i> Guardar
+    </button>
+
+    <a asp-page="Index" class="btn btn-sm btn-secondary me-1">
+        <i class="bi bi-x-circle"></i> Cancelar
+    </a>
 
     @section Scripts {
         <script>
                 $(function () {
+
                     $('#cboPais').select2({
                         tags: true,
                         placeholder: 'Seleccione o escriba un país',
                         width: '100%'
                     });
+
+                    $('#cboPais').trigger('change');
                 });
 
                 document.getElementById('fileFoto').addEventListener('change', function (event) {
-
                     const file = event.target.files[0];
-
                     if (!file)
                         return;
-
                     const reader = new FileReader();
-
                     reader.onload = function (e) {
-
                         // Vista previa
                         document.getElementById('previewFoto').src =
                             e.target.result;
-
                         // Guardar Base64 en el hidden
                         document.getElementById('FotoTemporalBase64').value =
                             e.target.result.split(',')[1];
-
                         // Guardar tipo MIME
                         document.getElementById('FotoMime').value =
                             file.type;
                     };
-
                     reader.readAsDataURL(file);
                 });
+                
+                function disableSaveButton() {
+                    var btn = document.getElementById("btnGuardar");
+
+                    if (btn) {
+                        btn.disabled = true;
+                        btn.innerHTML =
+                            '<i class="bi bi-save"></i> Guardando...';
+                    }
+
+                    return true;
+                }
         </script>
     }
 </form>

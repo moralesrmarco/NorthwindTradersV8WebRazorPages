@@ -36,17 +36,13 @@ namespace NorthwindTradersV8WebRazorPages.Pages.Empleados
             {
                 var resultado = empleadoBLL.Eliminar(Empleado);
                 if (resultado.Exito)
-                {
                     return RedirectToPage("Index");
-                }
                 else
                 {
                     TempData["Error"] = $"<p>El empleado con Id: <strong>{Empleado.EmployeeID}</strong> - Nombre de empleado: <strong>{Empleado.NameByFirstName}</strong>:</p>{resultado.Mensaje}";
                     // Sólo bloquea para errores definitivos
                     if (resultado.Codigo < 0)
-                    {
                         BloquearEliminacion = true;
-                    }
                 }
             }
             return Page();
