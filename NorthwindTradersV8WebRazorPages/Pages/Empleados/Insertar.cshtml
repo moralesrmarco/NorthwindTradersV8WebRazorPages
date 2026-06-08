@@ -127,7 +127,11 @@
     </div>
     <input type="hidden" asp-for="FotoTemporalBase64" />
     <input type="hidden" asp-for="FotoMime" />
-    <button type="submit" class="btn btn-sm btn-success me-1"><i class="bi bi-save"></i> Guardar</button>
+    <button type="submit"
+            id="btnGuardar"
+            class="btn btn-sm btn-success me-1">
+        <i class="bi bi-save"></i> Guardar
+    </button>
     <a asp-page="Index" class="btn btn-sm btn-secondary me-1"><i class="bi bi-x-circle"></i> Cancelar</a>
 
     @section Scripts {
@@ -140,30 +144,46 @@
                     });
                 });
 
+                // Configurar jQuery Validation para interceptar el submit
+                $("form").validate({
+                    submitHandler: function (form) {
+                        const btnGuardar = document.getElementById('btnGuardar');
+                        btnGuardar.disabled = true;
+                        btnGuardar.innerHTML = '<i class="bi bi-hourglass-split"></i> Procesando...';
+                        form.submit(); // ahora sí envía al servidor
+                    }
+                });
+
+                // Reactivar botón si hay error del servidor distinto a Nfrs
+                const errorDiv = document.querySelector('.alert-danger');
+                if (errorDiv) {
+                    const mensajeError = errorDiv.textContent || "";
+                    const btnGuardar = document.getElementById('btnGuardar');
+
+                    // Solo reactivar si el mensaje no es StringsCommons.Nfrs
+                    if (!mensajeError.includes("StringsCommons.Nfrs")) {
+                        btnGuardar.disabled = false;
+                        btnGuardar.innerHTML = '<i class="bi bi-save"></i> Guardar';
+                    }
+                }
+
+                // Manejo de la foto
                 document.getElementById('fileFoto').addEventListener('change', function (event) {
-
                     const file = event.target.files[0];
-
                     if (!file)
                         return;
-
                     const reader = new FileReader();
-
                     reader.onload = function (e) {
-
                         // Vista previa
                         document.getElementById('previewFoto').src =
                             e.target.result;
-
                         // Guardar Base64 en el hidden
                         document.getElementById('FotoTemporalBase64').value =
                             e.target.result.split(',')[1];
-
                         // Guardar tipo MIME
                         document.getElementById('FotoMime').value =
                             file.type;
                     };
-
                     reader.readAsDataURL(file);
                 });
         </script>

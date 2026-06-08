@@ -11,6 +11,7 @@ namespace NorthwindTradersV8WebRazorPages.Pages.Empleados
         private readonly EmpleadoBLL empleadoBLL;
         [BindProperty]
         public Empleado? Empleado { get; set; } = new Empleado();
+        public bool BloquearEliminacion { get; set; }
         public EliminarModel(IConfiguration configuration)
         {
             var connectionString = configuration.GetConnectionString("NorthwindConnection")
@@ -21,7 +22,10 @@ namespace NorthwindTradersV8WebRazorPages.Pages.Empleados
         {
             var empleado = empleadoBLL.ObtenerEmpleadoPorId(id);
             if (empleado == null)
+            {
                 TempData["Error"] = "<p>Empleado no encontrado</p>" + StringsCommons.Nefep;
+                BloquearEliminacion = true;
+            }
             else
                 Empleado = empleado;
             return Page();
@@ -38,6 +42,11 @@ namespace NorthwindTradersV8WebRazorPages.Pages.Empleados
                 else
                 {
                     TempData["Error"] = $"<p>El empleado con Id: <strong>{Empleado.EmployeeID}</strong> - Nombre de empleado: <strong>{Empleado.NameByFirstName}</strong>:</p>{resultado.Mensaje}";
+                    // Sólo bloquea para errores definitivos
+                    if (resultado.Codigo < 0)
+                    {
+                        BloquearEliminacion = true;
+                    }
                 }
             }
             return Page();
