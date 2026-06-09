@@ -72,5 +72,14 @@ namespace NorthwindTradersV8WebRazorPages.BLL
         public EmpleadoRptDto? ObtenerEmpleadoPorIdRptDto(int id) =>
             empleadoDAL.ObtenerEmpleadoPorIdRptDto(id);
 
+        public DataTable BuscarEmpleados(EmpleadosBuscarDto filtro)
+        {
+            if (filtro.Pais == "0")
+            {
+                filtro.Pais = "";
+            }
+            return empleadoDAL.BuscarEmpleados(filtro);
+        }
+
     }
 }

@@ -3,8 +3,11 @@
 @{
 }
 <h2>Lista de empleados</h2>
-<a asp-page="Insertar" class="btn btn-sm btn-primary mb-3">
+<a asp-page="Insertar" class="btn btn-sm btn-primary mb-3" asp-route-returnUrl="@Url.Page("Index")">
     <i class="bi bi-plus-circle"></i> Nuevo empleado
+</a>
+<a asp-page="Buscar" class="btn btn-sm btn-buscar mb-3">
+    <i class="bi bi-search"></i> Buscar empleado
 </a>
 <nav aria-label="Page navigation">
     <ul class="pagination justify-content-center">
@@ -42,9 +45,9 @@
             <tr>
                 <td class="text-center">
                     <img src="/Empleados/Foto?id=@row["EmployeeID"]"
-                         alt="Foto"
-                         class="img-thumbnail"
-                         style="max-width: 80px; max-height: 80px;" />
+                            alt="Foto"
+                            class="img-thumbnail"
+                            style="max-width: 80px; max-height: 80px;" />
                 </td>
                 <td class="text-center">@row["EmployeeID"]</td>
                 <td>@row["FirstName"]</td>
@@ -52,43 +55,49 @@
                 <td class="text-center">@row["Country"]</td>
                 <td class="text-center">@row["ReportsToName"]</td>
                 <td class="text-center">
-                    <td class="text-center">
-                        <a asp-page="Consultar" asp-route-id="@row["EmployeeID"]"
-                           class="btn btn-sm btn-success me-1 action-btn">
-                            <i class="bi bi-search"></i> Consultar
-                        </a>
-                        <a asp-page="Editar" asp-route-id="@row["EmployeeID"]"
-                           class="btn btn-sm btn-warning me-1 action-btn">
-                            <i class="bi bi-pencil"></i> Editar
-                        </a>
-                        <a asp-page="Eliminar" asp-route-id="@row["EmployeeID"]"
-                           class="btn btn-sm btn-danger me-1 action-btn">
-                            <i class="bi bi-trash"></i> Eliminar
-                        </a>
-                    </td>
-                </tr>
-            }
-        </tbody>
-    </table>
+                    <a asp-page="Consultar" 
+                    asp-route-id="@row["EmployeeID"]"
+                    asp-route-returnUrl="@Url.Page("Index")"
+                    class="btn btn-sm btn-success me-1 action-btn">
+                        <i class="bi bi-check-square"></i> Consultar
+                    </a>
+                    <a asp-page="Editar"
+                       asp-route-id="@row["EmployeeID"]"
+                       asp-route-returnUrl="@Url.Page("Index")"
+                       class="btn btn-sm btn-warning me-1 action-btn">
+                        <i class="bi bi-pencil"></i> Editar
+                    </a>
+                    <a asp-page="Eliminar"
+                       asp-route-id="@row["EmployeeID"]"
+                       asp-route-returnUrl="@Url.Page("Index")"
+                       class="btn btn-sm btn-danger me-1 action-btn">
+                        <i class="bi bi-trash"></i> Eliminar
+                    </a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
 
-    <nav aria-label="Page navigation">
-        <ul class="pagination justify-content-center">
-            <li class="page-item @(Model.PageIndex == 1 ? "disabled" : "")">
-                <a class="page-link" asp-page="Index" asp-route-pageIndex="@(Model.PageIndex - 1)">Anterior</a>
+<nav aria-label="Page navigation">
+    <ul class="pagination justify-content-center">
+        <li class="page-item @(Model.PageIndex == 1 ? "disabled" : "")">
+            <a class="page-link" asp-page="Index" asp-route-pageIndex="@(Model.PageIndex - 1)">Anterior</a>
+        </li>
+
+        @for (int i = 1; i <= Model.TotalPages; i++)
+        {
+            <li class="page-item @(i == Model.PageIndex ? "active" : "")">
+                <a class="page-link" asp-page="Index" asp-route-pageIndex="@i">@i</a>
             </li>
+        }
 
-            @for (int i = 1; i <= Model.TotalPages; i++)
-            {
-                <li class="page-item @(i == Model.PageIndex ? "active" : "")">
-                    <a class="page-link" asp-page="Index" asp-route-pageIndex="@i">@i</a>
-                </li>
-            }
-
-            <li class="page-item @(Model.PageIndex == Model.TotalPages ? "disabled" : "")">
-                <a class="page-link" asp-page="Index" asp-route-pageIndex="@(Model.PageIndex + 1)">Siguiente</a>
-            </li>
-        </ul>
-    </nav>
+        <li class="page-item @(Model.PageIndex == Model.TotalPages ? "disabled" : "")">
+            <a class="page-link" asp-page="Index" asp-route-pageIndex="@(Model.PageIndex + 1)">Siguiente</a>
+        </li>
+    </ul>
+</nav>
+@section Scripts {
     <script>
         document.addEventListener("DOMContentLoaded", function () {
             const buttons = document.querySelectorAll(".action-btn");
@@ -104,3 +113,4 @@
             });
         });
     </script>
+}

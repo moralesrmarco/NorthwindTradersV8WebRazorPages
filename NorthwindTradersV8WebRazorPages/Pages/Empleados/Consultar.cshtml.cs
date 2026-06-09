@@ -13,6 +13,9 @@ namespace NorthwindTradersV8WebRazorPages.Pages.Empleados
         private readonly EmpleadoBLL empleadoBLL;
         [BindProperty]
         public Empleado? Empleado { get; set; } = new Empleado();
+        [BindProperty(SupportsGet = true)]
+        public string? ReturnUrl { get; set; }
+
         public ConsultarModel(IConfiguration configuration)
         {
             var connectionString = configuration.GetConnectionString("NorthwindConnection")

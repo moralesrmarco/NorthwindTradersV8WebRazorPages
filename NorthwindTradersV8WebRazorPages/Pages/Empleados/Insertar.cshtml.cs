@@ -23,6 +23,8 @@ namespace NorthwindTradersV8WebRazorPages.Pages.Empleados
         public string? FotoTemporalBase64 { get; set; }
         [BindProperty]
         public string? FotoMime { get; set; }
+        [BindProperty(SupportsGet = true)]
+        public string? ReturnUrl { get; set; }
         public InsertarModel(IConfiguration configuration)
         {
             var connectionString = configuration.GetConnectionString("NorthwindConnection")

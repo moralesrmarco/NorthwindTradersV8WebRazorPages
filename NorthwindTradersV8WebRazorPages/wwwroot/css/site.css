@@ -49,3 +49,26 @@ body {
         margin-top: 0.5rem;
     }
 }
+
+.btn-buscar {
+    background-color: #099BC8;
+    border-color: #099BC8;
+    color: white;
+}
+
+.btn-buscar:hover {
+    background-color: #27C5F5;
+    border-color: #27C5F5;
+}
+
+.btn-cancelar {
+    background-color: #701705;
+    border-color: #701705;
+    color: white;
+}
+
+.btn-cancelar:hover {
+    background-color: #9C2007;
+    border-color: #9C2007;
+    color: white;
+}

@@ -12,6 +12,8 @@ namespace NorthwindTradersV8WebRazorPages.Pages.Empleados
         [BindProperty]
         public Empleado? Empleado { get; set; } = new Empleado();
         public bool BloquearEliminacion { get; set; }
+        [BindProperty(SupportsGet = true)]
+        public string? ReturnUrl { get; set; }
         public EliminarModel(IConfiguration configuration)
         {
             var connectionString = configuration.GetConnectionString("NorthwindConnection")

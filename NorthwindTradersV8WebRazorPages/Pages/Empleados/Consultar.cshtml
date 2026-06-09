@@ -98,7 +98,10 @@
             <label class="form-label">Reporta a</label>
             @if (Model.Empleado?.ReportsTo != null)
             {
-                <a asp-page="Consultar" asp-route-id="@Model.Empleado.ReportsTo" class="form-control">
+                <a asp-page="Consultar"
+                   asp-route-id="@Model.Empleado.ReportsTo"
+                   asp-route-returnUrl="@Model.ReturnUrl"
+                   class="form-control">
                     @Model.Empleado.ReportsToName
                 </a>
             }
@@ -120,7 +123,8 @@
         </div>
     </div>
 
-    <a href="javascript:history.back()" class="btn btn-sm btn-success me-1">
+    <a href="@(Model.ReturnUrl ?? Url.Page("Index"))"
+       class="btn btn-sm btn-success me-1">
         <i class="bi bi-check-circle"></i> Volver
     </a>
 

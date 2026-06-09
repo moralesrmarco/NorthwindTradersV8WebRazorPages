@@ -1,0 +1,221 @@
+﻿@page
+@model NorthwindTradersV8WebRazorPages.Pages.Empleados.BuscarModel
+@{
+}
+<h2>Buscar empleado</h2>
+<form method="get">
+
+    <div class="row mb-3">
+        <div class="col-md-3">
+            <label asp-for="Filtro.IdIni" class="form-label">Id inicial</label>
+            <input asp-for="Filtro.IdIni" id="txtIdIni" class="form-control" />
+            <span asp-validation-for="Filtro.IdIni" class="text-danger"></span>
+        </div>
+        <div class="col-md-3">
+            <label asp-for="Filtro.IdFin" class="form-label">Id final</label>
+            <input asp-for="Filtro.IdFin" id="txtIdFin" class="form-control" />
+            <span asp-validation-for="Filtro.IdFin" class="text-danger"></span>
+        </div>
+        <div class="col-md-3">
+            <label asp-for="Filtro.Nombres" class="form-label">Nombres</label>
+            <input asp-for="Filtro.Nombres" class="form-control" />
+        </div>
+        <div class="col-md-3">
+            <label asp-for="Filtro.Apellidos" class="form-label">Apellidos</label>
+            <input asp-for="Filtro.Apellidos" class="form-control" />
+        </div>
+    </div>
+
+    <div class="row mb-3">
+        <div class="col-md-3">
+            <label asp-for="Filtro.Titulo" class="form-label">Título</label>
+            <input asp-for="Filtro.Titulo" class="form-control" />
+        </div>
+        <div class="col-md-3">
+            <label asp-for="Filtro.Domicilio" class="form-label">Domicilio</label>
+            <input asp-for="Filtro.Domicilio" class="form-control" />
+        </div>
+        <div class="col-md-3">
+            <label asp-for="Filtro.Ciudad" class="form-label">Ciudad</label>
+            <input asp-for="Filtro.Ciudad" class="form-control" />
+        </div>
+        <div class="col-md-3">
+            <label asp-for="Filtro.Region" class="form-label">Región</label>
+            <input asp-for="Filtro.Region" class="form-control" />
+        </div>
+    </div>
+
+    <div class="row mb-3">
+        <div class="col-md-3">
+            <label asp-for="Filtro.CodigoP" class="form-label">Código Postal</label>
+            <input asp-for="Filtro.CodigoP" class="form-control" />
+        </div>
+        <div class="col-md-4">
+            <label asp-for="Filtro.Pais" class="form-label">País</label>
+            <select asp-for="Filtro.Pais"
+                    asp-items="Model.Paises"
+                    class="form-select">
+            </select>
+        </div>
+        <div class="col-md-4">
+            <label asp-for="Filtro.Telefono" class="form-label">Teléfono</label>
+            <input asp-for="Filtro.Telefono" class="form-control" />
+        </div>
+    </div>
+
+    <div class="row mb-3">
+        <div class="col-md-6 d-flex gap-2">
+
+            <button type="submit" class="btn btn-sm btn-buscar">
+                <i class="bi bi-search"></i> Buscar
+            </button>
+
+            <a asp-page="./Buscar"
+               class="btn btn-sm btn-primary">
+                <i class="bi bi-eraser"></i> Limpiar
+            </a>
+
+            <a asp-page="/Empleados/Index"
+               class="btn btn-sm btn-cancelar">
+                <i class="bi bi-x-circle"></i> Cancelar
+            </a>
+
+        </div>
+    </div>
+    @if (Model.SeBusco)
+    {
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th class="text-center">Foto</th>
+                    <th class="text-center">ID</th>
+                    <th>Nombres</th>
+                    <th>Apellidos</th>
+                    <th class="text-center">País</th>
+                    <th class="text-center">Reporta a</th>
+                    <th class="text-center">Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (System.Data.DataRow row in Model.Empleados.Rows)
+                {
+                    <tr>
+                        <td class="text-center">
+                            <img src="/Empleados/Foto?id=@row["EmployeeID"]"
+                                 alt="Foto"
+                                 class="img-thumbnail"
+                                 style="max-width: 80px; max-height: 80px;" />
+                        </td>
+                        <td class="text-center">@row["EmployeeID"]</td>
+                        <td>@row["FirstName"]</td>
+                        <td>@row["LastName"]</td>
+                        <td class="text-center">@row["Country"]</td>
+                        <td class="text-center">@row["ReportsToName"]</td>
+                        <td class="text-center">
+                            <a asp-page="Consultar" 
+                            asp-route-id="@row["EmployeeID"]"
+                               asp-route-returnUrl="@(Request.Path + Request.QueryString)"
+                                class="btn btn-sm btn-success me-1 action-btn">
+                                <i class="bi bi-check-square"></i> Consultar
+                            </a>
+                            <a asp-page="Editar"
+                               asp-route-id="@row["EmployeeID"]"
+                               asp-route-returnUrl="@(Request.Path + Request.QueryString)"
+                               class="btn btn-sm btn-warning me-1 action-btn">
+                                <i class="bi bi-pencil"></i> Editar
+                            </a>
+                            <a asp-page="Eliminar"
+                               asp-route-id="@row["EmployeeID"]"
+                               asp-route-returnUrl="@(Request.Path + Request.QueryString)"
+                               class="btn btn-sm btn-danger me-1 action-btn">
+                                <i class="bi bi-trash"></i> Eliminar
+                            </a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+
+</form>
+@section Scripts
+{
+    <script>
+        const txtIdIni = document.getElementById('txtIdIni');
+        const txtIdFin = document.getElementById('txtIdFin');
+
+        txtIdIni.addEventListener('blur', validarIdIni);
+        txtIdFin.addEventListener('blur', validarIdFin);
+
+        function validarIdIni() {
+
+            let idIni = txtIdIni.value.trim();
+            let idFin = txtIdFin.value.trim();
+
+            if (idIni === '')
+                return;
+
+            let numIni = parseInt(idIni);
+
+            if (isNaN(numIni)) {
+                alert('Por favor ingrese un número válido');
+                txtIdIni.focus();
+                return;
+            }
+
+            if (numIni === 0) {
+                alert('El valor del Id inicial no puede ser cero');
+                txtIdIni.value = '1';
+                txtIdIni.focus();
+                return;
+            }
+
+            if (idFin === '') {
+                txtIdFin.value = txtIdIni.value;
+                return;
+            }
+
+            let numFin = parseInt(idFin);
+
+            if (!isNaN(numFin) && numFin < numIni) {
+                txtIdFin.value = txtIdIni.value;
+            }
+        }
+
+        function validarIdFin() {
+
+            let idIni = txtIdIni.value.trim();
+            let idFin = txtIdFin.value.trim();
+
+            if (idFin === '')
+                return;
+
+            let numFin = parseInt(idFin);
+
+            if (isNaN(numFin)) {
+                alert('Por favor ingrese un número válido');
+                txtIdFin.focus();
+                return;
+            }
+
+            if (numFin === 0) {
+                alert('El valor del Id final no puede ser cero');
+                txtIdFin.value = '1';
+                txtIdFin.focus();
+                validarIdIni();
+                return;
+            }
+
+            if (idIni === '') {
+                txtIdIni.value = txtIdFin.value;
+                return;
+            }
+
+            let numIni = parseInt(idIni);
+
+            if (!isNaN(numIni) && numIni > numFin) {
+                txtIdIni.value = txtIdFin.value;
+            }
+        }
+    </script>
+}

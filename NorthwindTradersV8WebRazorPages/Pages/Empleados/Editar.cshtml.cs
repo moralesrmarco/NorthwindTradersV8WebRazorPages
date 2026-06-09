@@ -24,6 +24,8 @@ namespace NorthwindTradersV8WebRazorPages.Pages.Empleados
         [BindProperty]
         public string? FotoMime { get; set; }
         public bool BloquearEdicion { get; set; }
+        [BindProperty(SupportsGet = true)]
+        public string? ReturnUrl { get; set; }
         public EditarModel(IConfiguration configuration)
         {
             var connectionString = configuration.GetConnectionString("NorthwindConnection")
@@ -150,38 +152,5 @@ namespace NorthwindTradersV8WebRazorPages.Pages.Empleados
             if (Empleado?.ReportsTo == null)
                 Empleado?.ReportsTo = -1;
         }
-        //private string ObtenerMimeType(byte[] foto)
-        //{
-        //    if (foto.Length >= 8)
-        //    {
-        //        // PNG
-        //        if (foto[0] == 0x89 &&
-        //            foto[1] == 0x50 &&
-        //            foto[2] == 0x4E &&
-        //            foto[3] == 0x47)
-        //            return "image/png";
-
-        //        // JPG/JPEG
-        //        if (foto[0] == 0xFF &&
-        //            foto[1] == 0xD8)
-        //            return "image/jpeg";
-
-        //        // GIF
-        //        if (foto[0] == 0x47 &&
-        //            foto[1] == 0x49 &&
-        //            foto[2] == 0x46)
-        //            return "image/gif";
-
-        //        // WEBP
-        //        if (foto.Length >= 12 &&
-        //            foto[8] == 0x57 &&
-        //            foto[9] == 0x45 &&
-        //            foto[10] == 0x42 &&
-        //            foto[11] == 0x50)
-        //            return "image/webp";
-        //    }
-
-        //    return "application/octet-stream";
-        //}
     }
 }

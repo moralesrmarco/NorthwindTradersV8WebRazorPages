@@ -164,7 +164,7 @@ namespace NorthwindTradersV8WebRazorPages.DAL
                 fotoBytes = File.ReadAllBytes(defaultPath);
             }
             else
-            fotoBytes = (byte[])result;
+                fotoBytes = (byte[])result;
             return PhotoHelper.StripOleHeader(fotoBytes, employeeId);
         }
         public Empleado? ObtenerEmpleadoPorId(int id)
@@ -307,6 +307,27 @@ namespace NorthwindTradersV8WebRazorPages.DAL
             empleado.ReportsToName = rdr.IsDBNull(ordReportsToName) ? null : rdr.GetString(ordReportsToName);
             empleado.Photo = ObtenerEmpleadoFotoPorId(empleado.EmployeeID);
             return empleado;
+        }
+        public DataTable BuscarEmpleados(EmpleadosBuscarDto filtro)
+        {
+            using var connection = new SqlConnection(connectionString);
+            using var cmd = new SqlCommand("SpEmpleadosBuscar", connection);
+            cmd.CommandType = CommandType.StoredProcedure;
+            cmd.Parameters.AddWithValue("@IdIni", filtro.IdIni ?? 0);
+            cmd.Parameters.AddWithValue("@IdFin", filtro.IdFin ?? 0);
+            cmd.Parameters.AddWithValue("@Nombres", filtro.Nombres ?? string.Empty);
+            cmd.Parameters.AddWithValue("@Apellidos", filtro.Apellidos ?? string.Empty);
+            cmd.Parameters.AddWithValue("@Titulo", filtro.Titulo ?? string.Empty);
+            cmd.Parameters.AddWithValue("@Domicilio", filtro.Domicilio ?? string.Empty);
+            cmd.Parameters.AddWithValue("@Ciudad", filtro.Ciudad ?? string.Empty);
+            cmd.Parameters.AddWithValue("@Region", filtro.Region ?? string.Empty);
+            cmd.Parameters.AddWithValue("@CodigoP", filtro.CodigoP ?? string.Empty);
+            cmd.Parameters.AddWithValue("@Pais", filtro.Pais ?? string.Empty);
+            cmd.Parameters.AddWithValue("@Telefono", filtro.Telefono ?? string.Empty);
+            using var adapter = new SqlDataAdapter(cmd);
+            var dt = new DataTable();
+            adapter.Fill(dt);
+            return dt;
         }
     }
 }
