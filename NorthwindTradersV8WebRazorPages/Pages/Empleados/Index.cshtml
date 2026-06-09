@@ -52,15 +52,20 @@
                 <td class="text-center">@row["Country"]</td>
                 <td class="text-center">@row["ReportsToName"]</td>
                 <td class="text-center">
-                    <a asp-page="Consultar" asp-route-id="@row["EmployeeID"]" class="btn btn-sm btn-success me-1">
-                        <i class="bi bi-search"></i> Consultar
-                    </a>
-                    <a asp-page="Editar" asp-route-id="@row["EmployeeID"]" class="btn btn-sm btn-warning me-1">
-                        <i class="bi bi-pencil"></i> Editar
-                    </a>
-                    <a asp-page="Eliminar" asp-route-id="@row["EmployeeID"]" class="btn btn-sm btn-danger me-1">
-                        <i class="bi bi-trash"></i> Eliminar
-                    </a>
+                    <td class="text-center">
+                        <a asp-page="Consultar" asp-route-id="@row["EmployeeID"]"
+                           class="btn btn-sm btn-success me-1 action-btn">
+                            <i class="bi bi-search"></i> Consultar
+                        </a>
+                        <a asp-page="Editar" asp-route-id="@row["EmployeeID"]"
+                           class="btn btn-sm btn-warning me-1 action-btn">
+                            <i class="bi bi-pencil"></i> Editar
+                        </a>
+                        <a asp-page="Eliminar" asp-route-id="@row["EmployeeID"]"
+                           class="btn btn-sm btn-danger me-1 action-btn">
+                            <i class="bi bi-trash"></i> Eliminar
+                        </a>
+                    </td>
                 </tr>
             }
         </tbody>
@@ -84,3 +89,18 @@
             </li>
         </ul>
     </nav>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const buttons = document.querySelectorAll(".action-btn");
+
+            buttons.forEach(btn => {
+                btn.addEventListener("click", function () {
+                    // Deshabilita todos los botones al dar clic en cualquiera
+                    buttons.forEach(b => {
+                        b.classList.add("disabled"); // estilo Bootstrap
+                        b.setAttribute("disabled", "true"); // atributo real
+                    });
+                });
+            });
+        });
+    </script>
