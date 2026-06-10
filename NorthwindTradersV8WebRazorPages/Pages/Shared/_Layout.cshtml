@@ -38,7 +38,7 @@
                                 <li><a class="dropdown-item" asp-area="" asp-page="/Empleados/Index">Gestión de empleados</a></li>
                                 <li><hr class="dropdown-divider" /></li>
 
-                                <!-- Reportes con submenú -->
+                                <!-- Submenú Reportes -->
                                 <li class="dropdown-submenu">
                                     <a class="dropdown-item dropdown-toggle" href="#">Reportes</a>
                                     <ul class="dropdown-menu">
@@ -62,6 +62,75 @@
                                         </li>
                                     </ul>
                                 </li>
+                            </ul>
+                        </li>
+
+                        <!-- Menú  clientes con submenús -->
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle text-dark" href="#" id="clientesDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                Clientes
+                            </a>
+                            <ul class="dropdown-menu" aria-labelledby="clientesDropdown">
+
+                                <!-- Gestión de clientes -->
+                                <li><a class="dropdown-item" asp-area="" asp-page="/Clientes/Index">Gestión de clientes</a></li>
+                                <li><hr class="dropdown-divider" /></li>
+
+                                <!-- Submenú Consultas -->
+                                <li class="dropdown-submenu">
+                                    <a class="dropdown-item dropdown-toggle" href="#">Consultas</a>
+                                    <ul class="dropdown-menu">
+                                        <li>
+                                            <a class="dropdown-item"
+                                               asp-page="/Clientes/Reportes/RptClientes">
+                                                Directorio de clientes y proveedores
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a class="dropdown-item"
+                                               asp-page="/Clientes/Reportes/RptClientesConFoto">
+                                                Directorio de clientes y proveedores por ciudad
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a class="dropdown-item"
+                                               asp-page="/Clientes/Reportes/RptClientesConFoto2">
+                                                Directorio de clientes y proveedores por país
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </li>
+
+                                    <!-- Submenú Reportes -->
+                                <li class="dropdown-submenu">
+                                    <a class="dropdown-item dropdown-toggle" href="#">Reportes</a>
+                                    <ul class="dropdown-menu">
+                                        <li>
+                                            <a class="dropdown-item"
+                                               asp-page="/Empleados/Reportes/RptEmpleados">
+                                                Directorio de clientes
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a class="dropdown-item"
+                                               asp-page="/Empleados/Reportes/RptEmpleadosConFoto">
+                                                Directorio de clientes y proveedores
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a class="dropdown-item"
+                                               asp-page="/Empleados/Reportes/RptEmpleadosConFoto2">
+                                                Directorio de clientes y proveedores por ciudad
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a class="dropdown-item"
+                                               asp-page="/Empleados/Reportes/RptEmpleadosConFoto2">
+                                                Directorio de clientes y proveedores por país
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </li>   
                             </ul>
                         </li>
 

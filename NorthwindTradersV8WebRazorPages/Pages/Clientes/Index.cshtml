@@ -1,0 +1,90 @@
+﻿@page
+@model NorthwindTradersV8WebRazorPages.Pages.Clientes.IndexModel
+@{
+}
+<h2>Lista de clientes</h2>
+<a asp-page="Insertar" class="btn btn-sm btn-primary mb-3" asp-route-returnUrl="@Url.Page("Index")">
+    <i class="bi bi-plus-circle"></i> Nuevo cliente
+</a>
+<a asp-page="Buscar" class="btn btn-sm btn-buscar mb-3">
+    <i class="bi bi-search"></i> Buscar cliente
+</a>
+<nav aria-label="Page navigation">
+    <ul class="pagination justify-content-center">
+        <li class="page-item @(Model.PageIndex == 1 ? "disabled" : "")">
+            <a class="page-link" asp-page="Index" asp-route-pageIndex="@(Model.PageIndex - 1)">Anterior</a>
+        </li>
+
+        @for (int i = 1; i <= Model.TotalPages; i++)
+        {
+            <li class="page-item @(i == Model.PageIndex ? "active" : "")">
+                <a class="page-link" asp-page="Index" asp-route-pageIndex="@i">@i</a>
+            </li>
+        }
+
+        <li class="page-item @(Model.PageIndex == Model.TotalPages ? "disabled" : "")">
+            <a class="page-link" asp-page="Index" asp-route-pageIndex="@(Model.PageIndex + 1)">Siguiente</a>
+        </li>
+    </ul>
+</nav>
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th class="text-center">ID</th>
+            <th>Nombre de compañía</th>
+            <th class="text-center">Ciudad</th>
+            <th class="text-center">País</th>
+            <th class="text-center">Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (System.Data.DataRow row in Model.Clientes.Rows)
+        {
+            <tr>
+                <td class="text-center">@row["CustomerID"]</td>
+                <td>@row["CompanyName"]</td>
+                <td class="text-center">@row["City"]</td>
+                <td class="text-center">@row["Country"]</td>
+                <td class="text-center">
+                    <a asp-page="Consultar"
+                       asp-route-id="@row["CustomerID"]"
+                       asp-route-returnUrl="@Url.Page("Index")"
+                       class="btn btn-sm btn-success me-1 action-btn">
+                        <i class="bi bi-check-square"></i> Consultar
+                    </a>
+                    <a asp-page="Editar"
+                       asp-route-id="@row["CustomerID"]"
+                       asp-route-returnUrl="@Url.Page("Index")"
+                       class="btn btn-sm btn-warning me-1 action-btn">
+                        <i class="bi bi-pencil"></i> Editar
+                    </a>
+                    <a asp-page="Eliminar"
+                       asp-route-id="@row["CustomerID"]"
+                       asp-route-returnUrl="@Url.Page("Index")"
+                       class="btn btn-sm btn-danger me-1 action-btn">
+                        <i class="bi bi-trash"></i> Eliminar
+                    </a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<nav aria-label="Page navigation">
+    <ul class="pagination justify-content-center">
+        <li class="page-item @(Model.PageIndex == 1 ? "disabled" : "")">
+            <a class="page-link" asp-page="Index" asp-route-pageIndex="@(Model.PageIndex - 1)">Anterior</a>
+        </li>
+
+        @for (int i = 1; i <= Model.TotalPages; i++)
+        {
+            <li class="page-item @(i == Model.PageIndex ? "active" : "")">
+                <a class="page-link" asp-page="Index" asp-route-pageIndex="@i">@i</a>
+            </li>
+        }
+
+        <li class="page-item @(Model.PageIndex == Model.TotalPages ? "disabled" : "")">
+            <a class="page-link" asp-page="Index" asp-route-pageIndex="@(Model.PageIndex + 1)">Siguiente</a>
+        </li>
+    </ul>
+</nav>
