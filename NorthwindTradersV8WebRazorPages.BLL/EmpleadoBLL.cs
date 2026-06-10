@@ -80,6 +80,11 @@ namespace NorthwindTradersV8WebRazorPages.BLL
             }
             return empleadoDAL.BuscarEmpleados(filtro);
         }
+        public List<Empleado> ObtenerTodosLosEmpleados()
+        {
+            var empleados = empleadoDAL.ObtenerTodosLosEmpleados();
+            return empleados;
+        }
 
     }
 }

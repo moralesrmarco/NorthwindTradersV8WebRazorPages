@@ -262,6 +262,7 @@ namespace NorthwindTradersV8WebRazorPages.DAL
             empleado.Notes = rdr.IsDBNull(ordNotes) ? null : rdr.GetString(ordNotes);
             empleado.ReportsTo = rdr.IsDBNull(ordReportsTo) ? (int?)null : rdr.GetInt32(ordReportsTo);
             empleado.ReportsToName = rdr.IsDBNull(ordReportsToName) ? null : rdr.GetString(ordReportsToName);
+            empleado.Photo = ObtenerEmpleadoFotoPorId(empleado.EmployeeID);
             return empleado;
         }
 
@@ -328,6 +329,31 @@ namespace NorthwindTradersV8WebRazorPages.DAL
             var dt = new DataTable();
             adapter.Fill(dt);
             return dt;
+        }
+        public List<Empleado> ObtenerTodosLosEmpleados()
+        {
+            var empleados = new List<Empleado>();
+            try
+            {
+                using (var con = new SqlConnection(connectionString))
+                using (var cmd = new SqlCommand("SpEmpleadoObtenerTodos", con))
+                {
+                    cmd.CommandType = CommandType.StoredProcedure;
+                    con.Open();
+                    using (var reader = cmd.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            empleados.Add(MapearEmpleado(reader));
+                        }
+                    }
+                }
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+            return empleados;
         }
     }
 }
