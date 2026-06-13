@@ -51,7 +51,7 @@ namespace NorthwindTradersV8WebRazorPages.DAL
             }
             catch (Exception ex)
             {
-                throw new Exception("Error al insertar el nuevo empleado." + ex.Message);
+                throw new Exception("Error al insertar el empleado." + ex.Message);
             }
             return numRegs;
         }

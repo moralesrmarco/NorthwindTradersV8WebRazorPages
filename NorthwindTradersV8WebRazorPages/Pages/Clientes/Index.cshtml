@@ -48,23 +48,24 @@
                 <td class="text-center">
                     <a asp-page="Consultar"
                        asp-route-id="@row["CustomerID"]"
-                       asp-route-returnUrl="@Url.Page("Index")"
+                       asp-route-returnUrl="@Url.Page("Index", new { pageIndex = Model.PageIndex })"
                        class="btn btn-sm btn-success me-1 action-btn">
                         <i class="bi bi-check-square"></i> Consultar
                     </a>
                     <a asp-page="Editar"
                        asp-route-id="@row["CustomerID"]"
-                       asp-route-returnUrl="@Url.Page("Index")"
+                       asp-route-returnUrl="@Url.Page("Index", new { pageIndex = Model.PageIndex })"
                        class="btn btn-sm btn-warning me-1 action-btn">
                         <i class="bi bi-pencil"></i> Editar
-                    </a>
+                    </a>                    
                     <a asp-page="Eliminar"
                        asp-route-id="@row["CustomerID"]"
-                       asp-route-returnUrl="@Url.Page("Index")"
+                       asp-route-returnUrl="@Url.Page("Index", new { pageIndex = Model.PageIndex })"
                        class="btn btn-sm btn-danger me-1 action-btn">
                         <i class="bi bi-trash"></i> Eliminar
                     </a>
                 </td>
+
             </tr>
         }
     </tbody>
@@ -88,3 +89,20 @@
         </li>
     </ul>
 </nav>
+@section Scripts {
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const buttons = document.querySelectorAll(".action-btn");
+
+            buttons.forEach(btn => {
+                btn.addEventListener("click", function () {
+                    // Deshabilita todos los botones al dar clic en cualquiera
+                    buttons.forEach(b => {
+                        b.classList.add("disabled"); // estilo Bootstrap
+                        b.setAttribute("disabled", "true"); // atributo real
+                    });
+                });
+            });
+        });
+    </script>
+}
