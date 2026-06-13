@@ -22,6 +22,22 @@ namespace NorthwindTradersV8WebRazorPages.BLL
                 resultado.Mensaje = StringsCommons.Nfrs;
             return resultado;
         }
+        public ResultadoOperacion Actualizar(Cliente cliente)
+        {
+            var resultado = new ResultadoOperacion();
+            int numRegs = clienteDAL.Actualizar(cliente);
+            resultado.Codigo = numRegs;
+            if (numRegs > 0)
+                resultado.Exito = true;
+            else if (numRegs == -1)
+                resultado.Mensaje = StringsCommons.Nfmfe;
+            else if (numRegs == -2)
+                resultado.Mensaje = StringsCommons.Nfmfm;
+            else
+                resultado.Mensaje = StringsCommons.Nfmmd;
+            return resultado;
+        }
+
         public ResultadoOperacion Eliminar(Cliente cliente)
         {
             var resultado = new ResultadoOperacion();

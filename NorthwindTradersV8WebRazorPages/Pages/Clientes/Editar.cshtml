@@ -1,0 +1,128 @@
+﻿@page
+@model NorthwindTradersV8WebRazorPages.Pages.Clientes.EditarModel
+@{
+}
+<h2>Editar cliente</h2>
+<form method="post" class="form">
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger">@Html.Raw(TempData["Error"])</div>
+    }
+    <fieldset @(Model.BloquearEdicion ? "disabled" : "")>
+        <div class="row">
+            <div class="col-md-2 mb-3">
+                <label asp-for="Cliente.CustomerID" class="form-label">ID</label>
+                <input asp-for="Cliente.CustomerID" class="form-control text-uppercase" />
+                <span asp-validation-for="Cliente.CustomerID" class="text-danger"></span>
+            </div>
+            <div class="col-md-5 mb-3">
+                <label asp-for="Cliente.CompanyName" class="form-label">Nombre de compañía</label>
+                <input asp-for="Cliente.CompanyName" class="form-control" />
+                <span asp-validation-for="Cliente.CompanyName" class="text-danger"></span>
+            </div>
+            <div class="col-md-5 mb-3">
+                <label asp-for="Cliente.ContactName" class="form-label">Nombre de contacto</label>
+                <input asp-for="Cliente.ContactName" class="form-control" />
+                <span asp-validation-for="Cliente.ContactName" class="text-danger"></span>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-3 mb-3">
+                <label asp-for="Cliente.ContactTitle" class="form-label">Título de contacto</label>
+                <input asp-for="Cliente.ContactTitle" class="form-control" />
+                <span asp-validation-for="Cliente.ContactTitle" class="text-danger"></span>
+            </div>
+            <div class="col-md-9 mb-3">
+                <label asp-for="Cliente.Address" class="form-label">Domicilio</label>
+                <input asp-for="Cliente.Address" class="form-control" />
+                <span asp-validation-for="Cliente.Address" class="text-danger"></span>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-4 mb-3">
+                <label asp-for="Cliente.City" class="form-label">Ciudad</label>
+                <input asp-for="Cliente.City" class="form-control" />
+                <span asp-validation-for="Cliente.City" class="text-danger"></span>
+            </div>
+            <div class="col-md-4 mb-3">
+                <label asp-for="Cliente.Region" class="form-label">Región</label>
+                <input asp-for="Cliente.Region" class="form-control" />
+                <span asp-validation-for="Cliente.Region" class="text-danger"></span>
+            </div>
+            <div class="col-md-4 mb-3">
+                <label asp-for="Cliente.PostalCode" class="form-label">Código postal</label>
+                <input asp-for="Cliente.PostalCode" class="form-control" />
+                <span asp-validation-for="Cliente.PostalCode" class="text-danger"></span>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-4 mb-3">
+                <label asp-for="Cliente.Country" class="form-label">País</label>
+                <select id="cboPais" 
+                    asp-for="Cliente.Country"
+                    asp-items="Model.Paises"
+                    class="form-select"
+                    disabled="@Model.BloquearEdicion">
+                </select>
+                <span asp-validation-for="Cliente.Country" class="text-danger"></span>
+            </div>
+            <div class="col-md-4 mb-3">
+                <label asp-for="Cliente.Phone" class="form-label">Teléfono</label>
+                <input asp-for="Cliente.Phone" class="form-control" />
+                <span asp-validation-for="Cliente.Phone" class="text-danger"></span>
+            </div>
+            <div class="col-md-4 mb-3">
+                <label asp-for="Cliente.Fax" class="form-label">Fax</label>
+                <input asp-for="Cliente.Fax" class="form-control" />
+                <span asp-validation-for="Cliente.Fax" class="text-danger"></span>
+            </div>
+        </div>
+        <input type="hidden" asp-for="ReturnUrl" />
+        <input type="hidden" asp-for="Cliente.RowVersion" />
+    </fieldset>
+    <button type="submit"
+            id="btnGuardar"
+            class="btn btn-sm btn-success me-1"
+            disabled="@Model.BloquearEdicion">
+        <i class="bi bi-save"></i> Guardar
+    </button>
+    <a href="@Model.UrlCancelar"
+       class="btn btn-sm btn-cancelar me-1">
+        <i class="bi bi-x-circle"></i> Cancelar
+    </a>
+</form>
+@section Scripts {
+    <script>
+        $(function () {
+            $('#cboPais').select2({
+                tags: true,
+                placeholder: 'Seleccione o escriba un país',
+                width: '100%'
+            });
+            // $('#cboPais').trigger('change')
+        });
+
+        // Configurar jQuery Validation para interceptar el submit
+        $("form").validate({
+            submitHandler: function (form) {
+                const btnGuardar = document.getElementById('btnGuardar');
+                btnGuardar.disabled = true;
+                btnGuardar.innerHTML = '<i class="bi bi-hourglass-split"></i> Procesando...';
+                form.submit(); // ahora sí envía al servidor
+            }
+        });
+
+        // Reactivar botón si hay error del servidor distinto a Nfrs
+        const errorDiv = document.querySelector('.alert-danger');
+        if (errorDiv) {
+            const mensajeError = errorDiv.textContent || "";
+            const btnGuardar = document.getElementById('btnGuardar');
+
+            // Solo reactivar si el mensaje no es StringsCommons.Nfrs
+            if (!mensajeError.includes("StringsCommons.Nfrs")) {
+                btnGuardar.disabled = false;
+                btnGuardar.innerHTML = '<i class="bi bi-save"></i> Guardar';
+            }
+        }
+    </script>
+}

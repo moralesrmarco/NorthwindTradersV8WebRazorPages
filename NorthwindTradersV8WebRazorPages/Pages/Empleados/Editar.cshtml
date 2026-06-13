@@ -110,7 +110,8 @@
                         asp-items="Model.Paises"
                         class="form-select"
                         disabled="@Model.BloquearEdicion">
-                </select>            <span asp-validation-for="Empleado.Country" class="text-danger"></span>
+                </select>            
+                <span asp-validation-for="Empleado.Country" class="text-danger"></span>
         </div>
         <div class="col-md-4 mb-3">
             <label asp-for="Empleado.HomePhone" class="form-label">Teléfono</label>
@@ -167,50 +168,49 @@
        class="btn btn-sm btn-cancelar me-1">
         <i class="bi bi-x-circle"></i> Cancelar
     </a>
-
-    @section Scripts {
-        <script>
-                $(function () {
-
-                    $('#cboPais').select2({
-                        tags: true,
-                        placeholder: 'Seleccione o escriba un país',
-                        width: '100%'
-                    });
-
-                    $('#cboPais').trigger('change');
-                });
-
-                document.getElementById('fileFoto').addEventListener('change', function (event) {
-                    const file = event.target.files[0];
-                    if (!file)
-                        return;
-                    const reader = new FileReader();
-                    reader.onload = function (e) {
-                        // Vista previa
-                        document.getElementById('previewFoto').src =
-                            e.target.result;
-                        // Guardar Base64 en el hidden
-                        document.getElementById('FotoTemporalBase64').value =
-                            e.target.result.split(',')[1];
-                        // Guardar tipo MIME
-                        document.getElementById('FotoMime').value =
-                            file.type;
-                    };
-                    reader.readAsDataURL(file);
-                });
-                
-                function disableSaveButton() {
-                    var btn = document.getElementById("btnGuardar");
-
-                    if (btn) {
-                        btn.disabled = true;
-                        btn.innerHTML =
-                            '<i class="bi bi-save"></i> Guardando...';
-                    }
-
-                    return true;
-                }
-        </script>
-    }
 </form>
+@section Scripts {
+    <script>
+        $(function () {
+
+            $('#cboPais').select2({
+                tags: true,
+                placeholder: 'Seleccione o escriba un país',
+                width: '100%'
+            });
+
+            $('#cboPais').trigger('change');
+        });
+
+        document.getElementById('fileFoto').addEventListener('change', function (event) {
+            const file = event.target.files[0];
+            if (!file)
+                return;
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                // Vista previa
+                document.getElementById('previewFoto').src =
+                    e.target.result;
+                // Guardar Base64 en el hidden
+                document.getElementById('FotoTemporalBase64').value =
+                    e.target.result.split(',')[1];
+                // Guardar tipo MIME
+                document.getElementById('FotoMime').value =
+                    file.type;
+            };
+            reader.readAsDataURL(file);
+        });
+
+        function disableSaveButton() {
+            var btn = document.getElementById("btnGuardar");
+
+            if (btn) {
+                btn.disabled = true;
+                btn.innerHTML =
+                    '<i class="bi bi-save"></i> Guardando...';
+            }
+
+            return true;
+        }
+    </script>
+}

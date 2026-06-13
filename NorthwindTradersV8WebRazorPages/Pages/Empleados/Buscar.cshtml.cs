@@ -3,7 +3,6 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using NorthwindTradersV8WebRazorPages.BLL;
 using NorthwindTradersV8WebRazorPages.BLL.Services;
-using NorthwindTradersV8WebRazorPages.Entities;
 using NorthwindTradersV8WebRazorPages.Entities.DTOs;
 using System.Data;
 

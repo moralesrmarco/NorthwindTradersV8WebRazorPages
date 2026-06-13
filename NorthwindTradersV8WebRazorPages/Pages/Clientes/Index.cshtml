@@ -3,7 +3,9 @@
 @{
 }
 <h2>Lista de clientes</h2>
-<a asp-page="Insertar" class="btn btn-sm btn-primary mb-3" asp-route-returnUrl="@Url.Page("Index")">
+<a asp-page="Insertar" 
+    class="btn btn-sm btn-primary mb-3" 
+    asp-route-returnUrl="@Url.Page("Index", new { pageIndex = Model.PageIndex })">
     <i class="bi bi-plus-circle"></i> Nuevo cliente
 </a>
 <a asp-page="Buscar" class="btn btn-sm btn-buscar mb-3">

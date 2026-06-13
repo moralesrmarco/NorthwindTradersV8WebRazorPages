@@ -3,7 +3,7 @@
 @{
 }
 <h2>Eliminar cliente</h2>
-<form method="post" class="form">
+<form method="post" class="form" onsubmit="return disableDeleteButton();">
     <p>¿Está seguro de eliminar el empleado con ID: <strong>@Model.Cliente?.CustomerID</strong> - Nombre de compañía: <strong>@Model.Cliente?.CompanyName</strong>?</p>
     @if (TempData["Error"] != null)
     {
@@ -68,10 +68,10 @@
         <i class="bi bi-trash"></i> Eliminar
     </button>
 
-    <a href="@(Model.ReturnUrl ?? Url.Page("Index"))"
+    <a href="@Model.UrlCancelar"
        class="btn btn-sm btn-cancelar me-1">
         <i class="bi bi-x-circle"></i> Cancelar
-    </a>
+    </a>    
     <input type="hidden" asp-for="Cliente.RowVersion" />
     <input type="hidden" asp-for="ReturnUrl" />
 </form>
