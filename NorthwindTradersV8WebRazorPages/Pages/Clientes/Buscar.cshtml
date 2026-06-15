@@ -2,3 +2,190 @@
 @model NorthwindTradersV8WebRazorPages.Pages.Clientes.BuscarModel
 @{
 }
+<h2>Buscar cliente</h2>
+<form method="get" class="form" onsubmit="return disableSearchButton();">
+    <div class="row">
+        <div class="col-md-2 mb-3">
+            <label asp-for="Filtro.CustomerID" class="form-label">ID</label>
+            <input asp-for="Filtro.CustomerID" class="form-control text-uppercase" />
+            <span asp-validation-for="Filtro.CustomerID" class="text-danger"></span>
+        </div>
+        <div class="col-md-5 mb-3">
+            <label asp-for="Filtro.CompanyName" class="form-label">Nombre de compañía</label>
+            <input asp-for="Filtro.CompanyName" class="form-control" />
+            <span asp-validation-for="Filtro.CompanyName" class="text-danger"></span>
+        </div>
+        <div class="col-md-5 mb-3">
+            <label asp-for="Filtro.ContactName" class="form-label">Nombre de contacto</label>
+            <input asp-for="Filtro.ContactName" class="form-control" />
+            <span asp-validation-for="Filtro.ContactName" class="text-danger"></span>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-12 mb-3">
+            <label asp-for="Filtro.Address" class="form-label">Domicilio</label>
+            <input asp-for="Filtro.Address" class="form-control" />
+            <span asp-validation-for="Filtro.Address" class="text-danger"></span>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-4 mb-3">
+            <label asp-for="Filtro.City" class="form-label">Ciudad</label>
+            <input asp-for="Filtro.City" class="form-control" />
+            <span asp-validation-for="Filtro.City" class="text-danger"></span>
+        </div>
+        <div class="col-md-4 mb-3">
+            <label asp-for="Filtro.Region" class="form-label">Región</label>
+            <input asp-for="Filtro.Region" class="form-control" />
+            <span asp-validation-for="Filtro.Region" class="text-danger"></span>
+        </div>
+        <div class="col-md-4 mb-3">
+            <label asp-for="Filtro.PostalCode" class="form-label">Código postal</label>
+            <input asp-for="Filtro.PostalCode" class="form-control" />
+            <span asp-validation-for="Filtro.PostalCode" class="text-danger"></span>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-4 mb-3">
+            <label asp-for="Filtro.Country" class="form-label">País</label>
+            <select id="cboPais" 
+                asp-for="Filtro.Country"
+                asp-items="Model.Paises"
+                class="form-select">
+            </select>
+            <span asp-validation-for="Filtro.Country" class="text-danger"></span>
+        </div>
+        <div class="col-md-4 mb-3">
+            <label asp-for="Filtro.Phone" class="form-label">Teléfono</label>
+            <input asp-for="Filtro.Phone" class="form-control" />
+            <span asp-validation-for="Filtro.Phone" class="text-danger"></span>
+        </div>
+        <div class="col-md-4 mb-3">
+            <label asp-for="Filtro.Fax" class="form-label">Fax</label>
+            <input asp-for="Filtro.Fax" class="form-control" />
+            <span asp-validation-for="Filtro.Fax" class="text-danger"></span>
+        </div>
+    </div>
+    <div class="row mb-3">
+        <div class="col-md-6 d-flex gap-2">
+            <button 
+                id="btnBuscar"
+                type="submit" 
+                class="btn btn-sm btn-buscar"
+                title="Buscar">
+                <i class="bi bi-search"></i>
+                <span class="d-none d-md-inline"> Buscar</span>
+            </button>
+
+            <a asp-page="./Buscar"
+               class="btn btn-sm btn-primary"
+                title="Limpiar">
+                <i class="bi bi-eraser"></i>
+                <span class="d-none d-md-inline"> Limpiar</span>
+            </a>
+
+            <a asp-page="/Clientes/Index"
+               class="btn btn-sm btn-cancelar"
+                title="Cancelar">
+                <i class="bi bi-x-circle"></i>
+                <span class="d-none d-md-inline"> Cancelar</span>
+            </a>
+        </div>
+    </div>
+    @if (Model.SeBusco)
+    {
+        <div class="table-responsive">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th class="text-center">ID</th>
+                        <th>Nombre de compañía</th>
+                        <th class="text-center">Ciudad</th>
+                        <th class="text-center">País</th>
+                        <th class="text-center">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (System.Data.DataRow row in Model.Clientes.Rows)
+                    {
+                        <tr>
+                            <td class="text-center">@row["CustomerID"]</td>
+                            <td>@row["CompanyName"]</td>
+                            <td class="text-center">@row["City"]</td>
+                            <td class="text-center">@row["Country"]</td>
+                            <td class="text-center text-nowrap">
+                                <a asp-page="Consultar"
+                                   asp-route-id="@row["CustomerID"]"
+                                   asp-route-returnUrl="@(Request.Path + Request.QueryString)"
+                                   class="btn btn-sm btn-success me-1 action-btn"
+                                   title="Consultar">
+                                    <i class="bi bi-check-square"></i>
+                                    <span class="d-none d-md-inline"> Consultar</span>
+                                </a>
+                                <a asp-page="Editar"
+                                   asp-route-id="@row["CustomerID"]"
+                                   asp-route-returnUrl="@(Request.Path + Request.QueryString)"
+                                   class="btn btn-sm btn-warning me-1 action-btn"
+                                   title="Editar">
+                                    <i class="bi bi-pencil"></i>
+                                    <span class="d-none d-md-inline"> Editar</span>
+                                </a>
+                                <a asp-page="Eliminar"
+                                   asp-route-id="@row["CustomerID"]"
+                                   asp-route-returnUrl="@(Request.Path + Request.QueryString)"
+                                   class="btn btn-sm btn-danger me-1 action-btn"
+                                   title="Eliminar">
+                                    <i class="bi bi-trash"></i>
+                                    <span class="d-none d-md-inline"> Eliminar</span>
+                                </a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+</form>
+<div id="loadingOverlay" style="
+    display:none;
+    position:fixed;
+    top:0;
+    left:0;
+    width:100%;
+    height:100%;
+    background:rgba(255,255,255,0.7);
+    z-index:9999;">
+    <div class="d-flex justify-content-center align-items-center h-100">
+        <div class="text-center">
+            <div class="spinner-border" role="status"></div>
+            <div class="mt-2">Buscando...</div>
+        </div>
+    </div>
+</div>
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+
+    <script>
+        function disableSearchButton() {
+            const btn = document.getElementById('btnBuscar');
+            btn.style.pointerEvents = "none";
+            btn.innerHTML =
+                '<span class="spinner-border spinner-border-sm me-1"></span> Buscando...';
+            document.getElementById('loadingOverlay').style.display = 'block';
+            return true;
+        }
+        document.addEventListener("DOMContentLoaded", function () {
+            const buttons = document.querySelectorAll(".action-btn");
+
+            buttons.forEach(btn => {
+                btn.addEventListener("click", function () {
+                    // Deshabilita todos los botones al dar clic en cualquiera
+                    buttons.forEach(b => {
+                        b.classList.add("disabled"); // estilo Bootstrap
+                        b.setAttribute("disabled", "true"); // atributo real
+                    });
+                });
+            });
+        });
+    </script>
+}

@@ -24,7 +24,9 @@ namespace NorthwindTradersV8WebRazorPages.Pages.Clientes
         public InsertarModel(IConfiguration configuration)
         {
             string connectionString = configuration.GetConnectionString("NorthwindConnection") ?? throw new InvalidOperationException("Connection string not found.");
-            clienteBLL = new ClienteBLL(connectionString);
+            bool ejecutarTiempoDemora = configuration.GetValue<bool>("AppSettings:ejecutarTiempoDemora");
+            int tiempoDemora = configuration.GetValue<int>("AppSettings:tiempoDemora");
+            clienteBLL = new ClienteBLL(connectionString, ejecutarTiempoDemora, tiempoDemora);
             clienteService = new ClienteService(connectionString);
         }
         public void OnGet()

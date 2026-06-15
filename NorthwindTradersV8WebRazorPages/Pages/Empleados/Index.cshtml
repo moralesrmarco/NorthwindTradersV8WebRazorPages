@@ -3,97 +3,155 @@
 @{
 }
 <h2>Lista de empleados</h2>
-<a asp-page="Insertar" class="btn btn-sm btn-primary mb-3" asp-route-returnUrl="@Url.Page("Index")">
-    <i class="bi bi-plus-circle"></i> Nuevo empleado
+<a asp-page="Insertar" 
+    class="btn btn-sm btn-primary mb-3" 
+   asp-route-returnUrl="@Url.Page("Index", new { pageIndex = Model.PageIndex })"
+   title="Nuevo">
+    <i class="bi bi-plus-circle"></i>
+    <span class="d-none d-md-inline"> Nuevo empleado</span>
 </a>
-<a asp-page="Buscar" class="btn btn-sm btn-buscar mb-3">
-    <i class="bi bi-search"></i> Buscar empleado
+<a asp-page="Buscar" 
+    class="btn btn-sm btn-buscar mb-3"
+    title="Buscar">
+    <i class="bi bi-search"></i>
+    <span class="d-none d-md-inline"> Buscar empleado</span>
 </a>
+@{
+    int startPage = Math.Max(1, Model.PageIndex - 2);
+    int endPage = Math.Min(Model.TotalPages, Model.PageIndex + 2);
+}
 <nav aria-label="Page navigation">
-    <ul class="pagination justify-content-center">
+    <ul class="pagination justify-content-center flex-wrap">
+        <!-- Botón Inicio -->
         <li class="page-item @(Model.PageIndex == 1 ? "disabled" : "")">
-            <a class="page-link" asp-page="Index" asp-route-pageIndex="@(Model.PageIndex - 1)">Anterior</a>
+            <a class="page-link" asp-page="Index" asp-route-pageIndex="1" title="Primera página">
+                ««
+            </a>
         </li>
 
-        @for (int i = 1; i <= Model.TotalPages; i++)
+        <!-- Botón Anterior -->
+        <li class="page-item @(Model.PageIndex == 1 ? "disabled" : "")">
+            <a class="page-link" asp-page="Index" asp-route-pageIndex="@(Model.PageIndex - 1)" title="Anterior">
+                «
+            </a>
+        </li>
+
+        <!-- Rango dinámico -->
+        @for (int i = startPage; i <= endPage; i++)
         {
             <li class="page-item @(i == Model.PageIndex ? "active" : "")">
                 <a class="page-link" asp-page="Index" asp-route-pageIndex="@i">@i</a>
             </li>
         }
 
+        <!-- Botón Siguiente -->
         <li class="page-item @(Model.PageIndex == Model.TotalPages ? "disabled" : "")">
-            <a class="page-link" asp-page="Index" asp-route-pageIndex="@(Model.PageIndex + 1)">Siguiente</a>
+            <a class="page-link" asp-page="Index" asp-route-pageIndex="@(Model.PageIndex + 1)" title="Siguiente">
+                »
+            </a>
+        </li>
+
+        <!-- Botón Fin -->
+        <li class="page-item @(Model.PageIndex == Model.TotalPages ? "disabled" : "")">
+            <a class="page-link" asp-page="Index" asp-route-pageIndex="@Model.TotalPages" title="Última página">
+                »»
+            </a>
         </li>
     </ul>
 </nav>
-<table class="table table-striped">
-    <thead>
-        <tr>
-            <th class="text-center">Foto</th>
-            <th class="text-center">ID</th>
-            <th>Nombres</th>
-            <th>Apellidos</th>
-            <th class="text-center">País</th>
-            <th class="text-center">Reporta a</th>
-            <th class="text-center">Acciones</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (System.Data.DataRow row in Model.Empleados.Rows)
-        {
+<div class="table-responsive">
+    <table class="table table-striped">
+        <thead>
             <tr>
-                <td class="text-center">
-                    <img src="/Empleados/Foto?id=@row["EmployeeID"]"
-                            alt="Foto"
-                            class="img-thumbnail"
-                            style="max-width: 80px; max-height: 80px;" />
-                </td>
-                <td class="text-center">@row["EmployeeID"]</td>
-                <td>@row["FirstName"]</td>
-                <td>@row["LastName"]</td>
-                <td class="text-center">@row["Country"]</td>
-                <td class="text-center">@row["ReportsToName"]</td>
-                <td class="text-center">
-                    <a asp-page="Consultar" 
-                    asp-route-id="@row["EmployeeID"]"
-                    asp-route-returnUrl="@Url.Page("Index")"
-                    class="btn btn-sm btn-success me-1 action-btn">
-                        <i class="bi bi-check-square"></i> Consultar
-                    </a>
-                    <a asp-page="Editar"
-                       asp-route-id="@row["EmployeeID"]"
-                       asp-route-returnUrl="@Url.Page("Index")"
-                       class="btn btn-sm btn-warning me-1 action-btn">
-                        <i class="bi bi-pencil"></i> Editar
-                    </a>
-                    <a asp-page="Eliminar"
-                       asp-route-id="@row["EmployeeID"]"
-                       asp-route-returnUrl="@Url.Page("Index")"
-                       class="btn btn-sm btn-danger me-1 action-btn">
-                        <i class="bi bi-trash"></i> Eliminar
-                    </a>
-                </td>
+                <th class="text-center">Foto</th>
+                <th class="text-center">ID</th>
+                <th>Nombres</th>
+                <th>Apellidos</th>
+                <th class="text-center">País</th>
+                <th class="text-center">Acciones</th>
             </tr>
-        }
-    </tbody>
-</table>
-
+        </thead>
+        <tbody>
+            @foreach (System.Data.DataRow row in Model.Empleados.Rows)
+            {
+                <tr>
+                    <td class="text-center">
+                        <img src="/Empleados/Foto?id=@row["EmployeeID"]"
+                                alt="Foto"
+                                class="img-thumbnail"
+                                style="max-width: 80px; max-height: 80px;" />
+                    </td>
+                    <td class="text-center">@row["EmployeeID"]</td>
+                    <td>@row["FirstName"]</td>
+                    <td>@row["LastName"]</td>
+                    <td class="text-center">@row["Country"]</td>
+                    <td class="text-center text-nowrap">
+                        <a asp-page="Consultar" 
+                            asp-route-id="@row["EmployeeID"]"
+                           asp-route-returnUrl="@Url.Page("Index", new { pageIndex = Model.PageIndex })"
+                           class="btn btn-sm btn-success me-1 action-btn"
+                            title="Consultar">
+                            <i class="bi bi-check-square"></i>
+                            <span class="d-none d-md-inline"> Consultar</span>
+                        </a>
+                        <a asp-page="Editar"
+                           asp-route-id="@row["EmployeeID"]"
+                           asp-route-returnUrl="@Url.Page("Index", new { pageIndex = Model.PageIndex })"
+                           class="btn btn-sm btn-warning me-1 action-btn"
+                            title="Editar">
+                            <i class="bi bi-pencil"></i>
+                            <span class="d-none d-md-inline"> Editar</span>
+                        </a>
+                        <a asp-page="Eliminar"
+                           asp-route-id="@row["EmployeeID"]"
+                           asp-route-returnUrl="@Url.Page("Index", new { pageIndex = Model.PageIndex })"
+                           class="btn btn-sm btn-danger me-1 action-btn"
+                            title="Eliminar">
+                            <i class="bi bi-trash"></i>
+                            <span class="d-none d-md-inline"> Eliminar</span>
+                        </a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
 <nav aria-label="Page navigation">
-    <ul class="pagination justify-content-center">
+    <ul class="pagination justify-content-center flex-wrap">
+        <!-- Botón Inicio -->
         <li class="page-item @(Model.PageIndex == 1 ? "disabled" : "")">
-            <a class="page-link" asp-page="Index" asp-route-pageIndex="@(Model.PageIndex - 1)">Anterior</a>
+            <a class="page-link" asp-page="Index" asp-route-pageIndex="1" title="Primera página">
+                ««
+            </a>
         </li>
 
-        @for (int i = 1; i <= Model.TotalPages; i++)
+        <!-- Botón Anterior -->
+        <li class="page-item @(Model.PageIndex == 1 ? "disabled" : "")">
+            <a class="page-link" asp-page="Index" asp-route-pageIndex="@(Model.PageIndex - 1)" title="Anterior">
+                «
+            </a>
+        </li>
+
+        <!-- Rango dinámico -->
+        @for (int i = startPage; i <= endPage; i++)
         {
             <li class="page-item @(i == Model.PageIndex ? "active" : "")">
                 <a class="page-link" asp-page="Index" asp-route-pageIndex="@i">@i</a>
             </li>
         }
 
+        <!-- Botón Siguiente -->
         <li class="page-item @(Model.PageIndex == Model.TotalPages ? "disabled" : "")">
-            <a class="page-link" asp-page="Index" asp-route-pageIndex="@(Model.PageIndex + 1)">Siguiente</a>
+            <a class="page-link" asp-page="Index" asp-route-pageIndex="@(Model.PageIndex + 1)" title="Siguiente">
+                »
+            </a>
+        </li>
+
+        <!-- Botón Fin -->
+        <li class="page-item @(Model.PageIndex == Model.TotalPages ? "disabled" : "")">
+            <a class="page-link" asp-page="Index" asp-route-pageIndex="@Model.TotalPages" title="Última página">
+                »»
+            </a>
         </li>
     </ul>
 </nav>

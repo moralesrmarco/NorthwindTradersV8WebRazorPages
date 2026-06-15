@@ -10,11 +10,12 @@ namespace NorthwindTradersV8WebRazorPages.Pages.Clientes
         public DataTable Clientes { get; set; } = new DataTable();
         public int PageIndex { get; set; } = 1;
         public int TotalPages { get; set; }
-        private const int PageSize = 20;
+        private int PageSize;
         public IndexModel(IConfiguration configuration)
         {
             var connectionString = configuration.GetConnectionString("NorthwindConnection")
                 ?? throw new InvalidOperationException("Connection string not found");
+            PageSize = configuration.GetValue<int>("AppSettings:pageSize");
             clienteBLL = new ClienteBLL(connectionString);
         }
         public void OnGet(int pageIndex = 1)

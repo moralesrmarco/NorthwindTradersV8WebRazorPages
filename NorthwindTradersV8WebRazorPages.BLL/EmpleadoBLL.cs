@@ -9,11 +9,22 @@ namespace NorthwindTradersV8WebRazorPages.BLL
     public class EmpleadoBLL
     {
         private readonly EmpleadoDAL empleadoDAL;
+        private readonly bool _ejecutarTiempoDemora;
+        private readonly int _tiempoDemora;
 
         public EmpleadoBLL(string connectionString)
         {
             empleadoDAL = new EmpleadoDAL(connectionString);
+            _ejecutarTiempoDemora = false;
+            _tiempoDemora = 0;
         }
+        public EmpleadoBLL(string connectionString, bool ejecutarTiempoDemora, int tiempoDemora)
+        {
+            empleadoDAL = new EmpleadoDAL(connectionString);
+            _ejecutarTiempoDemora = ejecutarTiempoDemora;
+            _tiempoDemora = tiempoDemora;
+        }
+
         public ResultadoOperacion Insertar(Empleado empleado)
         {
             var resultado = new ResultadoOperacion();
@@ -22,6 +33,8 @@ namespace NorthwindTradersV8WebRazorPages.BLL
                 resultado.Exito = true;
             else
                 resultado.Mensaje = StringsCommons.Nfrs;
+            if (_ejecutarTiempoDemora)
+                Thread.Sleep(_tiempoDemora);
             return resultado;
         }
         public ResultadoOperacion Actualizar(Empleado empleado)
@@ -37,6 +50,8 @@ namespace NorthwindTradersV8WebRazorPages.BLL
                 resultado.Mensaje = StringsCommons.Nfmfm;
             else
                 resultado.Mensaje = StringsCommons.Nfmmd;
+            if (_ejecutarTiempoDemora)
+                Thread.Sleep(_tiempoDemora);
             return resultado;
         }
         public ResultadoOperacion Eliminar(Empleado empleado)
@@ -54,6 +69,8 @@ namespace NorthwindTradersV8WebRazorPages.BLL
                 resultado.Mensaje = StringsCommons.Nferr;
             else
                 resultado.Mensaje = StringsCommons.Nfemd;
+            if (_ejecutarTiempoDemora)
+                Thread.Sleep(_tiempoDemora);
             return resultado;
         }
         public DataTable ObtenerEmpleadosPaginados(int pageIndex, int pageSize, out int totalRegistros)
@@ -67,6 +84,8 @@ namespace NorthwindTradersV8WebRazorPages.BLL
 
         public Empleado? ObtenerEmpleadoPorId(int id)
         {
+            if (_ejecutarTiempoDemora)
+                Thread.Sleep(_tiempoDemora);
             return empleadoDAL.ObtenerEmpleadoPorId(id);
         }
         public EmpleadoRptDto? ObtenerEmpleadoPorIdRptDto(int id) =>
@@ -78,11 +97,15 @@ namespace NorthwindTradersV8WebRazorPages.BLL
             {
                 filtro.Pais = "";
             }
+            if (_ejecutarTiempoDemora)
+                Thread.Sleep(_tiempoDemora);
             return empleadoDAL.BuscarEmpleados(filtro);
         }
         public List<Empleado> ObtenerTodosLosEmpleados()
         {
             var empleados = empleadoDAL.ObtenerTodosLosEmpleados();
+            if (_ejecutarTiempoDemora)
+                Thread.Sleep(_tiempoDemora);
             return empleados;
         }
 

@@ -83,12 +83,16 @@
     <button type="submit"
             id="btnGuardar"
             class="btn btn-sm btn-success me-1"
-            disabled="@Model.BloquearEdicion">
-        <i class="bi bi-save"></i> Guardar
+            disabled="@Model.BloquearEdicion"
+            title="Guardar">
+        <i class="bi bi-save"></i>
+        <span class="d-none d-md-inline"> Guardar</span>
     </button>
     <a href="@Model.UrlCancelar"
-       class="btn btn-sm btn-cancelar me-1">
-        <i class="bi bi-x-circle"></i> Cancelar
+       class="btn btn-sm btn-cancelar me-1"
+        title="Cancelar">
+        <i class="bi bi-x-circle"></i>
+        <span class="d-none d-md-inline"> Cancelar</span>
     </a>
 </form>
 @section Scripts {

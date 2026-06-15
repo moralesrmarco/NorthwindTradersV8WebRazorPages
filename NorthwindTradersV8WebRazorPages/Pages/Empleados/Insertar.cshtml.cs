@@ -29,7 +29,9 @@ namespace NorthwindTradersV8WebRazorPages.Pages.Empleados
         {
             var connectionString = configuration.GetConnectionString("NorthwindConnection")
                 ?? throw new InvalidOperationException("Connection string not found");
-            empleadoBLL = new EmpleadoBLL(connectionString);
+            bool ejecutarTiempoDemora = configuration.GetValue<bool>("AppSettings:ejecutarTiempoDemora");
+            int tiempoDemora = configuration.GetValue<int>("AppSettings:tiempoDemora");
+            empleadoBLL = new EmpleadoBLL(connectionString, ejecutarTiempoDemora, tiempoDemora);
             empleadoService = new EmpleadoService(connectionString);
         }
         public void OnGet()
