@@ -11,6 +11,7 @@ namespace NorthwindTradersV8WebRazorPages.Pages.Empleados
         public int PageIndex { get; set; } = 1;
         public int TotalPages { get; set; }
         private int PageSize;
+        public bool BloquearEdicion { get; set; }
         public IndexModel(IConfiguration configuration)
         {
             var connectionString = configuration.GetConnectionString("NorthwindConnection")

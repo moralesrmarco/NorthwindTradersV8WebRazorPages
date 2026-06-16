@@ -92,13 +92,35 @@
 @section Scripts {
     <script>
         $(function () {
+
             $('#cboPais').select2({
                 tags: true,
                 placeholder: 'Seleccione o escriba un país',
                 width: '100%'
             });
-        });
 
+            $('#cboPais').on('select2:closing', function () {
+
+                const texto = $('.select2-search__field').val();
+
+                if (texto) {
+
+                    const existe =
+                        $('#cboPais option').filter(function () {
+                            return $(this).val() === texto;
+                        }).length > 0;
+
+                    if (!existe) {
+                        $('#cboPais').append(
+                            new Option(texto, texto, true, true)
+                        );
+                    }
+
+                    $('#cboPais').val(texto).trigger('change');
+                }
+            });
+
+        });
         // Configurar jQuery Validation para interceptar el submit
         $("form").validate({
             submitHandler: function (form) {
@@ -121,5 +143,26 @@
                 btnGuardar.innerHTML = '<i class="bi bi-save"></i> Guardar';
             }
         }
+
+        $("form").on("submit", function () {
+
+            const texto = $('.select2-search__field').val();
+
+            if (texto) {
+
+                const existe =
+                    $('#cboPais option').filter(function () {
+                        return $(this).val() === texto;
+                    }).length > 0;
+
+                if (!existe) {
+                    $('#cboPais').append(
+                        new Option(texto, texto, true, true)
+                    );
+                }
+
+                $('#cboPais').val(texto);
+            }
+        });
     </script>
 }

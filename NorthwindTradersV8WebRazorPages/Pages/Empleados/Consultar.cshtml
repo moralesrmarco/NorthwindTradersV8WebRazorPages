@@ -124,22 +124,28 @@
     </div>
 
     <a href="@(Model.ReturnUrl ?? Url.Page("Index"))"
-       class="btn btn-sm btn-success me-1">
-        <i class="bi bi-check-circle"></i> Volver
+       class="btn btn-sm btn-success me-1"
+        title="Volver">
+        <i class="bi bi-check-circle"></i>
+        <span class="d-none d-md-inline"> Volver</span>
     </a>
 
     @if (TempData["Error"] != null)
     {
-        <a class="btn btn-sm btn-primary me-1 disabled">
-            <i class="bi bi-printer"></i> Imprimir
+        <a class="btn btn-sm btn-primary me-1 disabled"
+            title="Imprimir">
+            <i class="bi bi-printer"></i>
+            <span class="d-none d-md-inline"> Imprimir</span>
         </a>
     }
     else
     {
         <a href="javascript:void(0)"
            onclick="disableAndOpen(this, '@Url.Page("Consultar", "Reporte", new { id = Model.Empleado?.EmployeeID })')"
-           class="btn btn-sm btn-primary me-1">
-            <i class="bi bi-printer"></i> Imprimir
+           class="btn btn-sm btn-primary me-1"
+            title="Imprimir">
+            <i class="bi bi-printer"></i>
+            <span class="d-none d-md-inline"> Imprimir</span>
         </a>
     }
     @section Scripts {

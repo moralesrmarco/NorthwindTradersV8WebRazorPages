@@ -16,3 +16,17 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 });
 
+// Cuando la página vuelve desde el historial
+window.addEventListener("pageshow", function () {
+
+    document.querySelectorAll(".action-btn").forEach(btn => {
+
+        btn.classList.remove("disabled");
+
+        btn.removeAttribute("disabled");
+
+        btn.style.pointerEvents = "auto";
+
+    });
+
+});

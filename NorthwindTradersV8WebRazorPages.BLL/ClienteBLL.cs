@@ -27,6 +27,7 @@ namespace NorthwindTradersV8WebRazorPages.BLL
         {
             var resultado = new ResultadoOperacion();
             int numRegs = clienteDAL.Insertar(cliente);
+            resultado.Codigo = numRegs;
             if (numRegs > 0)
                 resultado.Exito = true;
             else

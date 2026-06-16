@@ -43,6 +43,13 @@ namespace NorthwindTradersV8WebRazorPages.Pages.Empleados
                 TempData["Error"] = "<p>Empleado no encontrado</p>" + Common.StringsCommons.Nefep;
                 BloquearEdicion = true;
             }
+            else if (Empleado?.Photo != null)
+            {
+                FotoTemporalBase64 =
+                    Convert.ToBase64String(Empleado.Photo);
+
+                FotoMime = "image/jpeg";
+            }
             CargarCombos();
             return Page();
         }
@@ -93,29 +100,33 @@ namespace NorthwindTradersV8WebRazorPages.Pages.Empleados
                     {
                         if (fotoBytes != null)
                         {
+                            // Se seleccionó una foto nueva
                             Empleado.Photo = fotoBytes;
                         }
                         else if (!string.IsNullOrEmpty(FotoTemporalBase64))
                         {
+                            // Mantener la foto que venía en la página
                             Empleado.Photo = Convert.FromBase64String(FotoTemporalBase64);
                         }
                         else
                         {
-                            var defaultImagePath = Path.Combine(
-                                Directory.GetCurrentDirectory(),
-                                "wwwroot",
-                                "images",
-                                "FotoPerfil.png");
+                            // Recuperar la foto original de la BD
+                            var empleadoOriginal =
+                                empleadoBLL.ObtenerEmpleadoPorId(Empleado.EmployeeID);
 
-                            if (System.IO.File.Exists(defaultImagePath))
+                            if (empleadoOriginal != null)
                             {
-                                Empleado.Photo = System.IO.File.ReadAllBytes(defaultImagePath);
+                                Empleado.Photo = empleadoOriginal.Photo;
                             }
                         }
                     }
                     var resultado = empleadoBLL.Actualizar(Empleado);
                     if (resultado.Exito)
+                    {
+                        if (!string.IsNullOrEmpty(ReturnUrl))
+                            return LocalRedirect(ReturnUrl);
                         return RedirectToPage("Index");
+                    }
                     else
                     {
                         TempData["Error"] = $"<p>El empleado <strong>{Empleado.FirstName} {Empleado.LastName}</strong>:</p>{resultado.Mensaje}";

@@ -128,15 +128,36 @@
     <input type="hidden" asp-for="FotoMime" />
     <button type="submit"
             id="btnGuardar"
-            class="btn btn-sm btn-success me-1">
-        <i class="bi bi-save"></i> Guardar
+            class="btn btn-sm btn-success me-1"
+            title="Guardar">
+        <i class="bi bi-save"></i>
+        <span class="d-none d-md-inline"> Guardar</span>
     </button>
 
     <a href="@(Model.ReturnUrl ?? Url.Page("Index"))"
-       class="btn btn-sm btn-cancelar me-1">
-        <i class="bi bi-x-circle"></i> Cancelar
+       class="btn btn-sm btn-cancelar me-1"
+        title="Cancelar">
+        <i class="bi bi-x-circle"></i>
+        <span class="d-none d-md-inline"> Cancelar</span>
     </a>
 </form>
+<div id="loadingOverlay" style="
+    display:none;
+    position:fixed;
+    top:0;
+    left:0;
+    width:100%;
+    height:100%;
+    background:rgba(255,255,255,0.7);
+    z-index:9999;
+    cursor:wait">
+    <div class="d-flex justify-content-center align-items-center h-100">
+        <div class="text-center">
+            <div class="spinner-border" role="status"></div>
+            <div class="mt-2">Procesando...</div>
+        </div>
+    </div>
+</div>
 @section Scripts {
     <script>
         $(function () {
@@ -145,16 +166,47 @@
                 placeholder: 'Seleccione o escriba un país',
                 width: '100%'
             });
+
+            $('#cboPais').on('select2:closing', function () {
+
+                const texto = $('.select2-search__field').val();
+
+                if (texto) {
+
+                    const existe =
+                        $('#cboPais option').filter(function () {
+                            return $(this).val() === texto;
+                        }).length > 0;
+
+                    if (!existe) {
+                        $('#cboPais').append(
+                            new Option(texto, texto, true, true)
+                        );
+                    }
+
+                    $('#cboPais').val(texto).trigger('change');
+                }
+            });
         });
 
-        // Configurar jQuery Validation para interceptar el submit
-        $("form").validate({
-            submitHandler: function (form) {
+        $(function () {
+
+            $('form').on('submit', function () {
+
+                if (!$(this).valid()) {
+                    return false;
+                }
+
                 const btnGuardar = document.getElementById('btnGuardar');
+
                 btnGuardar.disabled = true;
-                btnGuardar.innerHTML = '<i class="bi bi-hourglass-split"></i> Procesando...';
-                form.submit(); // ahora sí envía al servidor
-            }
+                btnGuardar.innerHTML =
+                    '<span class="spinner-border spinner-border-sm me-1"></span> Procesando...';
+
+                document.getElementById('loadingOverlay').style.display = 'block';
+
+                return true;
+            });
         });
 
         // Reactivar botón si hay error del servidor distinto a Nfrs
