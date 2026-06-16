@@ -16,11 +16,6 @@ namespace NorthwindTradersV8WebRazorPages.Pages.Clientes
         public required List<SelectListItem> Paises { get; set; }
         [BindProperty(SupportsGet = true)]
         public string? ReturnUrl { get; set; }
-
-        public string UrlCancelar =>
-            string.IsNullOrEmpty(ReturnUrl)
-                ? Url.Page("Index")!
-                : ReturnUrl;
         public InsertarModel(IConfiguration configuration)
         {
             string connectionString = configuration.GetConnectionString("NorthwindConnection") ?? throw new InvalidOperationException("Connection string not found.");
@@ -38,7 +33,7 @@ namespace NorthwindTradersV8WebRazorPages.Pages.Clientes
             // Validciones en el servidor
             if (string.IsNullOrEmpty(Cliente?.Country)
                 || Cliente.Country == "0")
-                ModelState.AddModelError("Cliente.Country", "Seleccione o escriba un país termine con un tab cuando inserte un nuevo país");
+                ModelState.AddModelError("Cliente.Country", "Seleccione o escriba un país");
             if (!ModelState.IsValid)
             {
                 CargarCombo();

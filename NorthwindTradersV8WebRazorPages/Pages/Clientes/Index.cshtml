@@ -64,7 +64,6 @@
             <tr>
                 <th class="text-center">ID</th>
                 <th>Nombre de compañía</th>
-                <th class="text-center">Ciudad</th>
                 <th class="text-center">País</th>
                 <th class="text-center">Acciones</th>
             </tr>
@@ -75,7 +74,6 @@
                 <tr>
                     <td class="text-center">@row["CustomerID"]</td>
                     <td>@row["CompanyName"]</td>
-                    <td class="text-center">@row["City"]</td>
                     <td class="text-center">@row["Country"]</td>
                     <td class="text-center text-nowrap">
                         <a asp-page="Consultar"
@@ -147,21 +145,61 @@
         </li>
     </ul>
 </nav>
+<div id="loadingOverlay" style="
+    display:none;
+    position:fixed;
+    top:0;
+    left:0;
+    width:100%;
+    height:100%;
+    background:rgba(255,255,255,0.7);
+    z-index:9999;
+    cursor:wait">
+    <div class="d-flex justify-content-center align-items-center h-100">
+        <div class="text-center">
+            <div class="spinner-border"></div>
+            <div class="mt-2">Procesando...</div>
+        </div>
+    </div>
+</div>
 
 @section Scripts {
     <script>
         document.addEventListener("DOMContentLoaded", function () {
+
             const buttons = document.querySelectorAll(".action-btn");
 
             buttons.forEach(btn => {
+
                 btn.addEventListener("click", function () {
-                    // Deshabilita todos los botones al dar clic en cualquiera
+
                     buttons.forEach(b => {
-                        b.classList.add("disabled"); // estilo Bootstrap
-                        b.setAttribute("disabled", "true"); // atributo real
+                        b.style.pointerEvents = "none";
                     });
+
+                    document.getElementById("loadingOverlay").style.display = "block";
                 });
+
             });
+
+        });
+
+        window.addEventListener("pageshow", function () {
+
+            const overlay = document.getElementById("loadingOverlay");
+
+            if (overlay) {
+                overlay.style.display = "none";
+            }
+
+            const buttons = document.querySelectorAll(".action-btn");
+
+            buttons.forEach(b => {
+                b.style.pointerEvents = "auto";
+                b.classList.remove("disabled");
+                b.style.opacity = "";
+            });
+
         });
     </script>
 }

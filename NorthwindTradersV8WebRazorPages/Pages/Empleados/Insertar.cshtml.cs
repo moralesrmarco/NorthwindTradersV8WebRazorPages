@@ -55,7 +55,7 @@ namespace NorthwindTradersV8WebRazorPages.Pages.Empleados
             // Validciones en el servidor
             if (string.IsNullOrEmpty(Empleado?.Country)
                 || Empleado.Country == "0")
-                ModelState.AddModelError("Empleado.Country", "Seleccione o escriba un país termine con un tab cuando inserte un nuevo país");
+                ModelState.AddModelError("Empleado.Country", "Seleccione o escriba un país");
 
             if (Empleado?.ReportsTo == null || Empleado.ReportsTo == 0)
                 ModelState.AddModelError("Empleado.ReportsTo", "Seleccione a quién reporta el empleado");
@@ -89,7 +89,12 @@ namespace NorthwindTradersV8WebRazorPages.Pages.Empleados
                     }
                     var resultado = empleadoBLL.Insertar(Empleado);
                     if (resultado.Exito)
+                    {
+                        if (!string.IsNullOrEmpty(ReturnUrl))
+                            return LocalRedirect(ReturnUrl);
+
                         return RedirectToPage("Index");
+                    }
                     TempData["Error"] = $"<p>El empleado <strong>{Empleado.FirstName} {Empleado.LastName}</strong>:</p>{resultado.Mensaje}";
                 }
             }
