@@ -158,13 +158,13 @@ namespace NorthwindTradersV8WebRazorPages.DAL
             return cliente;
         }
 
-        public DataTable ObtenerClientesPaginados(int pageIndex, int pageSize, out int totalRegistros)
+        public DataTable ObtenerClientesPaginados(int pageIndex, int rowsPerPage, out int totalRegistros)
         {
             using var connection = new SqlConnection(connectionString);
             using var command = new SqlCommand("SpClientesObtenerPaginados", connection);
             command.CommandType = CommandType.StoredProcedure;
             command.Parameters.AddWithValue("@PageIndex", pageIndex);
-            command.Parameters.AddWithValue("@PageSize", pageSize);
+            command.Parameters.AddWithValue("@RowsPerPage", rowsPerPage);
 
             using var adapter = new SqlDataAdapter(command);
             var ds = new DataSet();

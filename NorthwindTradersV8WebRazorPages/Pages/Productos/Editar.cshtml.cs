@@ -76,7 +76,7 @@ namespace NorthwindTradersV8WebRazorPages.Pages.Productos
                 .Select(c => new SelectListItem { Value = c.Value, Text = c.Text })
                 .ToList();
 
-            Proveedores = proveedorService.ObtenerProveedoresCbo()
+            Proveedores = proveedorService.ObtenerProveedoresPaisesCbo()
                 .Select(p => new SelectListItem { Value = p.Value, Text = p.Text })
                 .ToList();
         }

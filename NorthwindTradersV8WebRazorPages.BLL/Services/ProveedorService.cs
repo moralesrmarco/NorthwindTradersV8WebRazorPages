@@ -13,9 +13,9 @@ namespace NorthwindTradersV8WebRazorPages.BLL.Services
             proveedorDAL = new ProveedorDAL(connectionString);
             comboDataHelper = new ComboDataHelper(connectionString);
         }
-        public List<ComboItemDto> ObtenerProveedoresCbo()
+        public List<ComboItemDto> ObtenerProveedoresPaisesCbo()
         {
-            return comboDataHelper.LlenarCbo("SpProveedorObtenerCbo");
+            return comboDataHelper.LlenarCbo("SpProveedorObtenerPaisesCbo");
         }
     }
 }

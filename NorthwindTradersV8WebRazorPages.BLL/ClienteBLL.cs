@@ -85,11 +85,11 @@ namespace NorthwindTradersV8WebRazorPages.BLL
                 Thread.Sleep(_tiempoDemora);
             return clienteDAL.ObtenerClientePorId(id);
         }
-        public DataTable ObtenerClientesPaginados(int pageIndex, int pageSize, out int totalRegistros)
+        public DataTable ObtenerClientesPaginados(int pageIndex, int rowsPerPage, out int totalRegistros)
         {
             if (_ejecutarTiempoDemora)
                 Thread.Sleep(_tiempoDemora);
-            return clienteDAL.ObtenerClientesPaginados(pageIndex, pageSize, out totalRegistros);
+            return clienteDAL.ObtenerClientesPaginados(pageIndex, rowsPerPage, out totalRegistros);
         }
         public DataTable BuscarClientes(ClientesBuscarDto filtro)
         {

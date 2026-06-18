@@ -133,6 +133,75 @@
                             </ul>
                         </li>
 
+                        <!-- Menú  proveedores con submenús -->
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle text-dark" href="#" id="proveedoresDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                Proveedores
+                            </a>
+                            <ul class="dropdown-menu" aria-labelledby="proveedoresDropdown">
+
+                                <!-- Gestión de proveedores -->
+                                <li><a class="dropdown-item" asp-area="" asp-page="/Proveedores/Index">Gestión de proveedores</a></li>
+                                <li><hr class="dropdown-divider" /></li>
+
+                                <!-- Submenú Consultas -->
+                                <li class="dropdown-submenu">
+                                    <a class="dropdown-item dropdown-toggle" href="#">Consultas</a>
+                                    <ul class="dropdown-menu">
+                                        <li>
+                                            <a class="dropdown-item"
+                                               asp-page="/Clientes/Reportes/RptClientes">
+                                                Directorio de clientes y proveedores
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a class="dropdown-item"
+                                               asp-page="/Clientes/Reportes/RptClientesConFoto">
+                                                Directorio de clientes y proveedores por ciudad
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a class="dropdown-item"
+                                               asp-page="/Clientes/Reportes/RptClientesConFoto2">
+                                                Directorio de clientes y proveedores por país
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </li>
+
+                                <!-- Submenú Reportes -->
+                                <li class="dropdown-submenu">
+                                    <a class="dropdown-item dropdown-toggle" href="#">Reportes</a>
+                                    <ul class="dropdown-menu">
+                                        <li>
+                                            <a class="dropdown-item"
+                                               asp-page="/Empleados/Reportes/RptEmpleados">
+                                                Directorio de clientes
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a class="dropdown-item"
+                                               asp-page="/Empleados/Reportes/RptEmpleadosConFoto">
+                                                Directorio de clientes y proveedores
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a class="dropdown-item"
+                                               asp-page="/Empleados/Reportes/RptEmpleadosConFoto2">
+                                                Directorio de clientes y proveedores por ciudad
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a class="dropdown-item"
+                                               asp-page="/Empleados/Reportes/RptEmpleadosConFoto2">
+                                                Directorio de clientes y proveedores por país
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </li>
+                            </ul>
+                        </li>
+
                         <!-- Menú Productos con submenús -->
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle text-dark" href="#" id="productosDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
