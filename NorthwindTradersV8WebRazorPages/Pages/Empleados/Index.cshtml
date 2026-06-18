@@ -16,49 +16,9 @@
     <i class="bi bi-search"></i>
     <span class="d-none d-md-inline"> Buscar empleado</span>
 </a>
-@{
-    int startPage = Math.Max(1, Model.PageIndex - 2);
-    int endPage = Math.Min(Model.TotalPages, Model.PageIndex + 2);
-}
-<nav aria-label="Page navigation">
-    <ul class="pagination justify-content-center flex-wrap">
-        <!-- Botón Inicio -->
-        <li class="page-item @(Model.PageIndex == 1 ? "disabled" : "")">
-            <a class="page-link" asp-page="Index" asp-route-pageIndex="1" title="Primera página">
-                ««
-            </a>
-        </li>
 
-        <!-- Botón Anterior -->
-        <li class="page-item @(Model.PageIndex == 1 ? "disabled" : "")">
-            <a class="page-link" asp-page="Index" asp-route-pageIndex="@(Model.PageIndex - 1)" title="Anterior">
-                «
-            </a>
-        </li>
+<partial name="_Paginacion" model="Model.Paginacion" />
 
-        <!-- Rango dinámico -->
-        @for (int i = startPage; i <= endPage; i++)
-        {
-            <li class="page-item @(i == Model.PageIndex ? "active" : "")">
-                <a class="page-link" asp-page="Index" asp-route-pageIndex="@i">@i</a>
-            </li>
-        }
-
-        <!-- Botón Siguiente -->
-        <li class="page-item @(Model.PageIndex == Model.TotalPages ? "disabled" : "")">
-            <a class="page-link" asp-page="Index" asp-route-pageIndex="@(Model.PageIndex + 1)" title="Siguiente">
-                »
-            </a>
-        </li>
-
-        <!-- Botón Fin -->
-        <li class="page-item @(Model.PageIndex == Model.TotalPages ? "disabled" : "")">
-            <a class="page-link" asp-page="Index" asp-route-pageIndex="@Model.TotalPages" title="Última página">
-                »»
-            </a>
-        </li>
-    </ul>
-</nav>
 <div class="table-responsive">
     <table class="table table-striped">
         <thead>
@@ -116,99 +76,15 @@
         </tbody>
     </table>
 </div>
-<nav aria-label="Page navigation">
-    <ul class="pagination justify-content-center flex-wrap">
-        <!-- Botón Inicio -->
-        <li class="page-item @(Model.PageIndex == 1 ? "disabled" : "")">
-            <a class="page-link" asp-page="Index" asp-route-pageIndex="1" title="Primera página">
-                ««
-            </a>
-        </li>
 
-        <!-- Botón Anterior -->
-        <li class="page-item @(Model.PageIndex == 1 ? "disabled" : "")">
-            <a class="page-link" asp-page="Index" asp-route-pageIndex="@(Model.PageIndex - 1)" title="Anterior">
-                «
-            </a>
-        </li>
+<partial name="_Paginacion" model="Model.Paginacion" />
 
-        <!-- Rango dinámico -->
-        @for (int i = startPage; i <= endPage; i++)
-        {
-            <li class="page-item @(i == Model.PageIndex ? "active" : "")">
-                <a class="page-link" asp-page="Index" asp-route-pageIndex="@i">@i</a>
-            </li>
-        }
-
-        <!-- Botón Siguiente -->
-        <li class="page-item @(Model.PageIndex == Model.TotalPages ? "disabled" : "")">
-            <a class="page-link" asp-page="Index" asp-route-pageIndex="@(Model.PageIndex + 1)" title="Siguiente">
-                »
-            </a>
-        </li>
-
-        <!-- Botón Fin -->
-        <li class="page-item @(Model.PageIndex == Model.TotalPages ? "disabled" : "")">
-            <a class="page-link" asp-page="Index" asp-route-pageIndex="@Model.TotalPages" title="Última página">
-                »»
-            </a>
-        </li>
-    </ul>
-</nav>
-<div id="loadingOverlay" style="
-    display:none;
-    position:fixed;
-    top:0;
-    left:0;
-    width:100%;
-    height:100%;
-    background:rgba(255,255,255,0.7);
-    z-index:9999;
-    cursor:wait">
-    <div class="d-flex justify-content-center align-items-center h-100">
-        <div class="text-center">
-            <div class="spinner-border"></div>
-            <div class="mt-2">Procesando...</div>
-        </div>
-    </div>
-</div>
 @section Scripts {
+    <script src="~/js/list-actions.js"></script>
+
     <script>
-        document.addEventListener("DOMContentLoaded", function () {
-
-            const buttons = document.querySelectorAll(".action-btn");
-
-            buttons.forEach(btn => {
-
-                btn.addEventListener("click", function () {
-
-                    buttons.forEach(b => {
-                        b.style.pointerEvents = "none";
-                    });
-
-                    document.getElementById("loadingOverlay").style.display = "block";
-                });
-
-            });
-
-        });
-
-        window.addEventListener("pageshow", function () {
-
-            const overlay = document.getElementById("loadingOverlay");
-
-            if (overlay) {
-                overlay.style.display = "none";
-            }
-
-            const buttons = document.querySelectorAll(".action-btn");
-
-            buttons.forEach(b => {
-                b.style.pointerEvents = "auto";
-                b.classList.remove("disabled");
-                b.style.opacity = "";
-            });
-
+        $(function () {
+            configurarAccionesListado();
         });
     </script>
 }

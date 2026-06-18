@@ -1,0 +1,55 @@
+﻿@model NorthwindTradersV8WebRazorPages.Infrastructure.PaginacionModel
+
+@{
+    int startPage = Math.Max(1, Model.PageIndex - 2);
+    int endPage = Math.Min(Model.TotalPages, Model.PageIndex + 2);
+}
+
+<nav aria-label="Page navigation">
+    <ul class="pagination justify-content-center flex-wrap">
+
+        <li class="page-item @(Model.PageIndex == 1 ? "disabled" : "")">
+            <a class="page-link"
+               asp-page="@Model.PageName"
+               asp-route-pageIndex="1">
+                ««
+            </a>
+        </li>
+
+        <li class="page-item @(Model.PageIndex == 1 ? "disabled" : "")">
+            <a class="page-link"
+               asp-page="@Model.PageName"
+               asp-route-pageIndex="@(Model.PageIndex - 1)">
+                «
+            </a>
+        </li>
+
+        @for (int i = startPage; i <= endPage; i++)
+        {
+            <li class="page-item @(i == Model.PageIndex ? "active" : "")">
+                <a class="page-link"
+                   asp-page="@Model.PageName"
+                   asp-route-pageIndex="@i">
+                    @i
+                </a>
+            </li>
+        }
+
+        <li class="page-item @(Model.PageIndex == Model.TotalPages ? "disabled" : "")">
+            <a class="page-link"
+               asp-page="@Model.PageName"
+               asp-route-pageIndex="@(Model.PageIndex + 1)">
+                »
+            </a>
+        </li>
+
+        <li class="page-item @(Model.PageIndex == Model.TotalPages ? "disabled" : "")">
+            <a class="page-link"
+               asp-page="@Model.PageName"
+               asp-route-pageIndex="@Model.TotalPages">
+                »»
+            </a>
+        </li>
+
+    </ul>
+</nav>
