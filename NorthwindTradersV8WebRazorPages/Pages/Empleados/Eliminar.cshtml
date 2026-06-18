@@ -3,7 +3,7 @@
 @{
 }
 <h2>Eliminar empleado</h2>
-<form method="post" class="form" onsubmit="return disableDeleteButton();">
+<form method="post" class="form" onsubmit="return configurarEliminar('btnEliminar');">
     <p>¿Está seguro de eliminar el empleado con ID: <strong>@Model.Empleado?.EmployeeID</strong> - Nombre de empleado: <strong>@Model.Empleado?.NameByFirstName</strong>?</p>
     @if (TempData["Error"] != null)
     {
@@ -136,42 +136,6 @@
     </a>
     <input type="hidden" asp-for="Empleado.RowVersion" />
 </form>
-<div id="loadingOverlay" style="
-    display:none;
-    position:fixed;
-    top:0;
-    left:0;
-    width:100%;
-    height:100%;
-    background:rgba(255,255,255,0.7);
-    z-index:9999;
-    cursor:wait;">
-
-    <div class="d-flex justify-content-center align-items-center h-100">
-        <div class="text-center">
-            <div class="spinner-border" role="status"></div>
-            <div class="mt-2">Procesando...</div>
-        </div>
-    </div>
-</div>
 @section Scripts {
-    <script>
-        function disableDeleteButton() {
-
-            const btn = document.getElementById("btnEliminar");
-
-            if (btn.disabled) {
-                return false;
-            }
-
-            btn.disabled = true;
-
-            btn.innerHTML =
-                '<span class="spinner-border spinner-border-sm me-1"></span> Procesando...';
-
-            document.getElementById("loadingOverlay").style.display = "block";
-
-            return true;
-        }    
-</script>
+    <script src="~/js/form-delete.js"></script>
 }
