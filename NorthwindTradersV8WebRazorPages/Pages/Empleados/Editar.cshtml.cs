@@ -23,9 +23,9 @@ namespace NorthwindTradersV8WebRazorPages.Pages.Empleados
         public string? FotoTemporalBase64 { get; set; }
         [BindProperty]
         public string? FotoMime { get; set; }
-        public bool BloquearEdicion { get; set; }
         [BindProperty(SupportsGet = true)]
         public string? ReturnUrl { get; set; }
+        public bool BloquearEdicion { get; set; }
         public EditarModel(IConfiguration configuration)
         {
             var connectionString = configuration.GetConnectionString("NorthwindConnection")
@@ -73,7 +73,7 @@ namespace NorthwindTradersV8WebRazorPages.Pages.Empleados
             // Validaciones en el servidor
             if (string.IsNullOrEmpty(Empleado?.Country)
                 || Empleado.Country == "0")
-                ModelState.AddModelError("Empleado.Country", "Seleccione o escriba un país termine con un tab cuando inserte un nuevo país");
+                ModelState.AddModelError("Empleado.Country", "Seleccione o escriba un país");
             if (Empleado?.ReportsTo == null || Empleado.ReportsTo == 0)
                 ModelState.AddModelError("Empleado.ReportsTo", "Seleccione a quién reporta el empleado");
             if (!ModelState.IsValid)

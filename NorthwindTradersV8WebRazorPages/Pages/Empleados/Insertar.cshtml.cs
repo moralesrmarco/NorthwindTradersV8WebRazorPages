@@ -25,6 +25,7 @@ namespace NorthwindTradersV8WebRazorPages.Pages.Empleados
         public string? FotoMime { get; set; }
         [BindProperty(SupportsGet = true)]
         public string? ReturnUrl { get; set; }
+        public bool BloquearEdicion { get; set; }
         public InsertarModel(IConfiguration configuration)
         {
             var connectionString = configuration.GetConnectionString("NorthwindConnection")
@@ -96,6 +97,8 @@ namespace NorthwindTradersV8WebRazorPages.Pages.Empleados
                         return RedirectToPage("Index");
                     }
                     TempData["Error"] = $"<p>El empleado <strong>{Empleado.FirstName} {Empleado.LastName}</strong>:</p>{resultado.Mensaje}";
+                    if (resultado.Codigo < 0)
+                        BloquearEdicion = true;
                 }
             }
             catch (Exception ex)

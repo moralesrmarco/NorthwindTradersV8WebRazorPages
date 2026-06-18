@@ -60,8 +60,8 @@
             <input asp-for="Cliente.Fax" class="form-control" readonly />
         </div>
     </div>
-    <a href="@Model.UrlVolver"
-       class="btn btn-sm btn-success me-1" 
+    <a href="@(Model.ReturnUrl ?? Url.Page("Index"))"
+       class="btn btn-sm btn-success me-1"
        title="Volver">
         <i class="bi bi-check-circle"></i>
         <span class="d-none d-md-inline"> Volver</span>

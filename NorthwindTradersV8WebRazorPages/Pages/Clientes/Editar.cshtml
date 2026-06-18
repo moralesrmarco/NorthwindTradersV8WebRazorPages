@@ -8,7 +8,6 @@
     {
         <div class="alert alert-danger">@Html.Raw(TempData["Error"])</div>
     }
-    <fieldset @(Model.BloquearEdicion ? "disabled" : "")>
         <div class="row">
             <div class="col-md-2 mb-3">
                 <label asp-for="Cliente.CustomerID" class="form-label">ID</label>
@@ -61,8 +60,7 @@
                 <select id="cboPais" 
                     asp-for="Cliente.Country"
                     asp-items="Model.Paises"
-                    class="form-select"
-                    disabled="@Model.BloquearEdicion">
+                    class="form-select">
                 </select>
                 <span asp-validation-for="Cliente.Country" class="text-danger"></span>
             </div>
@@ -77,9 +75,7 @@
                 <span asp-validation-for="Cliente.Fax" class="text-danger"></span>
             </div>
         </div>
-        <input type="hidden" asp-for="ReturnUrl" />
         <input type="hidden" asp-for="Cliente.RowVersion" />
-    </fieldset>
     <button type="submit"
             id="btnGuardar"
             class="btn btn-sm btn-success me-1"
@@ -88,7 +84,7 @@
         <i class="bi bi-save"></i>
         <span class="d-none d-md-inline"> Guardar</span>
     </button>
-    <a href="@Model.UrlCancelar"
+    <a href="@(Model.ReturnUrl ?? Url.Page("Index"))"
        class="btn btn-sm btn-cancelar me-1"
         title="Cancelar">
         <i class="bi bi-x-circle"></i>
@@ -96,37 +92,12 @@
     </a>
 </form>
 @section Scripts {
+    <script src="~/js/form-submit.js"></script>
+
     <script>
         $(function () {
-            $('#cboPais').select2({
-                tags: true,
-                placeholder: 'Seleccione o escriba un país',
-                width: '100%'
-            });
-            // $('#cboPais').trigger('change')
+            configurarPais('Cliente.Country');
+            configurarSubmitFormulario('Cliente.Country');
         });
-
-        // Configurar jQuery Validation para interceptar el submit
-        $("form").validate({
-            submitHandler: function (form) {
-                const btnGuardar = document.getElementById('btnGuardar');
-                btnGuardar.disabled = true;
-                btnGuardar.innerHTML = '<i class="bi bi-hourglass-split"></i> Procesando...';
-                form.submit(); // ahora sí envía al servidor
-            }
-        });
-
-        // Reactivar botón si hay error del servidor distinto a Nfrs
-        const errorDiv = document.querySelector('.alert-danger');
-        if (errorDiv) {
-            const mensajeError = errorDiv.textContent || "";
-            const btnGuardar = document.getElementById('btnGuardar');
-
-            // Solo reactivar si el mensaje no es StringsCommons.Nfrs
-            if (!mensajeError.includes("StringsCommons.Nfrs")) {
-                btnGuardar.disabled = false;
-                btnGuardar.innerHTML = '<i class="bi bi-save"></i> Guardar';
-            }
-        }
     </script>
 }

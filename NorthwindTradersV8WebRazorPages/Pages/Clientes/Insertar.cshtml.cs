@@ -16,6 +16,8 @@ namespace NorthwindTradersV8WebRazorPages.Pages.Clientes
         public required List<SelectListItem> Paises { get; set; }
         [BindProperty(SupportsGet = true)]
         public string? ReturnUrl { get; set; }
+        public bool BloquearEdicion { get; set; }
+
         public InsertarModel(IConfiguration configuration)
         {
             string connectionString = configuration.GetConnectionString("NorthwindConnection") ?? throw new InvalidOperationException("Connection string not found.");
@@ -62,6 +64,8 @@ namespace NorthwindTradersV8WebRazorPages.Pages.Clientes
                         return RedirectToPage("Index");
                     }
                     TempData["Error"] = $"<p>El cliente <strong>{Cliente.CompanyName}</strong>:</p>{resultado.Mensaje}";
+                    if (resultado.Codigo < 0)
+                        BloquearEdicion = true;
                 }
             }
             catch (Exception ex)

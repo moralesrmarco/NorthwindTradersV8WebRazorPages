@@ -169,112 +169,22 @@
         <span class="d-none d-md-inline"> Cancelar</span>
     </a>
 </form>
-<div id="loadingOverlay" style="
-    display:none;
-    position:fixed;
-    top:0;
-    left:0;
-    width:100%;
-    height:100%;
-    background:rgba(255,255,255,0.7);
-    z-index:9999;
-    cursor:wait">
-    <div class="d-flex justify-content-center align-items-center h-100">
-        <div class="text-center">
-            <div class="spinner-border" role="status"></div>
-            <div class="mt-2">Procesando...</div>
-        </div>
-    </div>
-</div>
+
 @section Scripts {
+    <script src="~/js/form-submit.js"></script>
+    <script src="~/js/manejo-foto.js"></script>
+
     <script>
         $(function () {
-
-            $('#cboPais').select2({
-                tags: true,
-                placeholder: 'Seleccione o escriba un país',
-                width: '100%'
-            });
-
-            $('#cboPais').on('select2:closing', function () {
-
-                const texto = $('.select2-search__field').val();
-
-                if (texto) {
-
-                    const existe =
-                        $('#cboPais option').filter(function () {
-                            return $(this).val() === texto;
-                        }).length > 0;
-
-                    if (!existe) {
-                        $('#cboPais').append(
-                            new Option(texto, texto, true, true)
-                        );
-                    }
-
-                    $('#cboPais').val(texto).trigger('change');
-                }
-            });
-
-        });
-
-        document.getElementById('fileFoto').addEventListener('change', function (event) {
-            const file = event.target.files[0];
-            if (!file)
-                return;
-            const reader = new FileReader();
-            reader.onload = function (e) {
-                // Vista previa
-                document.getElementById('previewFoto').src =
-                    e.target.result;
-                // Guardar Base64 en el hidden
-                document.getElementById('FotoTemporalBase64').value =
-                    e.target.result.split(',')[1];
-                // Guardar tipo MIME
-                document.getElementById('FotoMime').value =
-                    file.type;
-            };
-            reader.readAsDataURL(file);
-        });
-
-        function disableSaveButton() {
-
-            const btn = document.getElementById("btnGuardar");
-
-            // Si ya está deshabilitado no volver a procesar
-            if (btn.disabled) {
-                return false;
-            }
-
-            btn.disabled = true;
-
-            btn.innerHTML =
-                '<span class="spinner-border spinner-border-sm me-1"></span> Procesando...';
-
-            document.getElementById("loadingOverlay").style.display = "block";
-
-            return true;
-        }
-        $("form").on("submit", function () {
-
-            const texto = $('.select2-search__field').val();
-
-            if (texto) {
-
-                const existe =
-                    $('#cboPais option').filter(function () {
-                        return $(this).val() === texto;
-                    }).length > 0;
-
-                if (!existe) {
-                    $('#cboPais').append(
-                        new Option(texto, texto, true, true)
-                    );
-                }
-
-                $('#cboPais').val(texto);
-            }
+            configurarPais('Empleado.Country');
+            configurarSubmitFormulario('Empleado.Country');
+            configurarPreviewImagen(
+                'fileFoto',
+                'previewFoto',
+                'FotoTemporalBase64',
+                'FotoMime',
+                2
+            );        
         });
     </script>
 }

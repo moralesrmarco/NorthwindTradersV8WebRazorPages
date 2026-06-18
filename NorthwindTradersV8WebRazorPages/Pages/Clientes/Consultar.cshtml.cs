@@ -13,10 +13,6 @@ namespace NorthwindTradersV8WebRazorPages.Pages.Clientes
         public Cliente? Cliente { get; set; } = new Cliente();
         [BindProperty(SupportsGet = true)]
         public string? ReturnUrl { get; set; }
-        public string UrlVolver =>
-            string.IsNullOrEmpty(ReturnUrl)
-                ? Url.Page("Index")!
-                : ReturnUrl;
         public ConsultarModel(IConfiguration configuration)
         {
             var connectionString = configuration.GetConnectionString("NorthwindConnection")
