@@ -4,13 +4,13 @@ using NorthwindTradersV8WebRazorPages.BLL;
 using NorthwindTradersV8WebRazorPages.Common;
 using NorthwindTradersV8WebRazorPages.Entities;
 
-namespace NorthwindTradersV8WebRazorPages.Pages.Clientes
+namespace NorthwindTradersV8WebRazorPages.Pages.Proveedores
 {
     public class EliminarModel : PageModel
     {
-        private readonly ClienteBLL clienteBLL;
+        private readonly ProveedorBLL proveedorBLL;
         [BindProperty]
-        public Cliente? Cliente { get; set; } = new Cliente();
+        public Proveedor? Proveedor { get; set; } = new Proveedor();
         public bool BloquearEliminacion { get; set; }
         [BindProperty(SupportsGet = true)]
         public string? ReturnUrl { get; set; }
@@ -20,25 +20,25 @@ namespace NorthwindTradersV8WebRazorPages.Pages.Clientes
                 ?? throw new InvalidOperationException("Connection string not found");
             bool ejecutarTiempoDemora = configuration.GetValue<bool>("AppSettings:ejecutarTiempoDemora");
             int tiempoDemora = configuration.GetValue<int>("AppSettings:tiempoDemora");
-            clienteBLL = new ClienteBLL(connectionString, ejecutarTiempoDemora, tiempoDemora);
+            proveedorBLL = new ProveedorBLL(connectionString, ejecutarTiempoDemora, tiempoDemora);
         }
         public IActionResult OnGet(string id)
         {
-            var cliente = clienteBLL.ObtenerClientePorId(id);
+            var cliente = proveedorBLL.ObtenerProveedorPorId(id);
             if (cliente == null)
             {
-                TempData["Error"] = "<p>Cliente no encontrado</p>" + StringsCommons.Nefep;
+                TempData["Error"] = "<p>Proveedor no encontrado</p>" + StringsCommons.Nefep;
                 BloquearEliminacion = true;
             }
             else
-                Cliente = cliente;
+                Proveedor = cliente;
             return Page();
         }
         public IActionResult OnPost()
         {
-            if (Cliente != null)
+            if (Proveedor != null)
             {
-                var resultado = clienteBLL.Eliminar(Cliente);
+                var resultado = proveedorBLL.Eliminar(Proveedor);
                 if (resultado.Exito)
                 {
                     if (!string.IsNullOrEmpty(ReturnUrl))
@@ -47,7 +47,7 @@ namespace NorthwindTradersV8WebRazorPages.Pages.Clientes
                 }
                 else
                 {
-                    TempData["Error"] = $"<p>El cliente con Id: <strong>{Cliente.CustomerID}</strong> - Nombre de compañía: <strong>{Cliente.CompanyName}</strong>:</p>{resultado.Mensaje}";
+                    TempData["Error"] = $"<p>El proveedor con Id: <strong>{Proveedor.SupplierID}</strong> - Nombre de compañía: <strong>{Proveedor.CompanyName}</strong>:</p>{resultado.Mensaje}";
                     // Sólo bloquea para errores definitivos
                     if (resultado.Codigo < 0)
                         BloquearEliminacion = true;

@@ -33,13 +33,13 @@ namespace NorthwindTradersV8WebRazorPages.Pages.Proveedores
         public IActionResult OnPost()
         {
             // Validciones en el servidor
-            //if (string.IsNullOrEmpty(Proveedor?.Country))
-            //    ModelState.AddModelError("Proveedor.Country", "Seleccione o escriba un país");
-            //if (!ModelState.IsValid)
-            //{
-            //    CargarCombo();
-            //    return Page();
-            //}
+            if (string.IsNullOrWhiteSpace(Proveedor?.Country))
+                ModelState.AddModelError("Proveedor.Country", "Seleccione o escriba un país");
+            if (!ModelState.IsValid)
+            {
+                CargarCombo();
+                return Page();
+            }
             try
             {
                 if (Proveedor != null)

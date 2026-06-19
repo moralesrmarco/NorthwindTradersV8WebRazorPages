@@ -1,0 +1,102 @@
+﻿@page
+@model NorthwindTradersV8WebRazorPages.Pages.Proveedores.EditarModel
+@{
+}
+<h2>Editar proveedor</h2>
+<form method="post" class="form">
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger">@Html.Raw(TempData["Error"])</div>
+    }
+    <div class="row">
+        <div class="col-md-2 mb-3">
+            <label asp-for="Proveedor.SupplierID" class="form-label">ID</label>
+            <input asp-for="Proveedor.SupplierID" class="form-control" readonly />
+        </div>
+        <div class="col-md-5 mb-3">
+            <label asp-for="Proveedor.CompanyName" class="form-label">Nombre de compañía</label>
+            <input asp-for="Proveedor.CompanyName" class="form-control" />
+            <span asp-validation-for="Proveedor.CompanyName" class="text-danger"></span>
+        </div>
+        <div class="col-md-5 mb-3">
+            <label asp-for="Proveedor.ContactName" class="form-label">Nombre de contacto</label>
+            <input asp-for="Proveedor.ContactName" class="form-control" />
+            <span asp-validation-for="Proveedor.ContactName" class="text-danger"></span>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-3 mb-3">
+            <label asp-for="Proveedor.ContactTitle" class="form-label">Título de contacto</label>
+            <input asp-for="Proveedor.ContactTitle" class="form-control" />
+            <span asp-validation-for="Proveedor.ContactTitle" class="text-danger"></span>
+        </div>
+        <div class="col-md-9 mb-3">
+            <label asp-for="Proveedor.Address" class="form-label">Domicilio</label>
+            <input asp-for="Proveedor.Address" class="form-control" />
+            <span asp-validation-for="Proveedor.Address" class="text-danger"></span>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-4 mb-3">
+            <label asp-for="Proveedor.City" class="form-label">Ciudad</label>
+            <input asp-for="Proveedor.City" class="form-control" />
+            <span asp-validation-for="Proveedor.City" class="text-danger"></span>
+        </div>
+        <div class="col-md-4 mb-3">
+            <label asp-for="Proveedor.Region" class="form-label">Región</label>
+            <input asp-for="Proveedor.Region" class="form-control" />
+            <span asp-validation-for="Proveedor.Region" class="text-danger"></span>
+        </div>
+        <div class="col-md-4 mb-3">
+            <label asp-for="Proveedor.PostalCode" class="form-label">Código postal</label>
+            <input asp-for="Proveedor.PostalCode" class="form-control" />
+            <span asp-validation-for="Proveedor.PostalCode" class="text-danger"></span>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-4 mb-3">
+            <label asp-for="Proveedor.Country" class="form-label">País</label>
+            <select id="cboPais"
+                    asp-for="Proveedor.Country"
+                    asp-items="Model.Paises"
+                    class="form-select">
+            </select>
+            <span asp-validation-for="Proveedor.Country" class="text-danger"></span>
+        </div>
+        <div class="col-md-4 mb-3">
+            <label asp-for="Proveedor.Phone" class="form-label">Teléfono</label>
+            <input asp-for="Proveedor.Phone" class="form-control" />
+            <span asp-validation-for="Proveedor.Phone" class="text-danger"></span>
+        </div>
+        <div class="col-md-4 mb-3">
+            <label asp-for="Proveedor.Fax" class="form-label">Fax</label>
+            <input asp-for="Proveedor.Fax" class="form-control" />
+            <span asp-validation-for="Proveedor.Fax" class="text-danger"></span>
+        </div>
+    </div>
+    <input type="hidden" asp-for="Proveedor.RowVersion" />
+    <button type="submit"
+            id="btnGuardar"
+            class="btn btn-sm btn-success me-1"
+            disabled="@Model.BloquearEdicion"
+            title="Guardar">
+        <i class="bi bi-save"></i>
+        <span class="d-none d-md-inline"> Guardar</span>
+    </button>
+    <a href="@(Model.ReturnUrl ?? Url.Page("Index"))"
+       class="btn btn-sm btn-cancelar me-1"
+       title="Cancelar">
+        <i class="bi bi-x-circle"></i>
+        <span class="d-none d-md-inline"> Cancelar</span>
+    </a>
+</form>
+@section Scripts {
+    <script src="~/js/form-submit.js"></script>
+
+    <script>
+        $(function () {
+        configurarPais('Proveedor.Country');
+        configurarSubmitFormulario('Proveedor.Country');
+        });
+    </script>
+}

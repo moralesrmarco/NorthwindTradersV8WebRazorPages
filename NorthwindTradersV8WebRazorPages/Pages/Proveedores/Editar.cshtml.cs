@@ -5,14 +5,14 @@ using NorthwindTradersV8WebRazorPages.BLL;
 using NorthwindTradersV8WebRazorPages.BLL.Services;
 using NorthwindTradersV8WebRazorPages.Entities;
 
-namespace NorthwindTradersV8WebRazorPages.Pages.Clientes
+namespace NorthwindTradersV8WebRazorPages.Pages.Proveedores
 {
     public class EditarModel : PageModel
     {
-        private readonly ClienteBLL clienteBLL;
-        private readonly ClienteService clienteService;
+        private readonly ProveedorBLL proveedorBLL;
+        private readonly ProveedorService proveedorService;
         [BindProperty]
-        public Cliente? Cliente { get; set; } = new Cliente();
+        public Proveedor? Proveedor { get; set; } = new Proveedor();
         public required List<SelectListItem> Paises { get; set; }
         public bool BloquearEdicion { get; set; }
         [BindProperty(SupportsGet = true)]
@@ -22,15 +22,15 @@ namespace NorthwindTradersV8WebRazorPages.Pages.Clientes
             string connectionString = configuration.GetConnectionString("NorthwindConnection") ?? throw new InvalidOperationException("Connection string not found.");
             bool ejecutarTiempoDemora = configuration.GetValue<bool>("AppSettings:ejecutarTiempoDemora");
             int tiempoDemora = configuration.GetValue<int>("AppSettings:tiempoDemora");
-            clienteBLL = new ClienteBLL(connectionString, ejecutarTiempoDemora, tiempoDemora);
-            clienteService = new ClienteService(connectionString);
+            proveedorBLL = new ProveedorBLL(connectionString, ejecutarTiempoDemora, tiempoDemora);
+            proveedorService = new ProveedorService(connectionString);
         }
         public IActionResult OnGet(string id)
         {
-            Cliente = clienteBLL.ObtenerClientePorId(id);
-            if (Cliente == null)
+            Proveedor = proveedorBLL.ObtenerProveedorPorId(id);
+            if (Proveedor == null)
             {
-                TempData["Error"] = "<p>Cliente no encontrado</p>" + Common.StringsCommons.Nefep;
+                TempData["Error"] = "<p>Proveedor no encontrado</p>" + Common.StringsCommons.Nefep;
                 BloquearEdicion = true;
             }
             CargarCombo();
@@ -39,8 +39,8 @@ namespace NorthwindTradersV8WebRazorPages.Pages.Clientes
         public IActionResult OnPost()
         {
             //// Validaciones en el servidor
-            if (string.IsNullOrWhiteSpace(Cliente?.Country))
-                ModelState.AddModelError("Cliente.Country", "Seleccione o escriba un país");
+            if (string.IsNullOrWhiteSpace(Proveedor?.Country))
+                ModelState.AddModelError("Proveedor.Country", "Seleccione o escriba un país");
             if (!ModelState.IsValid)
             {
                 CargarCombo();
@@ -48,43 +48,43 @@ namespace NorthwindTradersV8WebRazorPages.Pages.Clientes
             }
             try
             {
-                if (Cliente != null)
+                if (Proveedor != null)
                 {
-                    var resultado = clienteBLL.Actualizar(Cliente);
+                    var resultado = proveedorBLL.Actualizar(Proveedor);
                     if (resultado.Exito)
                     {
                         if (!string.IsNullOrEmpty(ReturnUrl))
                             return LocalRedirect(ReturnUrl);
                         return RedirectToPage("Index");
                     }
-                    TempData["Error"] = $"<p>El cliente <strong>{Cliente.CompanyName}</strong>:</p>{resultado.Mensaje}";
+                    TempData["Error"] = $"<p>El proveedor <strong>{Proveedor.CompanyName}</strong>:</p>{resultado.Mensaje}";
                     if (resultado.Codigo < 0)
                         BloquearEdicion = true;
                 }
             }
             catch (Exception ex)
             {
-                TempData["Error"] = $"<p>Error al editar el cliente <strong>{Cliente?.CompanyName}</strong>.</p><p>Detalles: {ex.Message}</p>";
+                TempData["Error"] = $"<p>Error al editar el proveedor <strong>{Proveedor?.CompanyName}</strong>.</p><p>Detalles: {ex.Message}</p>";
             }
             CargarCombo();
             return Page();
         }
         private void CargarCombo()
         {
-            Paises = clienteService.ObtenerClientesPaisesCbo().Select(p => new SelectListItem
+            Paises = proveedorService.ObtenerProveedoresPaisesCbo().Select(p => new SelectListItem
             {
                 Value = p.Value,
                 Text = p.Text
             }).ToList();
             // 👇 Si el usuario escribió un país nuevo, lo agregamos para que se conserve
-            if (!string.IsNullOrEmpty(Cliente?.Country)
+            if (!string.IsNullOrEmpty(Proveedor?.Country)
                 && !Paises.Any(p => string.Equals(
-                        p.Value, 
-                        Cliente.Country,
+                        p.Value,
+                        Proveedor.Country,
                         StringComparison.OrdinalIgnoreCase
                     )))
             {
-                Paises.Add(new SelectListItem { Value = Cliente.Country, Text = Cliente.Country });
+                Paises.Add(new SelectListItem { Value = Proveedor.Country, Text = Proveedor.Country });
             }
         }
     }

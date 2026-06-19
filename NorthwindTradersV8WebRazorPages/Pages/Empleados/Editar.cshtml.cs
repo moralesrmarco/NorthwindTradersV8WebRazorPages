@@ -71,17 +71,16 @@ namespace NorthwindTradersV8WebRazorPages.Pages.Empleados
                 FotoMime = Foto.ContentType;
             }
             // Validaciones en el servidor
-            //if (string.IsNullOrEmpty(Empleado?.Country)
-            //    || Empleado.Country == "0")
-            //    ModelState.AddModelError("Empleado.Country", "Seleccione o escriba un país");
+            if (string.IsNullOrWhiteSpace(Empleado?.Country))
+                ModelState.AddModelError("Empleado.Country", "Seleccione o escriba un país");
             //if (Empleado?.ReportsTo == null || Empleado.ReportsTo == 0)
             //    ModelState.AddModelError("Empleado.ReportsTo", "Seleccione a quién reporta el empleado");
-            //if (!ModelState.IsValid)
-            //{
-            //    // Recargar listas si hay error de validación
-            //    CargarCombos();
-            //    return Page();
-            //}
+            if (!ModelState.IsValid)
+            {
+                // Recargar listas si hay error de validación
+                CargarCombos();
+                return Page();
+            }
             try
             {
                 if (Empleado != null)

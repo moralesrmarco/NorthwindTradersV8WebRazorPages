@@ -32,15 +32,14 @@ namespace NorthwindTradersV8WebRazorPages.Pages.Clientes
         }
         public IActionResult OnPost()
         {
-            //// Validciones en el servidor
-            //if (string.IsNullOrEmpty(Cliente?.Country)
-            //    || Cliente.Country == "0")
-            //    ModelState.AddModelError("Cliente.Country", "Seleccione o escriba un país");
-            //if (!ModelState.IsValid)
-            //{
-            //    CargarCombo();
-            //    return Page();
-            //}
+            // Validciones en el servidor
+            if (string.IsNullOrWhiteSpace(Cliente?.Country))
+                ModelState.AddModelError("Cliente.Country", "Seleccione o escriba un país");
+            if (!ModelState.IsValid)
+            {
+                CargarCombo();
+                return Page();
+            }
             // Validar ID duplicado
             if (Cliente != null && clienteBLL.ExisteCliente(Cliente.CustomerID))
             {

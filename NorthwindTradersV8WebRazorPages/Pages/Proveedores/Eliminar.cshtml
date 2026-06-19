@@ -1,0 +1,83 @@
+﻿@page
+@model NorthwindTradersV8WebRazorPages.Pages.Proveedores.EliminarModel
+@{
+}
+<h2>Eliminar proveedor</h2>
+<form method="post" class="form" onsubmit="return configurarEliminar('btnEliminar');">
+    <p>¿Está seguro de eliminar el proveedor con ID: <strong>@Model.Proveedor?.SupplierID</strong> - Nombre de compañía: <strong>@Model.Proveedor?.CompanyName</strong>?</p>
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger">@Html.Raw(TempData["Error"])</div>
+    }
+    <div class="row">
+        <div class="col-md-2 mb-3">
+            <label asp-for="Proveedor.SupplierID" class="form-label">ID</label>
+            <input asp-for="Proveedor.SupplierID" class="form-control" readonly />
+        </div>
+        <div class="col-md-5 mb-3">
+            <label asp-for="Proveedor.CompanyName" class="form-label">Nombres</label>
+            <input asp-for="Proveedor.CompanyName" class="form-control" readonly />
+        </div>
+        <div class="col-md-5 mb-3">
+            <label asp-for="Proveedor.ContactName" class="form-label">Apellidos</label>
+            <input asp-for="Proveedor.ContactName" class="form-control" readonly />
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-3 mb-3">
+            <label asp-for="Proveedor.ContactTitle" class="form-label">Título de contacto</label>
+            <input asp-for="Proveedor.ContactTitle" class="form-control" readonly />
+        </div>
+        <div class="col-md-9 mb-3">
+            <label asp-for="Proveedor.Address" class="form-label">Domicilio</label>
+            <input asp-for="Proveedor.Address" class="form-control" readonly />
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-4 mb-3">
+            <label asp-for="Proveedor.City" class="form-label">Ciudad</label>
+            <input asp-for="Proveedor.City" class="form-control" readonly />
+        </div>
+        <div class="col-md-4 mb-3">
+            <label asp-for="Proveedor.Region" class="form-label">Región</label>
+            <input asp-for="Proveedor.Region" class="form-control" readonly />
+        </div>
+        <div class="col-md-4 mb-3">
+            <label asp-for="Proveedor.PostalCode" class="form-label">Código postal</label>
+            <input asp-for="Proveedor.PostalCode" class="form-control" readonly />
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-4 mb-3">
+            <label asp-for="Proveedor.Country" class="form-label">País</label>
+            <input asp-for="Proveedor.Country" class="form-control" readonly />
+        </div>
+        <div class="col-md-4 mb-3">
+            <label asp-for="Proveedor.Phone" class="form-label">Teléfono</label>
+            <input asp-for="Proveedor.Phone" class="form-control" readonly />
+        </div>
+        <div class="col-md-4 mb-3">
+            <label asp-for="Proveedor.Fax" class="form-label">Fax</label>
+            <input asp-for="Proveedor.Fax" class="form-control" readonly />
+        </div>
+    </div>
+    <button type="submit"
+            id="btnEliminar"
+            class="btn btn-sm btn-danger me-1"
+            disabled="@Model.BloquearEliminacion"
+            title="Eliminar">
+        <i class="bi bi-trash"></i>
+        <span class="d-none d-md-inline"> Eliminar</span>
+    </button>
+
+    <a href="@(Model.ReturnUrl ?? Url.Page("Index"))"
+       class="btn btn-sm btn-cancelar me-1"
+       title="Cancelar">
+        <i class="bi bi-x-circle"></i>
+        <span class="d-none d-md-inline"> Cancelar</span>
+    </a>
+    <input type="hidden" asp-for="Proveedor.RowVersion" />
+</form>
+@section Scripts {
+    <script src="~/js/form-delete.js"></script>
+}

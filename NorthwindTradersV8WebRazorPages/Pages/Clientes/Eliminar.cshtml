@@ -4,7 +4,7 @@
 }
 <h2>Eliminar cliente</h2>
 <form method="post" class="form" onsubmit="return configurarEliminar('btnEliminar');">
-    <p>¿Está seguro de eliminar el empleado con ID: <strong>@Model.Cliente?.CustomerID</strong> - Nombre de compañía: <strong>@Model.Cliente?.CompanyName</strong>?</p>
+    <p>¿Está seguro de eliminar el cliente con ID: <strong>@Model.Cliente?.CustomerID</strong> - Nombre de compañía: <strong>@Model.Cliente?.CompanyName</strong>?</p>
     @if (TempData["Error"] != null)
     {
         <div class="alert alert-danger">@Html.Raw(TempData["Error"])</div>
