@@ -32,7 +32,7 @@ namespace NorthwindTradersV8WebRazorPages.Entities
         public string? Region { get; set; }
         [StringLength(10, ErrorMessage = "El código postal no puede exceder de 15 caracteres")]
         public string? PostalCode { get; set; }
-        [Required(ErrorMessage = "Ingrese el país")]
+        [Required(ErrorMessage = "Seleccione o escriba un país")]
         [StringLength(15, ErrorMessage = "El país no puede exceder de 15 caracteres")]
         public string? Country { get; set; }
         [Required(ErrorMessage = "Ingrese el teléfono")]

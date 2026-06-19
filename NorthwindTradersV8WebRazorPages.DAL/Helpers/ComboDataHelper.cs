@@ -29,7 +29,7 @@ namespace NorthwindTradersV8WebRazorPages.DAL.Helpers
                 // Insertar fila "Seleccione" al inicio
                 items.Add(new ComboItemDto
                 {
-                    Value = "0",
+                    Value = String.Empty,
                     Text = "»--- Seleccione ---«"
                 });
                 if (storedProcedure == "SpEmpleadoObtenerEmpleadosCbo")

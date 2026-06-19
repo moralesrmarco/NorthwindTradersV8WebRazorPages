@@ -84,7 +84,13 @@ function configurarPais(campoValidacion) {
 function validarPais(campoValidacion) {
 
     const pais = $('#cboPais').val();
+    if (!pais || pais === '0') {
 
+        $(`[data-valmsg-for="${campoValidacion}"]`)
+            .text('Seleccione o escriba un país.');
+
+        return false;
+    }
     if (pais && pais.length > 15) {
 
         $(`[data-valmsg-for="${campoValidacion}"]`)

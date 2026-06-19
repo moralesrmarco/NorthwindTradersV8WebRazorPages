@@ -31,7 +31,7 @@ namespace NorthwindTradersV8WebRazorPages.Entities
         public string? Region { get; set; }
         [StringLength(10, ErrorMessage = "El código postal no puede exceder de 10 caracteres")] 
         public string? PostalCode { get; set; }
-        [Required(ErrorMessage = "Ingrese o seleccione el país")]
+        [Required(ErrorMessage = "Seleccione o escriba un país")]
         [StringLength(15, ErrorMessage = "El país no puede exceder de 15 caracteres")]
         public string? Country { get; set; }
         [Required(ErrorMessage = "Ingrese teléfono")]
@@ -46,6 +46,7 @@ namespace NorthwindTradersV8WebRazorPages.Entities
         public byte[]? RowVersion { get; set; }
 
         // Clave foránea hacia otro empleado
+        [Required(ErrorMessage = "Seleccione a quién reporta el empleado")]
         public int? ReportsTo { get; set; }
 
         public string NameByFirstName

@@ -24,7 +24,7 @@ namespace NorthwindTradersV8WebRazorPages.DAL
                     cmd.Parameters.AddWithValue("@CompanyName", proveedor.CompanyName);
                     cmd.Parameters.AddWithValue("@ContactName", proveedor.ContactName);
                     cmd.Parameters.AddWithValue("@ContactTitle", proveedor.ContactTitle);
-                    cmd.Parameters.AddWithValue("@Addres", proveedor.Address);
+                    cmd.Parameters.AddWithValue("@Address", proveedor.Address);
                     cmd.Parameters.AddWithValue("@City", proveedor.City);
                     cmd.Parameters.AddWithValue("@Region", string.IsNullOrWhiteSpace(proveedor.Region) ? (object)DBNull.Value : proveedor.Region);
                     cmd.Parameters.AddWithValue("@PostalCode", string.IsNullOrWhiteSpace(proveedor.PostalCode) ? (object)DBNull.Value : proveedor.PostalCode);

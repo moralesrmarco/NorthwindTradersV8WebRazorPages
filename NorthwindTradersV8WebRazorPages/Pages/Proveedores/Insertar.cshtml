@@ -9,17 +9,12 @@
         <div class="alert alert-danger">@Html.Raw(TempData["Error"])</div>
     }
     <div class="row">
-        <div class="col-md-2 mb-3">
-            <label asp-for="Proveedor.SupplierID" class="form-label">ID</label>
-            <input asp-for="Proveedor.SupplierID" class="form-control text-uppercase" />
-            <span asp-validation-for="Proveedor.SupplierID" class="text-danger"></span>
-        </div>
-        <div class="col-md-5 mb-3">
+        <div class="col-md-6 mb-3">
             <label asp-for="Proveedor.CompanyName" class="form-label">Nombre de compañía</label>
             <input asp-for="Proveedor.CompanyName" class="form-control" />
             <span asp-validation-for="Proveedor.CompanyName" class="text-danger"></span>
         </div>
-        <div class="col-md-5 mb-3">
+        <div class="col-md-6 mb-3">
             <label asp-for="Proveedor.ContactName" class="form-label">Nombre de contacto</label>
             <input asp-for="Proveedor.ContactName" class="form-control" />
             <span asp-validation-for="Proveedor.ContactName" class="text-danger"></span>
@@ -96,8 +91,8 @@
 
     <script>
         $(function () {
-        configurarPais('Proveedor.Country');
-        configurarSubmitFormulario('Proveedor.Country');
+            configurarPais('Proveedor.Country');
+            configurarSubmitFormulario('Proveedor.Country');
         });
     </script>
 }
