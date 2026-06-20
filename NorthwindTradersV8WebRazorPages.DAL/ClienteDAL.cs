@@ -197,23 +197,30 @@ namespace NorthwindTradersV8WebRazorPages.DAL
         }
         public DataTable BuscarClientes(ClientesBuscarDto filtro)
         {
-            using var connection = new SqlConnection(connectionString);
-            using var cmd = new SqlCommand("SpClienteBuscar", connection);
-            cmd.CommandType = CommandType.StoredProcedure;
-            cmd.Parameters.AddWithValue("@Id", filtro.CustomerID ?? "");
-            cmd.Parameters.AddWithValue("@Compañia", filtro.CompanyName ?? "");
-            cmd.Parameters.AddWithValue("@Contacto", filtro.ContactName ?? "");
-            cmd.Parameters.AddWithValue("@Domicilio", filtro.Address ?? "");
-            cmd.Parameters.AddWithValue("@Ciudad", filtro.City ?? "");
-            cmd.Parameters.AddWithValue("@Region", filtro.Region ?? "");
-            cmd.Parameters.AddWithValue("@CodigoP", filtro.PostalCode ?? "");
-            cmd.Parameters.AddWithValue("@Pais", filtro.Country ?? "");
-            cmd.Parameters.AddWithValue("@Telefono", filtro.Phone ?? "");
-            cmd.Parameters.AddWithValue("@Fax", filtro.Fax ?? "");
-            using var dap = new SqlDataAdapter(cmd);
-            var dt = new DataTable();
-            dap.Fill(dt);
-            return dt;
+            try
+            {
+                using var connection = new SqlConnection(connectionString);
+                using var cmd = new SqlCommand("SpClienteBuscar", connection);
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.Parameters.AddWithValue("@Id", filtro.CustomerID ?? "");
+                cmd.Parameters.AddWithValue("@Compañia", filtro.CompanyName ?? "");
+                cmd.Parameters.AddWithValue("@Contacto", filtro.ContactName ?? "");
+                cmd.Parameters.AddWithValue("@Domicilio", filtro.Address ?? "");
+                cmd.Parameters.AddWithValue("@Ciudad", filtro.City ?? "");
+                cmd.Parameters.AddWithValue("@Region", filtro.Region ?? "");
+                cmd.Parameters.AddWithValue("@CodigoP", filtro.PostalCode ?? "");
+                cmd.Parameters.AddWithValue("@Pais", filtro.Country ?? "");
+                cmd.Parameters.AddWithValue("@Telefono", filtro.Phone ?? "");
+                cmd.Parameters.AddWithValue("@Fax", filtro.Fax ?? "");
+                using var dap = new SqlDataAdapter(cmd);
+                var dt = new DataTable();
+                dap.Fill(dt);
+                return dt;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Error al buscar los clientes " + ex.Message);
+            }
         }
     }
 }

@@ -1,6 +1,7 @@
 ﻿using NorthwindTradersV8WebRazorPages.Common;
 using NorthwindTradersV8WebRazorPages.DAL;
 using NorthwindTradersV8WebRazorPages.Entities;
+using NorthwindTradersV8WebRazorPages.Entities.DTOs;
 using System.Data;
 
 namespace NorthwindTradersV8WebRazorPages.BLL
@@ -83,5 +84,12 @@ namespace NorthwindTradersV8WebRazorPages.BLL
                 Thread.Sleep(_tiempoDemora);
             return proveedorDAL.ObtenerProveedoresPaginados(pageIndex, rowsPerPage, out totalRegistros);
         }
+        public DataTable BuscarProveedores(ProveedoresBuscarDto filtro)
+        {
+            if (_ejecutarTiempoDemora)
+                Thread.Sleep(_tiempoDemora);
+            return proveedorDAL.BuscarProveedores(filtro);
+        }
+
     }
 }

@@ -6,15 +6,15 @@ using NorthwindTradersV8WebRazorPages.BLL.Services;
 using NorthwindTradersV8WebRazorPages.Entities.DTOs;
 using System.Data;
 
-namespace NorthwindTradersV8WebRazorPages.Pages.Clientes
+namespace NorthwindTradersV8WebRazorPages.Pages.Proveedores
 {
     public class BuscarModel : PageModel
     {
-        private readonly ClienteBLL clienteBLL;
-        private readonly ClienteService clienteService;
+        private readonly ProveedorBLL proveedorBLL;
+        private readonly ProveedorService proveedorService;
         [BindProperty(SupportsGet = true)]
-        public ClientesBuscarDto Filtro { get; set; } = new ClientesBuscarDto();
-        public DataTable Clientes { get; set; } = new DataTable();
+        public ProveedoresBuscarDto Filtro { get; set; } = new ProveedoresBuscarDto();
+        public DataTable Proveedores { get; set; } = new DataTable();
         public bool SeBusco { get; set; }
         public required List<SelectListItem> Paises { get; set; }
         public BuscarModel(IConfiguration configuration)
@@ -22,8 +22,8 @@ namespace NorthwindTradersV8WebRazorPages.Pages.Clientes
             string connectionString = configuration.GetConnectionString("NorthwindConnection") ?? throw new InvalidOperationException("Connection string not found.");
             bool ejecutarTiempoDemora = configuration.GetValue<bool>("AppSettings:ejecutarTiempoDemora");
             int tiempoDemora = configuration.GetValue<int>("AppSettings:tiempoDemora");
-            clienteBLL = new ClienteBLL(connectionString, ejecutarTiempoDemora, tiempoDemora);
-            clienteService = new ClienteService(connectionString);
+            proveedorBLL = new ProveedorBLL(connectionString, ejecutarTiempoDemora, tiempoDemora);
+            proveedorService = new ProveedorService(connectionString);
         }
 
         public void OnGet()
@@ -31,13 +31,13 @@ namespace NorthwindTradersV8WebRazorPages.Pages.Clientes
             CargarCombo();
             SeBusco = Request.Query.Count > 0;
             if (SeBusco)
-                Clientes = clienteBLL.BuscarClientes(Filtro);
+                Proveedores = proveedorBLL.BuscarProveedores(Filtro);
             else
-                Clientes = new DataTable();
+                Proveedores = new DataTable();
         }
         private void CargarCombo()
         {
-            Paises = clienteService.ObtenerClientesPaisesCbo().Select(p => new SelectListItem
+            Paises = proveedorService.ObtenerProveedoresPaisesCbo().Select(p => new SelectListItem
             {
                 Value = p.Value,
                 Text = p.Text

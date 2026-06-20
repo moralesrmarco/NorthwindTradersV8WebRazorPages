@@ -93,10 +93,6 @@ namespace NorthwindTradersV8WebRazorPages.BLL
         }
         public DataTable BuscarClientes(ClientesBuscarDto filtro)
         {
-            if (filtro.Country == "0")
-            {
-                filtro.Country = "";
-            }
             if (_ejecutarTiempoDemora)
                 Thread.Sleep(_tiempoDemora);
             return clienteDAL.BuscarClientes(filtro);

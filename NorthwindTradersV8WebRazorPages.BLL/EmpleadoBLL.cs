@@ -94,10 +94,6 @@ namespace NorthwindTradersV8WebRazorPages.BLL
 
         public DataTable BuscarEmpleados(EmpleadosBuscarDto filtro)
         {
-            if (filtro.Pais == "0")
-            {
-                filtro.Pais = "";
-            }
             if (_ejecutarTiempoDemora)
                 Thread.Sleep(_tiempoDemora);
             return empleadoDAL.BuscarEmpleados(filtro);

@@ -1,0 +1,266 @@
+﻿@page
+@model NorthwindTradersV8WebRazorPages.Pages.Proveedores.BuscarModel
+@{
+}
+<h2>Buscar proveedor</h2>
+<form method="get" class="form" onsubmit="return disableSearchButton();">
+    <div class="row">
+        <div class="col-md-3 mb-3">
+            <label asp-for="Filtro.IdIni" class="form-label">Id inicial</label>
+            <input asp-for="Filtro.IdIni" id="txtIdIni" class="form-control" />
+        </div>
+        <div class="col-md-3 mb-3">
+            <label asp-for="Filtro.IdFin" class="form-label">Id final</label>
+            <input asp-for="Filtro.IdFin" id="txtIdFin" class="form-control" />
+        </div>        
+        <div class="col-md-3 mb-3">
+            <label asp-for="Filtro.CompanyName" class="form-label">Nombre de compañía</label>
+            <input asp-for="Filtro.CompanyName" class="form-control" />
+        </div>
+        <div class="col-md-3 mb-3">
+            <label asp-for="Filtro.ContactName" class="form-label">Nombre de contacto</label>
+            <input asp-for="Filtro.ContactName" class="form-control" />
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-3 mb-3">
+            <label asp-for="Filtro.Address" class="form-label">Domicilio</label>
+            <input asp-for="Filtro.Address" class="form-control" />
+        </div>
+        <div class="col-md-3 mb-3">
+            <label asp-for="Filtro.City" class="form-label">Ciudad</label>
+            <input asp-for="Filtro.City" class="form-control" />
+        </div>
+        <div class="col-md-3 mb-3">
+            <label asp-for="Filtro.Region" class="form-label">Región</label>
+            <input asp-for="Filtro.Region" class="form-control" />
+        </div>
+        <div class="col-md-3 mb-3">
+            <label asp-for="Filtro.PostalCode" class="form-label">Código postal</label>
+            <input asp-for="Filtro.PostalCode" class="form-control" />
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-3 mb-3">
+            <label asp-for="Filtro.Country" class="form-label">País</label>
+            <select id="cboPais"
+                    asp-for="Filtro.Country"
+                    asp-items="Model.Paises"
+                    class="form-select">
+            </select>
+        </div>
+        <div class="col-md-3 mb-3">
+            <label asp-for="Filtro.Phone" class="form-label">Teléfono</label>
+            <input asp-for="Filtro.Phone" class="form-control" />
+        </div>
+        <div class="col-md-3 mb-3">
+            <label asp-for="Filtro.Fax" class="form-label">Fax</label>
+            <input asp-for="Filtro.Fax" class="form-control" />
+        </div>
+    </div>
+    <div class="row mb-3">
+        <div class="col-md-6 d-flex gap-2">
+            <button id="btnBuscar"
+                    type="submit"
+                    class="btn btn-sm btn-buscar"
+                    title="Buscar">
+                <i class="bi bi-search"></i>
+                <span class="d-none d-md-inline"> Buscar</span>
+            </button>
+
+            <a asp-page="./Buscar"
+               class="btn btn-sm btn-primary"
+               title="Limpiar">
+                <i class="bi bi-eraser"></i>
+                <span class="d-none d-md-inline"> Limpiar</span>
+            </a>
+
+            <a asp-page="/Proveedores/Index"
+               class="btn btn-sm btn-cancelar"
+               title="Cancelar">
+                <i class="bi bi-x-circle"></i>
+                <span class="d-none d-md-inline"> Cancelar</span>
+            </a>
+        </div>
+    </div>
+    @if (Model.SeBusco)
+    {
+        <div class="table-responsive">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th class="text-center">ID</th>
+                        <th>Nombre de compañía</th>
+                        <th class="text-center">País</th>
+                        <th class="text-center">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (System.Data.DataRow row in Model.Proveedores.Rows)
+                    {
+                        <tr>
+                            <td class="text-center">@row["SupplierID"]</td>
+                            <td>@row["CompanyName"]</td>
+                            <td class="text-center">@row["Country"]</td>
+                            <td class="text-center text-nowrap">
+                                <a asp-page="Consultar"
+                                   asp-route-id="@row["SupplierID"]"
+                                   asp-route-returnUrl="@(Request.Path + Request.QueryString)"
+                                   class="btn btn-sm btn-success me-1 action-btn"
+                                   title="Consultar">
+                                    <i class="bi bi-check-square"></i>
+                                    <span class="d-none d-md-inline"> Consultar</span>
+                                </a>
+                                <a asp-page="Editar"
+                                   asp-route-id="@row["SupplierID"]"
+                                   asp-route-returnUrl="@(Request.Path + Request.QueryString)"
+                                   class="btn btn-sm btn-warning me-1 action-btn"
+                                   title="Editar">
+                                    <i class="bi bi-pencil"></i>
+                                    <span class="d-none d-md-inline"> Editar</span>
+                                </a>
+                                <a asp-page="Eliminar"
+                                   asp-route-id="@row["SupplierID"]"
+                                   asp-route-returnUrl="@(Request.Path + Request.QueryString)"
+                                   class="btn btn-sm btn-danger me-1 action-btn"
+                                   title="Eliminar">
+                                    <i class="bi bi-trash"></i>
+                                    <span class="d-none d-md-inline"> Eliminar</span>
+                                </a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+</form>
+@section Scripts {
+    <script>
+        const txtIdIni = document.getElementById('txtIdIni');
+        const txtIdFin = document.getElementById('txtIdFin');
+        const btnBuscar = document.getElementById('btnBuscar');
+        const overlay = document.getElementById('loadingOverlay');
+
+        txtIdIni.addEventListener('blur', validarIdIni);
+        txtIdFin.addEventListener('blur', validarIdFin);
+
+        function validarIdIni() {
+
+            let idIni = txtIdIni.value.trim();
+            let idFin = txtIdFin.value.trim();
+
+            if (idIni === '')
+                return;
+
+            let numIni = parseInt(idIni);
+
+            if (isNaN(numIni)) {
+                alert('Por favor ingrese un número válido');
+                txtIdIni.focus();
+                return;
+            }
+
+            if (numIni === 0) {
+                alert('El valor del Id inicial no puede ser cero');
+                txtIdIni.value = '1';
+                txtIdIni.focus();
+                return;
+            }
+
+            if (idFin === '') {
+                txtIdFin.value = txtIdIni.value;
+                return;
+            }
+
+            let numFin = parseInt(idFin);
+
+            if (!isNaN(numFin) && numFin < numIni) {
+                txtIdFin.value = txtIdIni.value;
+            }
+        }
+
+        function validarIdFin() {
+
+            let idIni = txtIdIni.value.trim();
+            let idFin = txtIdFin.value.trim();
+
+            if (idFin === '')
+                return;
+
+            let numFin = parseInt(idFin);
+
+            if (isNaN(numFin)) {
+                alert('Por favor ingrese un número válido');
+                txtIdFin.focus();
+                return;
+            }
+
+            if (numFin === 0) {
+                alert('El valor del Id final no puede ser cero');
+                txtIdFin.value = '1';
+                txtIdFin.focus();
+                validarIdIni();
+                return;
+            }
+
+            if (idIni === '') {
+                txtIdIni.value = txtIdFin.value;
+                return;
+            }
+
+            let numIni = parseInt(idIni);
+
+            if (!isNaN(numIni) && numIni > numFin) {
+                txtIdIni.value = txtIdFin.value;
+            }
+        }
+
+        function disableSearchButton() {
+
+            btnBuscar.style.pointerEvents = 'none';
+            btnBuscar.innerHTML =
+                '<span class="spinner-border spinner-border-sm me-1"></span> Procesando...';
+            overlay?.style.setProperty('display', 'block');
+            return true;
+        }
+        
+        document.addEventListener("DOMContentLoaded", function () {
+            const buttons = document.querySelectorAll(".action-btn");
+
+            buttons.forEach(btn => {
+                btn.addEventListener("click", function () {
+                    // Deshabilita todos los botones al dar clic en cualquiera
+                    buttons.forEach(b => {
+                        b.classList.add("disabled");
+                        b.style.pointerEvents = "none";
+                    });
+                });
+            });
+        });
+        
+        function restaurarControles() {
+
+            if (overlay) {
+                overlay.style.display = "none";
+            }
+
+            if (btnBuscar) {
+
+                btnBuscar.style.pointerEvents = "auto";
+
+                btnBuscar.innerHTML =
+                    '<i class="bi bi-search"></i><span class="d-none d-md-inline"> Buscar</span>';
+            }
+
+            document.querySelectorAll(".action-btn")
+                .forEach(b => {
+                    b.classList.remove("disabled");
+                    b.style.pointerEvents = "auto";
+                    b.style.opacity = "";
+                });
+        }
+
+        window.addEventListener("pageshow", restaurarControles);
+    </script>
+}

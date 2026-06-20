@@ -1,5 +1,6 @@
 ﻿using Microsoft.Data.SqlClient;
 using NorthwindTradersV8WebRazorPages.Entities;
+using NorthwindTradersV8WebRazorPages.Entities.DTOs;
 using System.Data;
 
 namespace NorthwindTradersV8WebRazorPages.DAL
@@ -123,25 +124,32 @@ namespace NorthwindTradersV8WebRazorPages.DAL
             }
             catch (Exception ex)
             {
-                throw new Exception("Error al obtener el proveedor por ID" + ex.Message);
+                throw new Exception("Error al obtener el proveedor por ID " + ex.Message);
             }
             return proveedor;
         }
         public DataTable ObtenerProveedoresPaginados(int pageIndex, int rowsPerPage, out int totalRegistros)
         {
-            using var connection = new SqlConnection(connectionString);
-            using var command = new SqlCommand("SpProveedoresObtenerPaginados", connection);
-            command.CommandType = CommandType.StoredProcedure;
-            command.Parameters.AddWithValue("@PageIndex", pageIndex);
-            command.Parameters.AddWithValue("@RowsPerPage", rowsPerPage);
-            using var adapter = new SqlDataAdapter(command);
-            var ds= new DataSet();
-            adapter.Fill(ds);
-            // Primer resultset = total de registros
-            totalRegistros = Convert.ToInt32(ds.Tables[0].Rows[0]["TotalRegistros"]);
+            try
+            {
+                using var connection = new SqlConnection(connectionString);
+                using var command = new SqlCommand("SpProveedoresObtenerPaginados", connection);
+                command.CommandType = CommandType.StoredProcedure;
+                command.Parameters.AddWithValue("@PageIndex", pageIndex);
+                command.Parameters.AddWithValue("@RowsPerPage", rowsPerPage);
+                using var adapter = new SqlDataAdapter(command);
+                var ds = new DataSet();
+                adapter.Fill(ds);
+                // Primer resultset = total de registros
+                totalRegistros = Convert.ToInt32(ds.Tables[0].Rows[0]["TotalRegistros"]);
 
-            // Segundo resultset = proveedores paginados
-            return ds.Tables[1];
+                // Segundo resultset = proveedores paginados
+                return ds.Tables[1];
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Error al obtener los proveedores " + ex.Message);
+            }
         }
         private Proveedor MapearProveedor(SqlDataReader reader)
         {
@@ -161,6 +169,34 @@ namespace NorthwindTradersV8WebRazorPages.DAL
                 RowVersion = reader.IsDBNull(reader.GetOrdinal("RowVersion")) ? null : (byte[])reader["RowVersion"]
             };
             return proveedor;
+        }
+        public DataTable BuscarProveedores(ProveedoresBuscarDto filtro)
+        {
+            try
+            {
+                using var connection = new SqlConnection(connectionString);
+                using var cmd = new SqlCommand("SpProveedorBuscar", connection);
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.Parameters.AddWithValue("@IdIni", filtro.IdIni ?? 0);
+                cmd.Parameters.AddWithValue("@IdFin", filtro.IdFin ?? 0);
+                cmd.Parameters.AddWithValue("@CompanyName", filtro.CompanyName ?? "");
+                cmd.Parameters.AddWithValue("@ContactName", filtro.ContactName ?? "");
+                cmd.Parameters.AddWithValue("@Address", filtro.Address ?? "");
+                cmd.Parameters.AddWithValue("@City", filtro.City ?? "");
+                cmd.Parameters.AddWithValue("@Region", filtro.Region ?? "");
+                cmd.Parameters.AddWithValue("@PostalCode", filtro.PostalCode ?? "");
+                cmd.Parameters.AddWithValue("@Country", filtro.Country ?? "");
+                cmd.Parameters.AddWithValue("@Phone", filtro.Phone ?? "");
+                cmd.Parameters.AddWithValue("@Fax", filtro.Fax ?? "");
+                using var dap = new SqlDataAdapter(cmd);
+                var dt = new DataTable();
+                dap.Fill(dt);
+                return dt;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Error al buscar los proveedores " + ex.Message);
+            }
         }
     }
 }
