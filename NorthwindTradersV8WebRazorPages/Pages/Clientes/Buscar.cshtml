@@ -85,7 +85,7 @@
             </a>
 
             <a asp-page="/Clientes/Index"
-               class="btn btn-sm btn-cancelar"
+               class="btn btn-sm btn-cancelar navigation-btn"
                 title="Cancelar">
                 <i class="bi bi-x-circle"></i>
                 <span class="d-none d-md-inline"> Cancelar</span>
@@ -100,7 +100,6 @@
                     <tr>
                         <th class="text-center">ID</th>
                         <th>Nombre de compañía</th>
-                        <th class="text-center">Ciudad</th>
                         <th class="text-center">País</th>
                         <th class="text-center">Acciones</th>
                     </tr>
@@ -111,7 +110,6 @@
                         <tr>
                             <td class="text-center">@row["CustomerID"]</td>
                             <td>@row["CompanyName"]</td>
-                            <td class="text-center">@row["City"]</td>
                             <td class="text-center">@row["Country"]</td>
                             <td class="text-center text-nowrap">
                                 <a asp-page="Consultar"
@@ -146,46 +144,106 @@
         </div>
     }
 </form>
-<div id="loadingOverlay" style="
-    display:none;
-    position:fixed;
-    top:0;
-    left:0;
-    width:100%;
-    height:100%;
-    background:rgba(255,255,255,0.7);
-    z-index:9999;">
-    <div class="d-flex justify-content-center align-items-center h-100">
-        <div class="text-center">
-            <div class="spinner-border" role="status"></div>
-            <div class="mt-2">Buscando...</div>
-        </div>
-    </div>
-</div>
 @section Scripts {
-    <partial name="_ValidationScriptsPartial" />
+
+    <script src="~/js/navigation-actions.js"></script>
 
     <script>
-        function disableSearchButton() {
-            const btn = document.getElementById('btnBuscar');
-            btn.style.pointerEvents = "none";
-            btn.innerHTML =
-                '<span class="spinner-border spinner-border-sm me-1"></span> Buscando...';
-            document.getElementById('loadingOverlay').style.display = 'block';
-            return true;
-        }
+
         document.addEventListener("DOMContentLoaded", function () {
+
+            configurarNavegacion();
+
             const buttons = document.querySelectorAll(".action-btn");
 
             buttons.forEach(btn => {
+
                 btn.addEventListener("click", function () {
-                    // Deshabilita todos los botones al dar clic en cualquiera
+
                     buttons.forEach(b => {
-                        b.classList.add("disabled"); // estilo Bootstrap
-                        b.setAttribute("disabled", "true"); // atributo real
+
+                        b.style.pointerEvents = "none";
+
                     });
+
+
+                    const overlay = document.getElementById('loadingOverlay');
+
+                    if (overlay) {
+
+                        overlay.style.display = 'block';
+
+                    }
+
                 });
+
             });
+
         });
+
+
+        function disableSearchButton() {
+
+            const btnBuscar = document.getElementById('btnBuscar');
+
+            if (btnBuscar) {
+
+                btnBuscar.style.pointerEvents = 'none';
+
+                btnBuscar.innerHTML =
+                    '<span class="spinner-border spinner-border-sm me-1"></span> Buscando...';
+
+            }
+
+
+            const overlay = document.getElementById('loadingOverlay');
+
+            if (overlay) {
+
+                overlay.style.display = 'block';
+
+            }
+
+
+            return true;
+        }
+
+
+        function restaurarControles() {
+
+            const overlay = document.getElementById('loadingOverlay');
+
+            if (overlay) {
+
+                overlay.style.display = 'none';
+
+            }
+
+
+            const btnBuscar = document.getElementById('btnBuscar');
+
+            if (btnBuscar) {
+
+                btnBuscar.style.pointerEvents = 'auto';
+
+                btnBuscar.innerHTML =
+                    '<i class="bi bi-search"></i><span class="d-none d-md-inline"> Buscar</span>';
+
+            }
+
+
+            document.querySelectorAll(".action-btn")
+                .forEach(b => {
+
+                    b.style.pointerEvents = "auto";
+
+                });
+
+        }
+
+
+        window.addEventListener("pageshow", restaurarControles);
+
     </script>
+
 }

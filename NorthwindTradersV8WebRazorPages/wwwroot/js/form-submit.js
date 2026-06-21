@@ -27,14 +27,15 @@
                 '<span class="spinner-border spinner-border-sm me-1"></span> Procesando...';
         }
 
-        const overlay = document.getElementById('loadingOverlay');
-
-        if (overlay) {
-            overlay.style.display = 'block';
-        }
+        mostrarOverlay();
 
         return true;
     });
+
+    $('.btn-cancelar').on('click', function () {
+        mostrarOverlay();
+    });
+
 
     window.addEventListener('pageshow', function () {
 
@@ -121,4 +122,13 @@ function asegurarValorPais() {
     }
 
     $('#cboPais').val(texto).trigger('change');
+}
+
+function mostrarOverlay() {
+
+    const overlay = document.getElementById('loadingOverlay');
+
+    if (overlay) {
+        overlay.style.display = 'block';
+    }
 }

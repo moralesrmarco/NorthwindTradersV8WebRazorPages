@@ -61,9 +61,20 @@
         </div>
     </div>
     <a href="@(Model.ReturnUrl ?? Url.Page("Index"))"
-       class="btn btn-sm btn-success me-1"
+       class="btn btn-sm btn-success me-1 navigation-btn"
        title="Volver">
         <i class="bi bi-check-circle"></i>
         <span class="d-none d-md-inline"> Volver</span>
     </a>
 </form>
+@section Scripts {
+
+    <script src="~/js/navigation-actions.js"></script>
+
+    <script>
+        $(function () {
+        configurarNavegacion();
+        });
+    </script>
+
+}
