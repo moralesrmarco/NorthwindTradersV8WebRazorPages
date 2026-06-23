@@ -1,0 +1,81 @@
+﻿@page
+@model NorthwindTradersV8WebRazorPages.Pages.Clientes.Consultas.ClientesProveedoresModel
+@{
+    ViewData["Title"] = "Directorio de Clientes y Proveedores";
+}
+
+<h2 class="mb-4">
+    @Model.TituloDirectorio
+</h2>
+
+<form method="get" class="mb-3">
+    <input type="hidden" name="Buscar" value="true" />
+    Buscar por: &nbsp;&nbsp;
+    <div class="form-check form-check-inline">
+        <input asp-for="MostrarClientes" class="form-check-input" />
+        <label asp-for="MostrarClientes" class="form-check-label">
+            Clientes
+        </label>
+    </div>
+
+    <div class="form-check form-check-inline">
+        <input asp-for="MostrarProveedores" class="form-check-input" />
+        <label asp-for="MostrarProveedores" class="form-check-label">
+            Proveedores
+        </label>
+    </div>
+
+    <button type="submit" class="btn btn-primary btn-sm ms-2">
+        Aplicar
+    </button>
+</form>
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger">
+        @Html.Raw(TempData["Error"])
+    </div>
+}
+@if (Model.Buscar)
+{
+
+    <div class="container mt-4">
+
+        <partial name="_Paginacion" model="Model.PaginacionDirectorio" />
+
+        <p class="text-muted">
+            @Model.MensajeResultados
+        </p>
+
+        <!-- Fichas de clientes/proveedores -->
+        <div class="row">
+            @foreach (var cliente in Model.ClientesProveedores)
+            {
+                <div class="col-md-4 mb-3">
+                    <div class="card shadow-sm h-100">
+                        <div class="card-body">
+                            <h5 class="card-title">@cliente.CompanyName</h5>
+                            <h6 class="card-subtitle mb-2 text-muted">@cliente.Contact (@cliente.Relation)</h6>
+                            <p class="card-text">
+                                <strong>Domicilio</strong> @cliente.Address <br />
+                                <strong>Ciudad:</strong> @cliente.City <br />
+                                <strong>Region:</strong> @cliente.Region <br />
+                                <strong>Código postal:</strong> @cliente.PostalCode <br />
+                                <strong>País:</strong> @cliente.Country <br />
+                                <strong>Teléfono:</strong> @cliente.Phone <br />
+                                <strong>Fax:</strong> @cliente.Fax
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+
+    <partial name="_Paginacion" model="Model.PaginacionDirectorio" />
+}
+else
+{
+    <div class="alert alert-info">
+        Seleccione Clientes y/o Proveedores y haga clic en Aplicar.
+    </div>
+}

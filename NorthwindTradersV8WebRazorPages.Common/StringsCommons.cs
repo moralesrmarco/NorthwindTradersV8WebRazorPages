@@ -14,5 +14,7 @@
         public const string Nfemd = "<p><strong>NO fue eliminado en la base de datos,</strong> por un motivo desconocido.</p>";
 
         public const string Nefep = "<p><strong>El registro fue eliminado previamente por otro usuario de la red.</strong></p>";
+
+        public const string ErrorCriterioSelec = "Proporcione los criterios de selección.";
     }
 }

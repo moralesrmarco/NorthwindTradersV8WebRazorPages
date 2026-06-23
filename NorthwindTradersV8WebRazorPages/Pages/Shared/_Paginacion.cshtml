@@ -11,7 +11,10 @@
         <li class="page-item @(Model.PageIndex == 1 ? "disabled" : "")">
             <a class="page-link"
                asp-page="@Model.PageName"
-               asp-route-pageIndex="1">
+               asp-route-pageIndex="1"
+               asp-route-Buscar="@Model.Buscar"
+               asp-route-MostrarClientes="@Model.MostrarClientes"
+               asp-route-MostrarProveedores="@Model.MostrarProveedores">
                 ««
             </a>
         </li>
@@ -19,7 +22,10 @@
         <li class="page-item @(Model.PageIndex == 1 ? "disabled" : "")">
             <a class="page-link"
                asp-page="@Model.PageName"
-               asp-route-pageIndex="@(Model.PageIndex - 1)">
+               asp-route-pageIndex="@(Model.PageIndex - 1)"
+               asp-route-Buscar="@Model.Buscar"
+               asp-route-MostrarClientes="@Model.MostrarClientes"
+               asp-route-MostrarProveedores="@Model.MostrarProveedores">
                 «
             </a>
         </li>
@@ -27,18 +33,26 @@
         @for (int i = startPage; i <= endPage; i++)
         {
             <li class="page-item @(i == Model.PageIndex ? "active" : "")">
+
                 <a class="page-link"
                    asp-page="@Model.PageName"
-                   asp-route-pageIndex="@i">
+                   asp-route-pageIndex="@i"
+                   asp-route-Buscar="@Model.Buscar"
+                   asp-route-MostrarClientes="@Model.MostrarClientes"
+                   asp-route-MostrarProveedores="@Model.MostrarProveedores">
                     @i
                 </a>
+
             </li>
         }
 
         <li class="page-item @(Model.PageIndex == Model.TotalPages ? "disabled" : "")">
             <a class="page-link"
                asp-page="@Model.PageName"
-               asp-route-pageIndex="@(Model.PageIndex + 1)">
+               asp-route-pageIndex="@(Model.PageIndex + 1)"
+               asp-route-Buscar="@Model.Buscar"
+               asp-route-MostrarClientes="@Model.MostrarClientes"
+               asp-route-MostrarProveedores="@Model.MostrarProveedores">
                 »
             </a>
         </li>
@@ -46,10 +60,12 @@
         <li class="page-item @(Model.PageIndex == Model.TotalPages ? "disabled" : "")">
             <a class="page-link"
                asp-page="@Model.PageName"
-               asp-route-pageIndex="@Model.TotalPages">
+               asp-route-pageIndex="@Model.TotalPages"
+               asp-route-Buscar="@Model.Buscar"
+               asp-route-MostrarClientes="@Model.MostrarClientes"
+               asp-route-MostrarProveedores="@Model.MostrarProveedores">
                 »»
             </a>
         </li>
-
     </ul>
 </nav>

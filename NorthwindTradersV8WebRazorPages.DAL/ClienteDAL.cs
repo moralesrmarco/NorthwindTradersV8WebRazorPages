@@ -222,5 +222,57 @@ namespace NorthwindTradersV8WebRazorPages.DAL
                 throw new Exception("Error al buscar los clientes " + ex.Message);
             }
         }
+
+        public List<ClienteProveedorDto> ObtenerClientesProveedoresPaginados(string tipo, int pageIndex, int rowsPerPage, out int totalRegistros, out int totalClientes, out int totalProveedores)
+        {
+            List<ClienteProveedorDto> clientesProveedores = new List<ClienteProveedorDto>();
+            using var connection = new SqlConnection(connectionString);
+            using var command = new SqlCommand("SpClientesProveedoresPaginados", connection);
+            command.CommandType = CommandType.StoredProcedure;
+            command.Parameters.AddWithValue("@Tipo", tipo);
+            command.Parameters.AddWithValue("@PageIndex", pageIndex);
+            command.Parameters.AddWithValue("@RowsPerPage", rowsPerPage);
+            using var dap = new SqlDataAdapter(command);
+            var ds = new DataSet();
+            dap.Fill(ds);
+            totalRegistros = 0;
+            totalClientes = 0;
+            totalProveedores = 0;
+
+            if (ds.Tables.Count > 0 &&
+                ds.Tables[0].Rows.Count > 0)
+            {
+                totalRegistros =
+                    Convert.ToInt32(ds.Tables[0].Rows[0]["TotalRegistros"]);
+
+                totalClientes =
+                    Convert.ToInt32(ds.Tables[0].Rows[0]["TotalClientes"]);
+
+                totalProveedores =
+                    Convert.ToInt32(ds.Tables[0].Rows[0]["TotalProveedores"]);
+            }
+
+            if (ds.Tables.Count > 1)
+            {
+                foreach (DataRow row in ds.Tables[1].Rows)
+                {
+                    clientesProveedores.Add(new ClienteProveedorDto
+                    {
+                        CompanyName = row["CompanyName"].ToString() ?? string.Empty,
+                        Contact = row["Contact"].ToString() ?? string.Empty,
+                        Relation = row["Relation"].ToString() ?? string.Empty,
+                        Address = row["Address"].ToString() ?? string.Empty,
+                        City = row["City"].ToString() ?? string.Empty,
+                        Region = row["Region"] as string,
+                        PostalCode = row["PostalCode"] as string,
+                        Country = row["Country"].ToString() ?? string.Empty,
+                        Phone = row["Phone"] as string,
+                        Fax = row["Fax"] as string
+                    });
+                }
+            }
+            return clientesProveedores;
+        }
     }
 }
+    

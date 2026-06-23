@@ -7,5 +7,10 @@
         public int TotalPages { get; set; }
 
         public string PageName { get; set; } = string.Empty;
+        public bool Buscar { get; set; }
+
+        public bool MostrarClientes { get; set; }
+
+        public bool MostrarProveedores { get; set; }
     }
 }
