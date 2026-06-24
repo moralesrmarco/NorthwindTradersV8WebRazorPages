@@ -17,5 +17,19 @@ namespace NorthwindTradersV8WebRazorPages.BLL.Services
         {
             return comboDataHelper.LlenarCbo("SpClienteObtenerPaisesCbo");
         }
+        public List<KeyValuePair<string, string>> ObtenerCiudadesPaisesVwCliProvCbo()
+        {
+            var ciudadesPaises = clienteDAL.ObtenerCiudadesPaisesVwCliProvCbo();
+            var ciudadesPaisesKvp = new List<KeyValuePair<string, string>>();
+            ciudadesPaisesKvp.Add(new KeyValuePair<string, string>("»--- Seleccione ---«", ""));
+            // Insertar opción "Todas las ciudades"
+            ciudadesPaisesKvp.Add(new KeyValuePair<string, string>("»--- Todas las ciudades ---«", "00000"));
+            // Agregar el resto de ciudades desde la DAL
+            foreach (var item in ciudadesPaises)
+            {
+                ciudadesPaisesKvp.Add(new KeyValuePair<string, string>(item.CiudadPais, item.CiudadPais));
+            }
+            return ciudadesPaisesKvp;
+        }
     }
 }

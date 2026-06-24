@@ -1,7 +1,7 @@
 ﻿@page
 @model NorthwindTradersV8WebRazorPages.Pages.Clientes.Consultas.ClientesProveedoresModel
 @{
-    ViewData["Title"] = "Directorio de Clientes y Proveedores";
+    ViewData["Title"] = "Directorio de clientes y proveedores";
 }
 
 <h2 class="mb-4">
@@ -48,21 +48,21 @@
 
         <!-- Fichas de clientes/proveedores -->
         <div class="row">
-            @foreach (var cliente in Model.ClientesProveedores)
+            @foreach (var clienteProveedor in Model.ClientesProveedores)
             {
                 <div class="col-md-4 mb-3">
                     <div class="card shadow-sm h-100">
                         <div class="card-body">
-                            <h5 class="card-title">@cliente.CompanyName</h5>
-                            <h6 class="card-subtitle mb-2 text-muted">@cliente.Contact (@cliente.Relation)</h6>
+                            <h5 class="card-title">@clienteProveedor.CompanyName</h5>
+                            <h6 class="card-subtitle mb-2 text-muted">@clienteProveedor.Contact (@clienteProveedor.Relation)</h6>
                             <p class="card-text">
-                                <strong>Domicilio</strong> @cliente.Address <br />
-                                <strong>Ciudad:</strong> @cliente.City <br />
-                                <strong>Region:</strong> @cliente.Region <br />
-                                <strong>Código postal:</strong> @cliente.PostalCode <br />
-                                <strong>País:</strong> @cliente.Country <br />
-                                <strong>Teléfono:</strong> @cliente.Phone <br />
-                                <strong>Fax:</strong> @cliente.Fax
+                                <strong>Domicilio</strong> @clienteProveedor.Address <br />
+                                <strong>Ciudad:</strong> @clienteProveedor.City <br />
+                                <strong>Region:</strong> @clienteProveedor.Region <br />
+                                <strong>Código postal:</strong> @clienteProveedor.PostalCode <br />
+                                <strong>País:</strong> @clienteProveedor.Country <br />
+                                <strong>Teléfono:</strong> @clienteProveedor.Phone <br />
+                                <strong>Fax:</strong> @clienteProveedor.Fax
                             </p>
                         </div>
                     </div>
@@ -76,6 +76,6 @@
 else
 {
     <div class="alert alert-info">
-        Seleccione Clientes y/o Proveedores y haga clic en Aplicar.
+        Seleccione clientes y/o proveedores y haga clic en aplicar.
     </div>
 }

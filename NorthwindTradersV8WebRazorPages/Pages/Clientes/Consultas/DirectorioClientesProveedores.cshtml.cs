@@ -8,7 +8,6 @@ namespace NorthwindTradersV8WebRazorPages.Pages.Clientes.Consultas
 {
     public class ClientesProveedoresModel : PagedPageModel
     {
-        //private readonly NorthwindContext _context;
         private readonly ClienteBLL clienteBLL;
         public int TotalRecords { get; private set; }
         public int TotalClientes { get; private set; }
@@ -118,6 +117,5 @@ namespace NorthwindTradersV8WebRazorPages.Pages.Clientes.Consultas
                 MostrarProveedores = MostrarProveedores
             };
         }
-
     }
 }

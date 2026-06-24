@@ -97,12 +97,17 @@ namespace NorthwindTradersV8WebRazorPages.BLL
                 Thread.Sleep(_tiempoDemora);
             return clienteDAL.BuscarClientes(filtro);
         }
-
         public List<ClienteProveedorDto> ObtenerClientesProveedoresPaginados(string tipo, int pageIndex, int rowsPerPage, out int totalRegistros, out int totalClientes, out int totalProveedores)
         {
             if (_ejecutarTiempoDemora)
                 Thread.Sleep(_tiempoDemora);
             return clienteDAL.ObtenerClientesProveedoresPaginados(tipo, pageIndex, rowsPerPage, out totalRegistros, out totalClientes, out totalProveedores);
+        }
+        public List<ClienteProveedorDto> ObtenerClientesProveedoresPorCiudadPaginados(string tipo, string ciudadPais, int pageIndex, int rowsPerPage, out int totalRegistros, out int totalClientes, out int totalProveedores)
+        {
+            if (_ejecutarTiempoDemora)
+                Thread.Sleep(_tiempoDemora);
+            return clienteDAL.ObtenerClientesProveedoresPorCiudadPaginados(tipo, ciudadPais, pageIndex, rowsPerPage, out totalRegistros, out totalClientes, out totalProveedores);
         }
     }
 }
