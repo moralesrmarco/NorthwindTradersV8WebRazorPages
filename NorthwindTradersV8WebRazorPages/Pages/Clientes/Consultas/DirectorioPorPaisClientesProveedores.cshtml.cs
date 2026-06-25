@@ -8,14 +8,14 @@ using NorthwindTradersV8WebRazorPages.Infrastructure;
 
 namespace NorthwindTradersV8WebRazorPages.Pages.Clientes.Consultas
 {
-    public class DirectorioPorCiudadClientesProveedoresModel : PagedPageModel
+    public class DirectorioPorPaisClientesProveedoresModel : PagedPageModel
     {
         private readonly ClienteBLL clienteBLL;
         private readonly ClienteService clienteService;
         public int TotalRecords { get; private set; }
         public int TotalClientes { get; private set; }
         public int TotalProveedores { get; private set; }
-        public override string PageName => "/Clientes/Consultas/DirectorioPorCiudadClientesProveedores";
+        public override string PageName => "/Clientes/Consultas/DirectorioPorPaisClientesProveedores";
         [BindProperty(SupportsGet = true)]
         public bool MostrarClientes { get; set; } = true;
         [BindProperty(SupportsGet = true)]
@@ -28,15 +28,15 @@ namespace NorthwindTradersV8WebRazorPages.Pages.Clientes.Consultas
             get
             {
                 if (MostrarClientes && MostrarProveedores)
-                    return "DirectorioPorCiudadClientesProveedores";
+                    return "DirectorioPorPaisClientesProveedores";
 
                 if (MostrarClientes)
-                    return "DirectorioPorCiudadClientes";
+                    return "DirectorioPorPaisClientes";
 
                 if (MostrarProveedores)
-                    return "DirectorioPorCiudadProveedores";
+                    return "DirectorioPorPaisProveedores";
 
-                return "DirectorioPorCiudadClientesProveedores";
+                return "DirectorioPorPaisClientesProveedores";
             }
         }
         public string TituloDirectorio
@@ -44,38 +44,38 @@ namespace NorthwindTradersV8WebRazorPages.Pages.Clientes.Consultas
             get
             {
                 if (MostrarClientes && MostrarProveedores)
-                    return "Directorio de clientes y proveedores por ciudad";
+                    return "Directorio de clientes y proveedores por país";
 
                 if (MostrarClientes)
-                    return "Directoriode clientes por ciudad";
+                    return "Directoriode clientes por país";
 
                 if (MostrarProveedores)
-                    return "Directorio de proveedores por ciudad";
+                    return "Directorio de proveedores por país";
 
-                return "Directorio de clientes y proveedores por ciudad";
+                return "Directorio de clientes y proveedores por país";
             }
         }
         public string MensajeResultados
         {
             get
             {
-                if (Tipo == "DirectorioPorCiudadClientes")
+                if (Tipo == "DirectorioPorPaisClientes")
                     return $"Se encontraron {TotalClientes} cliente(s).";
 
-                if (Tipo == "DirectorioPorCiudadProveedores")
+                if (Tipo == "DirectorioPorPaisProveedores")
                     return $"Se encontraron {TotalProveedores} proveedor(es).";
 
                 return $"Se encontraron {TotalClientes} cliente(s) y {TotalProveedores} proveedor(es), Total: {TotalRecords} registro(s)";
             }
         }
         [BindProperty(SupportsGet = true)]
-        public string? CiudadPaisSeleccionado { get; set; }
+        public string? PaisSeleccionado { get; set; }
 
-        public List<SelectListItem> CiudadesPaises { get; set; } = [];
+        public List<SelectListItem> Paises { get; set; } = [];
         // Propiedades para la vista
         public List<ClienteProveedorDto> ClientesProveedores { get; set; } = new();
 
-        public DirectorioPorCiudadClientesProveedoresModel(IConfiguration configuration) : base(configuration)
+        public DirectorioPorPaisClientesProveedoresModel(IConfiguration configuration) : base(configuration)
         {
             var connectionString = configuration.GetConnectionString("NorthwindConnection")
                 ?? throw new InvalidOperationException("Connection string not found");
@@ -84,7 +84,6 @@ namespace NorthwindTradersV8WebRazorPages.Pages.Clientes.Consultas
             clienteBLL = new ClienteBLL(connectionString, ejecutarTiempoDemora, tiempoDemora);
             clienteService = new ClienteService(connectionString);
         }
-
         public void OnGet(int pageIndex = 1)
         {
             LlenarCombo();
@@ -100,7 +99,7 @@ namespace NorthwindTradersV8WebRazorPages.Pages.Clientes.Consultas
                 return;
             }
             // Debe seleccionar al menos una opción
-            if (string.IsNullOrWhiteSpace(CiudadPaisSeleccionado) || (!MostrarClientes && !MostrarProveedores))
+            if (string.IsNullOrWhiteSpace(PaisSeleccionado) || (!MostrarClientes && !MostrarProveedores))
             {
                 TempData["Error"] = StringsCommons.ErrorCriterioSelec;
 
@@ -113,7 +112,7 @@ namespace NorthwindTradersV8WebRazorPages.Pages.Clientes.Consultas
                 return;
             }
 
-            ClientesProveedores = clienteBLL.ObtenerClientesProveedoresPorCiudadPaginados(Tipo, CiudadPaisSeleccionado, PageIndex, RowsPerPage, out int totalRegistros, out int totalClientes, out int totalProveedores);
+            ClientesProveedores = clienteBLL.ObtenerClientesProveedoresPorPaisPaginados(Tipo, PaisSeleccionado, PageIndex, RowsPerPage, out int totalRegistros, out int totalClientes, out int totalProveedores);
             TotalRecords = totalRegistros;
             TotalClientes = totalClientes;
             TotalProveedores = totalProveedores;
@@ -126,13 +125,13 @@ namespace NorthwindTradersV8WebRazorPages.Pages.Clientes.Consultas
                 Buscar = Buscar,
                 MostrarClientes = MostrarClientes,
                 MostrarProveedores = MostrarProveedores,
-                CiudadPaisSeleccionado = CiudadPaisSeleccionado
+                PaisSeleccionado = PaisSeleccionado
             };
         }
         private void LlenarCombo()
         {
-            CiudadesPaises = clienteService
-                    .ObtenerCiudadesPaisesVwCliProvCbo()
+            Paises = clienteService
+                    .ObtenerPaisesVwCliProvCbo()
                     .Select(x => new SelectListItem
                     {
                         Text = x.Key,

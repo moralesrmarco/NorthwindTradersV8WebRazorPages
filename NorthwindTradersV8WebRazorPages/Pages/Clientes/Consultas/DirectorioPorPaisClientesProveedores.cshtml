@@ -1,7 +1,7 @@
 ﻿@page
-@model NorthwindTradersV8WebRazorPages.Pages.Clientes.Consultas.DirectorioPorCiudadClientesProveedoresModel
+@model NorthwindTradersV8WebRazorPages.Pages.Clientes.Consultas.DirectorioPorPaisClientesProveedoresModel
 @{
-    ViewData["Title"] = "Directorio de clientes y proveedores por ciudad";
+    ViewData["Title"] = "Directorio de clientes y proveedores por país";
 }
 
 <h2 class="mb-4">
@@ -15,12 +15,12 @@
     <div class="row align-items-end mb-3">
 
         <div class="col-md-5">
-            <label asp-for="CiudadPaisSeleccionado" class="form-label">
-                Buscar por ciudad
+            <label asp-for="PaisSeleccionado" class="form-label">
+                Buscar por país
             </label>
 
-            <select asp-for="CiudadPaisSeleccionado"
-                    asp-items="Model.CiudadesPaises"
+            <select asp-for="PaisSeleccionado"
+                    asp-items="Model.Paises"
                     class="form-select">
             </select>
         </div>
@@ -72,8 +72,8 @@
                 <div class="col-md-4 mb-3">
                     <div class="card shadow-sm h-100">
                         <div class="card-body">
-                            <h5 class="card-title">Ciudad: @clienteProveedor.City</h5>
-                            <h6 class="card-subtitle mb-2 text-muted"><strong>País:</strong> @clienteProveedor.Country</h6>
+                            <h5 class="card-title">País: @clienteProveedor.Country</h5>
+                            <h6 class="card-subtitle mb-2 text-muted"><strong>Ciudad:</strong> @clienteProveedor.City</h6>
                             <p class="card-text">
                                 <strong>Compañía:</strong> @clienteProveedor.CompanyName <br />
                                 <strong>Contacto:</strong> @clienteProveedor.Contact (@clienteProveedor.Relation)<br />
@@ -95,7 +95,7 @@
 else
 {
     <div class="alert alert-info">
-        Seleccione la ciudad, clientes y/o proveedores y haga clic en aplicar.
+        Seleccione el país, clientes y/o proveedores y haga clic en aplicar.
     </div>
 }
 @section Scripts {

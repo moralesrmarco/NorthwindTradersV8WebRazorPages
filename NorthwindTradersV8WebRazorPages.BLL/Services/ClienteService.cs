@@ -31,5 +31,17 @@ namespace NorthwindTradersV8WebRazorPages.BLL.Services
             }
             return ciudadesPaisesKvp;
         }
+        public List<KeyValuePair<string, string>> ObtenerPaisesVwCliProvCbo()
+        {
+            var paises = clienteDAL.ObtenerPaisesVwCliProvCbo();
+            var paisesKvp = new List<KeyValuePair<string, string>>();
+            paisesKvp.Add(new KeyValuePair<string, string>("»--- Seleccione ---«", ""));
+            paisesKvp.Add(new KeyValuePair<string, string>("»--- Todos los paises ---«", "00000"));
+            foreach (var item in paises)
+            {
+                paisesKvp.Add(new KeyValuePair<string, string>(item.Pais ?? string.Empty, item.Pais ?? string.Empty));
+            }
+            return paisesKvp;
+        }
     }
 }

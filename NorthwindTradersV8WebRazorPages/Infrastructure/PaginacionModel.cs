@@ -9,5 +9,6 @@
         public bool MostrarClientes { get; set; }
         public bool MostrarProveedores { get; set; }
         public string? CiudadPaisSeleccionado { get; set; }
+        public string? PaisSeleccionado { get; set; }
     }
 }
