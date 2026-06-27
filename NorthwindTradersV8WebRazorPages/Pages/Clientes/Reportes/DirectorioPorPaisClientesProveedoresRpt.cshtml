@@ -1,0 +1,86 @@
+﻿@page
+@model NorthwindTradersV8WebRazorPages.Pages.Clientes.Reportes.DirectorioPorPaisClientesProveedoresRptModel
+@{
+    ViewData["Title"] = "Reporte directorio de clientes y proveedores por país";
+}
+<h2 class="mb-4">
+    @Model.TituloDirectorio
+</h2>
+<form method="get" class="mb-3">
+    <input type="hidden" name="Buscar" value="true" />
+    <div class="row align-items-end mb-3">
+
+        <div class="col-md-5">
+            <label asp-for="PaisSeleccionado" class="form-label">
+                Buscar por país:
+            </label>
+
+            <select asp-for="PaisSeleccionado"
+                    asp-items="Model.Paises"
+                    class="form-select">
+            </select>
+        </div>
+        <div class="col-md-7">
+            <div class="form-check form-check-inline">
+                <input asp-for="MostrarClientes" class="form-check-input" />
+                <label asp-for="MostrarClientes" class="form-check-label">
+                    Clientes
+                </label>
+            </div>
+
+            <div class="form-check form-check-inline">
+                <input asp-for="MostrarProveedores" class="form-check-input" />
+                <label asp-for="MostrarProveedores" class="form-check-label">
+                    Proveedores
+                </label>
+            </div>
+            <button type="submit" class="btn btn-primary btn-sm ms-2">
+                Aplicar
+            </button>
+        </div>
+    </div>
+</form>
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger">
+        @Html.Raw(TempData["Error"])
+    </div>
+}
+@if (Model.Buscar)
+{
+    <a asp-page-handler="Excel"
+       asp-route-Buscar="true"
+       asp-route-CiudadPaisSeleccionado="@Model.PaisSeleccionado"
+       asp-route-MostrarClientes="@Model.MostrarClientes"
+       asp-route-MostrarProveedores="@Model.MostrarProveedores"
+       class="btn btn-sm btn-success">
+        Excel
+    </a>
+
+    <a asp-page-handler="Word"
+       asp-route-Buscar="true"
+       asp-route-CiudadPaisSeleccionado="@Model.PaisSeleccionado"
+       asp-route-MostrarClientes="@Model.MostrarClientes"
+       asp-route-MostrarProveedores="@Model.MostrarProveedores"
+       class="btn btn-sm btn-primary">
+        Word
+    </a>
+
+    <p>&nbsp;</p>
+
+    <iframe id="visorReporte"
+            data-report-src="?handler=VerPdf&Buscar=true&PaisSeleccionado=@Model.PaisSeleccionado&MostrarClientes=@Model.MostrarClientes&MostrarProveedores=@Model.MostrarProveedores"
+            width="100%"
+            height="600"
+            style="border:1px solid #ccc;">
+    </iframe>
+}
+else
+{
+    <div class="alert alert-info">
+        Seleccione el país, clientes y/o proveedores y haga clic en aplicar.
+    </div>
+}
+@section Scripts {
+    <script src="~/js/loading-overlay.js"></script>
+}
