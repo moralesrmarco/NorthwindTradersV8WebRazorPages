@@ -460,6 +460,77 @@ namespace NorthwindTradersV8WebRazorPages.DAL
             }
             return clientesProveedores;
         }
+        public List<Cliente> ObtenerClientesRpt()
+        {
+            List<Cliente> clientes = new List<Cliente>();
+            try
+            {
+                using var conn = new SqlConnection(connectionString);
+                using var cmd = new SqlCommand("SpClienteObtener", conn);
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.Parameters.AddWithValue("@top100", true);
+                conn.Open();
+                using var rdr = cmd.ExecuteReader();
+                while (rdr.Read())
+                {
+                    var cliente = new Cliente
+                    {
+                        CustomerID = rdr.IsDBNull(rdr.GetOrdinal("CustomerID")) ? null : rdr["CustomerID"].ToString(),
+                        CompanyName = rdr.IsDBNull(rdr.GetOrdinal("CompanyName")) ? null : rdr["CompanyName"].ToString(),
+                        ContactName = rdr.IsDBNull(rdr.GetOrdinal("ContactName")) ? null : rdr["ContactName"].ToString(),
+                        ContactTitle = rdr.IsDBNull(rdr.GetOrdinal("ContactTitle")) ? null : rdr["ContactTitle"].ToString(),
+                        Address = rdr.IsDBNull(rdr.GetOrdinal("Address")) ? null : rdr["Address"].ToString(),
+                        City = rdr.IsDBNull(rdr.GetOrdinal("City")) ? null : rdr["City"].ToString(),
+                        Region = rdr.IsDBNull(rdr.GetOrdinal("Region")) ? null : rdr["Region"].ToString(),
+                        PostalCode = rdr.IsDBNull(rdr.GetOrdinal("PostalCode")) ? null : rdr["PostalCode"].ToString(),
+                        Country = rdr.IsDBNull(rdr.GetOrdinal("Country")) ? null : rdr["Country"].ToString(),
+                        Phone = rdr.IsDBNull(rdr.GetOrdinal("Phone")) ? null : rdr["Phone"].ToString(),
+                        Fax = rdr.IsDBNull(rdr.GetOrdinal("Fax")) ? null : rdr["Fax"].ToString()
+                    };
+                    clientes.Add(cliente);
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Error al obtener los clientes " + ex.Message);
+            }
+            return clientes;
+        }
+        public List<ClienteProveedorDto> ObtenerClientesProveedoresRpt(string tipo)
+        {
+            List<ClienteProveedorDto> clientesProveedores = new List<ClienteProveedorDto>();
+            try
+            {
+                using var conn = new SqlConnection(connectionString);
+                using var cmd = new SqlCommand("SpClientesProveedores", conn);
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.Parameters.AddWithValue("@Tipo", tipo);
+                conn.Open();
+                using var rdr = cmd.ExecuteReader();
+                while (rdr.Read())
+                {
+                    var clienteProveedor = new ClienteProveedorDto()
+                    {
+                        CompanyName = rdr.IsDBNull(rdr.GetOrdinal("CompanyName")) ? null : rdr["CompanyName"].ToString(),
+                        Contact = rdr.IsDBNull(rdr.GetOrdinal("Contact")) ? null : rdr["Contact"].ToString(),
+                        Relation = rdr.IsDBNull(rdr.GetOrdinal("Relation")) ? null : rdr["Relation"].ToString(),
+                        Address = rdr.IsDBNull(rdr.GetOrdinal("Address")) ? null : rdr["Address"].ToString(),
+                        City = rdr.IsDBNull(rdr.GetOrdinal("City")) ? null : rdr["City"].ToString(),
+                        Region = rdr.IsDBNull(rdr.GetOrdinal("Region")) ? null : rdr["Region"].ToString(),
+                        PostalCode = rdr.IsDBNull(rdr.GetOrdinal("PostalCode")) ? null : rdr["PostalCode"].ToString(),
+                        Country = rdr.IsDBNull(rdr.GetOrdinal("Country")) ? null : rdr["Country"].ToString(),
+                        Phone = rdr.IsDBNull(rdr.GetOrdinal("Phone")) ? null : rdr["Phone"].ToString(),
+                        Fax = rdr.IsDBNull(rdr.GetOrdinal("Fax")) ? null : rdr["Fax"].ToString()
+                    };
+                    clientesProveedores.Add(clienteProveedor);
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Error al obtener los clientes y proveedores " + ex.Message);
+            }
+            return clientesProveedores;
+        }
     }
 }
     

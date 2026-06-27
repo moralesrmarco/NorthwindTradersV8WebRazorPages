@@ -17,16 +17,13 @@ function ocultarLoadingOverlay() {
 }
 
 document.addEventListener("DOMContentLoaded", function () {
-
-    // Compatibilidad con páginas actuales
-    const formulario = document.querySelector("form");
-
-    if (formulario) {
+    // Todos los formularios
+    document.querySelectorAll("form").forEach(function (formulario) {
         formulario.addEventListener("submit", function () {
             mostrarLoadingOverlay();
         });
-    }
-
+    });
+    // Paginación
     document.querySelectorAll(".pagination a").forEach(function (link) {
 
         link.addEventListener("click", function () {
@@ -36,24 +33,29 @@ document.addEventListener("DOMContentLoaded", function () {
             }
 
         });
-
     });
-
-    // Para páginas nuevas
+    // Botones o enlaces marcados    
     document.querySelectorAll("[data-show-overlay]").forEach(function (element) {
-
         element.addEventListener("click", function () {
-
             mostrarLoadingOverlay();
+        });
+    });
+    // Reportes PDF
+    document.querySelectorAll("iframe[data-report-src]").forEach(function (iframe) {
+
+        mostrarLoadingOverlay();
+
+        iframe.addEventListener("load", function () {
+
+            ocultarLoadingOverlay();
 
         });
 
-    });
+        iframe.src = iframe.dataset.reportSrc;
 
+    });
 });
 
 window.addEventListener("pageshow", function () {
-
     ocultarLoadingOverlay();
-
 });

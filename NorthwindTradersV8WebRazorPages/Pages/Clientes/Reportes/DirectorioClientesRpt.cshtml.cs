@@ -1,0 +1,66 @@
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.Reporting.NETCore;
+using NorthwindTradersV8WebRazorPages.BLL;
+
+namespace NorthwindTradersV8WebRazorPages.Pages.Clientes.Reportes
+{
+    public class DirectorioClientesRptModel : PageModel
+    {
+        private readonly ClienteBLL clienteBLL;
+        public DirectorioClientesRptModel(IConfiguration configuration)
+        {
+            var connectionString = configuration.GetConnectionString("NorthwindConnection")
+                ?? throw new InvalidOperationException("Connection string not found");
+            bool ejecutarTiempoDemora = configuration.GetValue<bool>("AppSettings:ejecutarTiempoDemora");
+            int tiempoDemora = configuration.GetValue<int>("AppSettings:tiempoDemora");
+            clienteBLL = new ClienteBLL(connectionString, ejecutarTiempoDemora, tiempoDemora);
+        }
+        public void OnGet()
+        {
+        }
+        public IActionResult OnGetVerPdf()
+        {
+            var reporte = CrearReporte();
+            return File(reporte.Render("PDF"), "application/pdf");
+        }
+
+        public IActionResult OnGetExcel()
+        {
+            var reporte = CrearReporte();
+            return File(
+                reporte.Render("EXCELOPENXML"),
+                "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                "DirectorioClientesProveedores.xlsx");
+        }
+
+        public IActionResult OnGetWord()
+        {
+            var reporte = CrearReporte();
+            return File(
+                reporte.Render("WORDOPENXML"),
+                "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+                "DirectorioClientesProveedores.docx");
+        }
+
+        private LocalReport CrearReporte()
+        {
+            LocalReport reporte = new();
+
+            reporte.ReportPath = Path.Combine(
+                Directory.GetCurrentDirectory(),
+                "Pages",
+                "Clientes",
+                "Reportes",
+                "RptClientes.rdlc");
+
+            var clientes = clienteBLL.ObtenerClientesRpt();
+
+            reporte.DataSources.Clear();
+            reporte.DataSources.Add(
+                new ReportDataSource("DataSet1", clientes));
+
+            return reporte;
+        }
+    }
+}
