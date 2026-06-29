@@ -3,18 +3,18 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Reporting.NETCore;
 using NorthwindTradersV8WebRazorPages.BLL;
 
-namespace NorthwindTradersV8WebRazorPages.Pages.Clientes.Reportes
+namespace NorthwindTradersV8WebRazorPages.Pages.Proveedores.Reportes
 {
-    public class DirectorioClientesRptModel : PageModel
+    public class DirectorioProveedoresRptModel : PageModel
     {
-        private readonly ClienteBLL clienteBLL;
-        public DirectorioClientesRptModel(IConfiguration configuration)
+        private readonly ProveedorBLL proveedorBLL;
+        public DirectorioProveedoresRptModel(IConfiguration configuration)
         {
             var connectionString = configuration.GetConnectionString("NorthwindConnection")
                 ?? throw new InvalidOperationException("Connection string not found");
             bool ejecutarTiempoDemora = configuration.GetValue<bool>("AppSettings:ejecutarTiempoDemora");
             int tiempoDemora = configuration.GetValue<int>("AppSettings:tiempoDemora");
-            clienteBLL = new ClienteBLL(connectionString, ejecutarTiempoDemora, tiempoDemora);
+            proveedorBLL = new ProveedorBLL(connectionString, ejecutarTiempoDemora, tiempoDemora);
         }
         public void OnGet()
         {
@@ -31,7 +31,7 @@ namespace NorthwindTradersV8WebRazorPages.Pages.Clientes.Reportes
             return File(
                 reporte.Render("EXCELOPENXML"),
                 "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-                "DirectorioClientes.xlsx");
+                "DirectorioProveedores.xlsx");
         }
 
         public IActionResult OnGetWord()
@@ -40,7 +40,7 @@ namespace NorthwindTradersV8WebRazorPages.Pages.Clientes.Reportes
             return File(
                 reporte.Render("WORDOPENXML"),
                 "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-                "DirectorioClientes.docx");
+                "DirectorioProveedores.docx");
         }
 
         private LocalReport CrearReporte()
@@ -50,15 +50,15 @@ namespace NorthwindTradersV8WebRazorPages.Pages.Clientes.Reportes
             reporte.ReportPath = Path.Combine(
                 Directory.GetCurrentDirectory(),
                 "Pages",
-                "Clientes",
+                "Proveedores",
                 "Reportes",
-                "RptClientes.rdlc");
+                "RptProveedores.rdlc");
 
-            var clientes = clienteBLL.ObtenerClientesRpt();
+            var proveedores = proveedorBLL.ObtenerProveedoresRpt();
 
             reporte.DataSources.Clear();
             reporte.DataSources.Add(
-                new ReportDataSource("DataSet1", clientes));
+                new ReportDataSource("DataSet1", proveedores));
 
             return reporte;
         }

@@ -90,6 +90,11 @@ namespace NorthwindTradersV8WebRazorPages.BLL
                 Thread.Sleep(_tiempoDemora);
             return proveedorDAL.BuscarProveedores(filtro);
         }
-
+        public List<Proveedor> ObtenerProveedoresRpt()
+        {
+            if (_ejecutarTiempoDemora)
+                Thread.Sleep(_tiempoDemora);
+            return proveedorDAL.ObtenerProveedoresRpt();
+        }
     }
 }
