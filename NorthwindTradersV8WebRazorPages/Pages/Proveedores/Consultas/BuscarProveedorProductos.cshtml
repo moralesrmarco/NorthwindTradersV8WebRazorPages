@@ -1,9 +1,9 @@
 ﻿@page
-@model NorthwindTradersV8WebRazorPages.Pages.Proveedores.BuscarModel
+@model NorthwindTradersV8WebRazorPages.Pages.Proveedores.Consultas.BuscarProveedorProductosModel
 @{
-    ViewData["Title"] = "Buscar proveedor";
+    ViewData["Title"] = "Consulta de productos por proveedor";
 }
-<h2>Buscar proveedor</h2>
+<h2>Consulta de productos por proveedor <i class="bi bi-arrow-right"></i> Buscar proveedor</h2>
 <form method="get" class="form" onsubmit="return disableSearchButton();">
     <div class="row">
         <div class="col-md-3 mb-3">
@@ -104,7 +104,7 @@
                             <td>@row["CompanyName"]</td>
                             <td class="text-center">@row["Country"]</td>
                             <td class="text-center text-nowrap">
-                                <a asp-page="Consultar"
+                                <a asp-page="/Proveedores/Consultar"
                                    asp-route-id="@row["SupplierID"]"
                                    asp-route-returnUrl="@(Request.Path + Request.QueryString)"
                                    class="btn btn-sm btn-success me-1 action-btn"
@@ -112,21 +112,13 @@
                                     <i class="bi bi-check-square"></i>
                                     <span class="d-none d-md-inline"> Consultar</span>
                                 </a>
-                                <a asp-page="Editar"
+                                <a asp-page="ProductosPorProveedor"
                                    asp-route-id="@row["SupplierID"]"
                                    asp-route-returnUrl="@(Request.Path + Request.QueryString)"
-                                   class="btn btn-sm btn-warning me-1 action-btn"
-                                   title="Editar">
-                                    <i class="bi bi-pencil"></i>
-                                    <span class="d-none d-md-inline"> Editar</span>
-                                </a>
-                                <a asp-page="Eliminar"
-                                   asp-route-id="@row["SupplierID"]"
-                                   asp-route-returnUrl="@(Request.Path + Request.QueryString)"
-                                   class="btn btn-sm btn-danger me-1 action-btn"
-                                   title="Eliminar">
-                                    <i class="bi bi-trash"></i>
-                                    <span class="d-none d-md-inline"> Eliminar</span>
+                                   class="btn btn-sm btn-primary me-1 action-btn"
+                                   title="Productos">
+                                    <i class="bi bi-cart"></i>
+                                    <span class="d-none d-md-inline"> Productos</span>
                                 </a>
                             </td>
                         </tr>
@@ -137,8 +129,6 @@
     }
 </form>
 @section Scripts {
-
     <script src="~/js/navigation-actions.js"></script>
     <script src="~/js/form-buscar.js"></script>
-
 }

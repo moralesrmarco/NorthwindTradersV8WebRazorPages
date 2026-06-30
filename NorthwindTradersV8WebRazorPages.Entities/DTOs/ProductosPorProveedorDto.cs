@@ -12,6 +12,5 @@
         public short? ReorderLevel { get; set; }
         public bool Discontinued { get; set; }
         public string? CategoryName { get; set; }
-
     }
 }
