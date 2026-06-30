@@ -1,0 +1,85 @@
+﻿@page
+@model NorthwindTradersV8WebRazorPages.Pages.Categorias.IndexModel
+@{
+    ViewData["Title"] = "Gestión de categorías";
+}
+<h2>Lista de categorías</h2>
+<a asp-page="Insertar"
+   class="btn btn-sm btn-primary mb-3"
+   data-show-overlay
+   asp-route-returnUrl="@Url.Page("Index", new { pageIndex = Model.PageIndex })"
+   title="Nuevo">
+    <i class="bi bi-plus-circle"></i>
+    <span class="d-none d-md-inline"> Nueva categoría</span>
+</a>
+<a asp-page="Buscar"
+   class="btn btn-sm btn-buscar mb-3"
+   data-show-overlay
+   title="Buscar">
+    <i class="bi bi-search"></i>
+    <span class="d-none d-md-inline"> Buscar categoría</span>
+</a>
+<partial name="_Paginacion" model="Model.Paginacion" />
+<div class="table-responsive">
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th class="text-center">Imagen</th>
+                <th class="text-center">ID</th>
+                <th>Categoría</th>
+                <th class="text-center">Descripción</th>
+                <th class="text-center">Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (System.Data.DataRow row in Model.Categorias.Rows)
+            {
+                <tr>
+                    <td class="text-center">
+@*                         <img src="/Empleados/Foto?id=@row["EmployeeID"]"
+                             alt="Foto"
+                             class="img-thumbnail"
+                             style="max-width: 80px; max-height: 80px;" />
+ *@
+                    </td>
+                    <td class="text-center">@row["CategoryID"]</td>
+                    <td>@row["CategoryName"]</td>
+                    <td>@row["Description"]</td>
+                    <td class="text-center text-nowrap">
+                        <a asp-page="Consultar"
+                           asp-route-id="@row["CategoryID"]"
+                           data-show-overlay
+                           asp-route-returnUrl="@Url.Page("Index", new { pageIndex = Model.PageIndex })"
+                           class="btn btn-sm btn-success me-1 action-btn"
+                           title="Consultar">
+                            <i class="bi bi-check-square"></i>
+                            <span class="d-none d-md-inline"> Consultar</span>
+                        </a>
+                        <a asp-page="Editar"
+                           asp-route-id="@row["CategoryID"]"
+                           data-show-overlay
+                           asp-route-returnUrl="@Url.Page("Index", new { pageIndex = Model.PageIndex })"
+                           class="btn btn-sm btn-warning me-1 action-btn"
+                           title="Editar">
+                            <i class="bi bi-pencil"></i>
+                            <span class="d-none d-md-inline"> Editar</span>
+                        </a>
+                        <a asp-page="Eliminar"
+                           asp-route-id="@row["CategoryID"]"
+                           data-show-overlay
+                           asp-route-returnUrl="@Url.Page("Index", new { pageIndex = Model.PageIndex })"
+                           class="btn btn-sm btn-danger me-1 action-btn"
+                           title="Eliminar">
+                            <i class="bi bi-trash"></i>
+                            <span class="d-none d-md-inline"> Eliminar</span>
+                        </a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+<partial name="_Paginacion" model="Model.Paginacion" />
+@section Scripts {
+    <script src="~/js/loading-overlay.js"></script>
+}

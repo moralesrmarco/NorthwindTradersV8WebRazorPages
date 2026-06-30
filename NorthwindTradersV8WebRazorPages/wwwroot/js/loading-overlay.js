@@ -34,6 +34,16 @@ document.addEventListener("DOMContentLoaded", function () {
 
         });
     });
+    // Menú de navegación
+    document.querySelectorAll(".navbar a[href]").forEach(function (link) {
+        link.addEventListener("click", function () {
+            const href = link.getAttribute("href");
+
+            if (href && !href.startsWith("#")) {
+                mostrarLoadingOverlay();
+            }
+        });
+    });
     // Botones o enlaces marcados    
     document.querySelectorAll("[data-show-overlay]").forEach(function (element) {
         element.addEventListener("click", function () {

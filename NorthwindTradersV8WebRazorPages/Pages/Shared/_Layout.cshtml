@@ -219,7 +219,59 @@
                                 </li>
                             </ul>
                         </li>
-
+                        <!-- Menú Categorías con submenús -->
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle text-dark" href="#" id="categoriasDropDown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                Categorías
+                            </a>
+                            <ul class="dropdown-menu" aria-labelledby="categoriasDropDown">
+                                <!-- Gestión de categorías -->
+                                <li>
+                                    <a class="dropdown-item" 
+                                        asp-area="" 
+                                        asp-page="/Categorias/Index">
+                                            Gestión de categorías
+                                    </a>
+                                </li>
+                                <li><hr class="dropdown-divider" /></li>
+                                <!-- Submenú Consultas -->
+                                <li class="dropdown-submenu">
+                                    <a class="dropdown-item dropdown-toggle" href="#">Consultas</a>
+                                    <ul class="dropdown-menu">
+                                        <li>
+                                            <a class="dropdown-item"
+                                                asp-page="/Categorias/Consultas/xxx">
+                                                Consulta de productos por categoría
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a class="dropdown-item"
+                                                asp-page="/Categorias/Consultas/xxx">
+                                                Listado de categorías con productos
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </li>
+                                <!-- Submenú Reportes -->
+                                <li class="dropdown-submenu">
+                                    <a class="dropdown-item dropdown-toggle" href="#">Reportes</a>
+                                    <ul class="dropdown-menu">
+                                        <li>
+                                            <a class="dropdown-item"
+                                               asp-page="/Categorias/Reportes/xxx">
+                                                Reporte de categorías
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a class="dropdown-item"
+                                               asp-page="/Categorias/Reportes/xxx">
+                                                Reporte de categorías con productos
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </li>
+                            </ul>
+                        </li>
                         <!-- Menú Productos con submenús -->
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle text-dark" href="#" id="productosDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
@@ -281,6 +333,8 @@
     <!-- 👇 Select2 debe ir después de jQuery -->
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
+
+    <script src="~/js/loading-overlay.js" asp-append-version="true"></script>
 
     <partial name="_LoadingOverlay" />
 
