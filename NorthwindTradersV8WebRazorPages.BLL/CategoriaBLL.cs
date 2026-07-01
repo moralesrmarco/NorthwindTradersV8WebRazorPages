@@ -29,5 +29,9 @@ namespace NorthwindTradersV8WebRazorPages.BLL
                 Thread.Sleep(_tiempoDemora);
             return categoriaDAL.ObtenerCategoriasPaginadas(pageIndex, rowsPerPage, out totalRegistros);
         }
+        public byte[]? ObtenerCategoriaPicturePorId(int id)
+        {
+            return categoriaDAL.ObtenerCategoriaPicturePorId(id);
+        }
     }
 }
