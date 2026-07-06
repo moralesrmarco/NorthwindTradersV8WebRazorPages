@@ -1,5 +1,4 @@
 using NorthwindTradersV8WebRazorPages.BLL;
-using NorthwindTradersV8WebRazorPages.DAL;
 using NorthwindTradersV8WebRazorPages.Infrastructure;
 using System.Data;
 

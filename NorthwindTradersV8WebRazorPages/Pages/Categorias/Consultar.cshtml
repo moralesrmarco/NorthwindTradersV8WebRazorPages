@@ -1,0 +1,59 @@
+﻿@page "{id:int}"
+@model NorthwindTradersV8WebRazorPages.Pages.Categorias.ConsultarModel
+@{
+    ViewData["Title"] = "Consulta de categoría";
+}
+<h2>Detalles de la categoría</h2>
+<form method="post" class="form">
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger">@Html.Raw(TempData["Error"])</div>
+    }
+    <div class="row mb-3">
+        <div class="col-md-12">
+            <label asp-for="Categoria.CategoryID" class="form-label">ID</label>
+            <input asp-for="Categoria.CategoryID" class="form-control" readonly />
+        </div>
+    </div>
+    <div class="row mb-3">
+        <div class="col-md-12">
+            <label asp-for="Categoria.CategoryName" class="form-label">Nombre</label>
+            <input asp-for="Categoria.CategoryName" class="form-control" readonly />
+        </div>
+    </div>
+    <div class="row mb-3">
+        <div class="col-md-12">
+            <label asp-for="Categoria.Description" class="form-label">Descripción</label>
+            <textarea asp-for="Categoria.Description" class="form-control" readonly></textarea>
+        </div>
+    </div>
+    <div class="row mb-3">
+        <div class="col-md-12">
+            <img src="/Categorias/Picture?id=@Model.Categoria?.CategoryID"
+                 alt="Imagen de la categoría"
+                 class="img-thumbnail float-start"
+                 style="max-width:250px; max-height:250px;" />
+        </div>
+    </div>
+    <div class="row mb-3">
+        <div class="col-md-12">
+            <a href="@(Model.ReturnUrl ?? Url.Page("Index"))"
+               class="btn btn-sm btn-success me-1 navigation-btn"
+               title="Volver">
+                <i class="bi bi-check-circle"></i>
+                <span class="d-none d-md-inline"> Volver</span>
+            </a>
+        </div>
+    </div>
+</form>
+@section Scripts {
+
+    <script src="~/js/navigation-actions.js"></script>
+
+    <script>
+        $(function () {
+            configurarNavegacion();
+        });
+    </script>
+
+}

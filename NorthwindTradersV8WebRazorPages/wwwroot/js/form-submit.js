@@ -1,23 +1,28 @@
-﻿function configurarSubmitFormulario(campoValidacion) {
+﻿function configurarSubmitFormulario(campoValidacion = null) {
 
     $('form').on('submit', function () {
 
-
+        const formulario = $(this);
         const btnGuardar = document.getElementById('btnGuardar');
 
         if (btnGuardar && btnGuardar.disabled) {
             return false;
         }
 
-        if (!$(this).valid()) {
+        if (!formulario.valid()) {
+            ocultarLoadingOverlay();
             return false;
         }
 
-        if (!validarPais(campoValidacion)) {
-            return false;
-        }
+        if (campoValidacion) {
 
-        asegurarValorPais();
+            if (!validarPais(campoValidacion)) {
+                ocultarLoadingOverlay();
+                return false;
+            }
+
+            asegurarValorPais();
+        }
 
         if (btnGuardar) {
 

@@ -1,8 +1,12 @@
-﻿namespace NorthwindTradersV8WebRazorPages.Entities
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace NorthwindTradersV8WebRazorPages.Entities
 {
     public class Categoria
     {
         public int CategoryID { get; set; }
+        [Required(ErrorMessage = "Ingrese la categoría")]
+        [StringLength(15, ErrorMessage = "El nombre de la categoría no puede exceder de 15 caracteres")]
         public string? CategoryName { get; set; }
         public string? Description { get; set; }
         public byte[]? Picture { get; set; }
