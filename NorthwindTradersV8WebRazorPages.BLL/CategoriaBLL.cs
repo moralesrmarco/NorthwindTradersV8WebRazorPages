@@ -94,6 +94,12 @@ namespace NorthwindTradersV8WebRazorPages.BLL
                 Thread.Sleep(_tiempoDemora);
             return categoriaDAL.BuscarCategorias(filtro);
         }
+        public List<Categoria> ObtenerCategoriasRpt()
+        {
+            if (_ejecutarTiempoDemora)
+                Thread.Sleep(_tiempoDemora);
+            return categoriaDAL.ObtenerCategoriasRpt();
+        }
 
     }
 }
