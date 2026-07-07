@@ -10,14 +10,14 @@
         }
 
         if (!formulario.valid()) {
-            ocultarLoadingOverlay();
+            ocultarLoadingOverlay(); // esta en loading-overlay.js
             return false;
         }
 
         if (campoValidacion) {
 
             if (!validarPais(campoValidacion)) {
-                ocultarLoadingOverlay();
+                ocultarLoadingOverlay(); // esta en loading-overlay.js
                 return false;
             }
 
@@ -32,13 +32,13 @@
                 '<span class="spinner-border spinner-border-sm me-1"></span> Procesando...';
         }
 
-        mostrarOverlay();
+        mostrarLoadingOverlay(); // esta en loading-overlay.js
 
         return true;
     });
 
     $('.btn-cancelar').on('click', function () {
-        mostrarOverlay();
+        mostrarLoadingOverlay(); // esta en loading-overlay.js
     });
 
 
@@ -127,13 +127,4 @@ function asegurarValorPais() {
     }
 
     $('#cboPais').val(texto).trigger('change');
-}
-
-function mostrarOverlay() {
-
-    const overlay = document.getElementById('loadingOverlay');
-
-    if (overlay) {
-        overlay.style.display = 'block';
-    }
 }

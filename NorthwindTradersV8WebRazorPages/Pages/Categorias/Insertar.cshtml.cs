@@ -48,9 +48,6 @@ namespace NorthwindTradersV8WebRazorPages.Pages.Categorias
             if (string.IsNullOrWhiteSpace(Categoria?.CategoryName))
                 ModelState.AddModelError("Categoria.CategoryName", "El nombre de la categoría es obligatorio");
 
-            //if (Categoria?.Description == null || Categoria.Description == 0)
-            //    ModelState.AddModelError("Categoria.Description", "Seleccione una descripción para la categoría");
-
             if (!ModelState.IsValid)
             {
                 return Page();

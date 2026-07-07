@@ -1,14 +1,23 @@
-﻿@page
-@model NorthwindTradersV8WebRazorPages.Pages.Categorias.InsertarModel
+﻿@page "{id:int}"
+@model NorthwindTradersV8WebRazorPages.Pages.Categorias.EditarModel
 @{
-    ViewData["Title"] = "Insertar categoría";
+    ViewData["Title"] = "Editar categoría";
 }
-<h2>Nueva categoría</h2>
-<form method="post" class="form" enctype="multipart/form-data">
+<h2>Editar categoría</h2>
+<form method="post" 
+    class="form" 
+    enctype="multipart/form-data" 
+    onsubmit="return disableSaveButton();">
     @if (TempData["Error"] != null)
     {
         <div class="alert alert-danger">@Html.Raw(TempData["Error"])</div>
     }
+    <div class="row mb-3">
+        <div class="col-md-12">
+            <label asp-for="Categoria.CategoryID" class="form-label">ID</label>
+            <input asp-for="Categoria.CategoryID" class="form-control" readonly />
+        </div>
+    </div>
     <div class="row mb-3">
         <div class="col-md-12">
             <label asp-for="Categoria.CategoryName" class="form-label">Nombre</label>
@@ -19,37 +28,50 @@
     <div class="row mb-3">
         <div class="col-md-12">
             <label asp-for="Categoria.Description" class="form-label">Descripción</label>
-            <textarea asp-for="Categoria.Description" 
-            class="form-control" 
-            rows="5"
-            style="resize:none; overflow-y:auto; max-height:200px;"></textarea>
+            <textarea asp-for="Categoria.Description"
+                      class="form-control"
+                      rows="5"
+                      style="resize:none; overflow-y:auto; max-height:200px;"></textarea>
         </div>
     </div>
     <div class="row mb-3">
         <div class="col-md-12 mb-3 d-flex align-items-end">
             <!-- Imagen por defecto o previa -->
             <img id="previewFoto"
-                 src="@(Model.PictureTemporalBase64 != null
-                        ? $"data:{Model.PictureMime};base64,{Model.PictureTemporalBase64}"
-                        : Url.Content("~/images/Categorias.png"))"
+                 src="@(!string.IsNullOrEmpty(Model.PictureTemporalBase64)
+                    ? $"data:{Model.PictureMime};base64,{Model.PictureTemporalBase64}"
+                    : $"/Categorias/Picture?id={Model.Categoria?.CategoryID}" )"
                  alt="Imagen de la categoría"
                  class="img-thumbnail"
                  style="max-width:150px; max-height:150px;" />
             <!-- Campo oculto para subir archivo -->
             <input type="file" asp-for="PictureFile" id="fileFoto" class="d-none" accept="image/*" />
             <!-- Botón que dispara el input file -->
-            <button type="button"
-                    class="btn btn-primary ms-2"
-                    style="padding:2px 6px; font-size:0.7rem;"
-                    onclick="document.getElementById('fileFoto').click();">
-                <i class="bi bi-camera"></i>
-                Cargar imagen...
-            </button>
-
+            @if (Model.Categoria?.CategoryID <= 9)
+            {
+                <button type="button"
+                class="btn btn-secondary ms-2"
+                style="padding:2px 6px; font-size:0.7rem;"
+                disabled>
+                    <i class="bi bi-camera"></i>
+                    Imagen protegida
+                </button>
+            }
+            else
+            {
+                <button type="button"
+                class="btn btn-primary ms-2"
+                style="padding:2px 6px; font-size:0.7rem;"
+                onclick="document.getElementById('fileFoto').click();">
+                    <i class="bi bi-camera"></i>
+                    Cargar imagen...
+                </button>
+            }
         </div>
     </div>
     <div class="row mb-3">
         <div class="col-md-12">
+            <input type="hidden" asp-for="Categoria.RowVersion" />
             <input type="hidden" asp-for="PictureTemporalBase64" />
             <input type="hidden" asp-for="PictureMime" />
             <button type="submit"
@@ -80,8 +102,8 @@
             configurarPreviewImagen(
                 'fileFoto',
                 'previewFoto',
-                'FotoTemporalBase64',
-                'FotoMime',
+                'PictureTemporalBase64',
+                'PictureMime',
                 2
             );
         });

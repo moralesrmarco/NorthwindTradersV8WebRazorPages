@@ -36,6 +36,35 @@ namespace NorthwindTradersV8WebRazorPages.DAL
             }
             return numRegs;
         }
+        public int Actualizar(Categoria categoria)
+        {
+            int numRegs = 0;
+            try
+            {
+                using (var conn = new SqlConnection(connectionString))
+                using (var cmd = new SqlCommand("SpCategoriaActualizar", conn))
+                {
+                    cmd.CommandType = CommandType.StoredProcedure;
+                    cmd.Parameters.AddWithValue("@CategoryID", categoria.CategoryID);
+                    cmd.Parameters.AddWithValue("@CategoryName", categoria.CategoryName);
+                    cmd.Parameters.AddWithValue("@Description", categoria.Description ?? (object)DBNull.Value);
+                    cmd.Parameters.AddWithValue("@Picture", categoria.Picture ?? (object)DBNull.Value);
+                    var pRrowVersion = cmd.Parameters.Add("@RowVersion", SqlDbType.Binary, 8);
+                    pRrowVersion.Value = categoria.RowVersion ?? (object)DBNull.Value;
+                    // Parámetro de retorno
+                    var returnParameter = cmd.Parameters.Add("@ReturnVal", SqlDbType.Int);
+                    returnParameter.Direction = ParameterDirection.ReturnValue;
+                    conn.Open();
+                    cmd.ExecuteNonQuery();
+                    numRegs = (int)returnParameter.Value;
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Error al actualizar la categoria " + ex.Message);
+            }
+            return numRegs;
+        }
         public int Eliminar(Categoria categoria)
         {
             int numRegs = 0;
@@ -133,6 +162,7 @@ namespace NorthwindTradersV8WebRazorPages.DAL
                                 CategoryID = dr["CategoryID"] != DBNull.Value ? Convert.ToInt32(dr["CategoryID"]) : 0,
                                 CategoryName = dr["CategoryName"] != DBNull.Value ? dr["CategoryName"].ToString() : null,
                                 Description = dr["Description"] != DBNull.Value ? dr["Description"].ToString() : null,
+                                Picture = ObtenerCategoriaPicturePorId(id),
                                 RowVersion = dr["RowVersion"] != DBNull.Value ? (byte[])dr["RowVersion"] : null
                             };
                         }
