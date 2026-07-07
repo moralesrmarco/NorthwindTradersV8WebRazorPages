@@ -178,5 +178,29 @@ namespace NorthwindTradersV8WebRazorPages.DAL
                 throw new Exception("Error al obtener la categoria por ID " + ex.Message);
             }
         }
+        public DataTable BuscarCategorias(CategoriasBuscarDto filtro)
+        {
+            try
+            {
+                using (var conn = new SqlConnection(connectionString))
+                using (var cmd = new SqlCommand("SpCategoriaBuscar", conn))
+                {
+                    cmd.CommandType = CommandType.StoredProcedure;
+                    cmd.Parameters.AddWithValue("@IdIni", filtro.IdIni ?? 0);
+                    cmd.Parameters.AddWithValue("@IdFin", filtro.IdFin ?? 0);
+                    cmd.Parameters.AddWithValue("@CategoryName", filtro.CategoryName ?? "");
+                    using (var dap = new SqlDataAdapter(cmd))
+                    {
+                        var dt = new DataTable();
+                        dap.Fill(dt);
+                        return dt;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Error al buscar las categorias " + ex.Message);
+            }
+        }
     }
 }

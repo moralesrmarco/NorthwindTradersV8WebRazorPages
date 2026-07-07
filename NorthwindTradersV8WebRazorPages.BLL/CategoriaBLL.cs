@@ -1,6 +1,7 @@
 ﻿using NorthwindTradersV8WebRazorPages.Common;
 using NorthwindTradersV8WebRazorPages.DAL;
 using NorthwindTradersV8WebRazorPages.Entities;
+using NorthwindTradersV8WebRazorPages.Entities.DTOs;
 using System.Data;
 
 namespace NorthwindTradersV8WebRazorPages.BLL
@@ -87,5 +88,12 @@ namespace NorthwindTradersV8WebRazorPages.BLL
                 Thread.Sleep(_tiempoDemora);
             return categoriaDAL.ObtenerCategoriaPorId(id);
         }
+        public DataTable BuscarCategorias(CategoriasBuscarDto filtro)
+        {
+            if (_ejecutarTiempoDemora)
+                Thread.Sleep(_tiempoDemora);
+            return categoriaDAL.BuscarCategorias(filtro);
+        }
+
     }
 }
