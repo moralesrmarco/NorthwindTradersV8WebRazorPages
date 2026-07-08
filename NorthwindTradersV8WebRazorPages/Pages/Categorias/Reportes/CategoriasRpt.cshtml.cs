@@ -2,7 +2,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Reporting.NETCore;
 using NorthwindTradersV8WebRazorPages.BLL;
-using NorthwindTradersV8WebRazorPages.DAL;
 
 namespace NorthwindTradersV8WebRazorPages.Pages.Categorias.Reportes
 {
