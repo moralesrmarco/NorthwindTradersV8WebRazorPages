@@ -7,9 +7,7 @@ namespace NorthwindTradersV8WebRazorPages.Entities
         public int ProductID { get; set; }
         [Required(ErrorMessage = "Ingrese producto")]
         public string? ProductName { get; set; }
-        //[Required(ErrorMessage = "Seleccione un proveedor")]
         public Proveedor? Proveedor { get; set; }
-        //[Required(ErrorMessage = "Seleccione una categoría")]
         public Categoria? Categoria { get; set; }
         public string? QuantityPerUnit { get; set; }
         [Required(ErrorMessage = "Ingrese precio")]

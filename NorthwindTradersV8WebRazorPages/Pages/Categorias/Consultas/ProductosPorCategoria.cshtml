@@ -1,0 +1,71 @@
+﻿@page
+@model NorthwindTradersV8WebRazorPages.Pages.Categorias.Consultas.ProductosPorCategoriaModel
+@{
+    ViewData["Title"] = "Productos por categoría";
+}
+<h2>Productos por categoría</h2>
+<form method="post" class="form">
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger">@Html.Raw(TempData["Error"])</div>
+    }
+    <div class="row mb-3">
+        <div class="col-md-3">
+            <img src="/Categorias/Picture?id=@Model.Categoria.CategoryID"
+                 alt="Picture"
+                 class="img-thumbnail"
+                 style="max-width: 100px; max-height: 100px;" />
+        </div>
+        <div class="col-md-2">
+            <label asp-for="Categoria.CategoryID" class="form-label">ID</label>
+            <input asp-for="Categoria.CategoryID" class="form-control" readonly />
+        </div>
+        <div class="col-md-7">
+            <label asp-for="Categoria.CategoryName" class="form-label">Nombre de categoría</label>
+            <input asp-for="Categoria.CategoryName" class="form-control" readonly />
+        </div>
+    </div>
+    @if (Model.Productos.Any())
+    {
+        <div class="container mt-4">
+            <div class="row">
+                @foreach (var producto in Model.Productos)
+                {
+                    <div class="col-md-4 mb-3">
+                        <div class="card shadow-sm h-100">
+                            <div class="card-body">
+                                <h5 class="card-title">@producto.ProductName</h5>
+                                <h6 class="card-subtitle mb-2 text-muted">ID: @producto.ProductID</h6>
+                                <p class="card-text">
+                                    <strong>Cantidad por unidad:</strong> @producto.QuantityPerUnit<br />
+                                    <strong>Precio:</strong> @producto.UnitPrice<br />
+                                    <strong>Unidades en inventario:</strong> @producto.UnitsInStock<br />
+                                    <strong>Unidades en pedido:</strong> @producto.UnitsOnOrder<br />
+                                    <strong>Nivel de reorden:</strong> @producto.ReorderLevel<br />
+                                    @if (producto.Discontinued)
+                                    {
+                                        <span class="text-danger fw-bold">Producto Descontinuado</span>
+                                        <br />
+                                    }
+                                    <strong>Proveedor:</strong> @producto.Proveedor.CompanyName
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="alert alert-info mt-3">
+            Este proveedor no contiene productos registrados
+        </div>
+    }
+    <a href="@(Model.ReturnUrl ?? Url.Page("/Index"))"
+       class="btn btn-secondary"
+       title="Regresar">
+        <i class="bi bi-arrow-left"></i>
+        <span class="d-none d-md-inline"> Regresar</span>
+    </a>
+</form>
