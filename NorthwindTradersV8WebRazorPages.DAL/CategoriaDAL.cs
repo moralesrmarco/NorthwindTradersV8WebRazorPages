@@ -234,7 +234,7 @@ namespace NorthwindTradersV8WebRazorPages.DAL
                 throw new Exception("Error al obtener las categorias para el reporte " + ex.Message);
             }
         }
-        public List<CategoriasConProductosRptDto> ObtenerCategoriasConProductosRpt()
+        public List<CategoriasConProductosDto> ObtenerCategoriasConProductosRpt()
         {
             try
             {
@@ -245,10 +245,10 @@ namespace NorthwindTradersV8WebRazorPages.DAL
                     conn.Open();
                     using (var dr = cmd.ExecuteReader())
                     {
-                        var categoriasConProductos = new List<CategoriasConProductosRptDto>();
+                        var categoriasConProductos = new List<CategoriasConProductosDto>();
                         while (dr.Read())
                         {
-                            categoriasConProductos.Add(new CategoriasConProductosRptDto
+                            categoriasConProductos.Add(new CategoriasConProductosDto
                             {
                                 CategoryName = dr["CategoryName"] != DBNull.Value ? dr["CategoryName"].ToString() : null,
                                 CompanyName = dr["CompanyName"] != DBNull.Value ? dr["CompanyName"].ToString() : null,

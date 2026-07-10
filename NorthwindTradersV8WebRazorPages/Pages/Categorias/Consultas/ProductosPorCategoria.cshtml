@@ -38,10 +38,10 @@
                                 <h6 class="card-subtitle mb-2 text-muted">ID: @producto.ProductID</h6>
                                 <p class="card-text">
                                     <strong>Cantidad por unidad:</strong> @producto.QuantityPerUnit<br />
-                                    <strong>Precio:</strong> @producto.UnitPrice<br />
-                                    <strong>Unidades en inventario:</strong> @producto.UnitsInStock<br />
-                                    <strong>Unidades en pedido:</strong> @producto.UnitsOnOrder<br />
-                                    <strong>Nivel de reorden:</strong> @producto.ReorderLevel<br />
+                                    <strong>Precio:</strong> @producto.UnitPrice?.ToString("C2")<br />
+                                    <strong>Unidades en inventario:</strong> @producto.UnitsInStock?.ToString("N0")<br />
+                                    <strong>Unidades en pedido:</strong> @producto.UnitsOnOrder?.ToString("N0")<br />
+                                    <strong>Nivel de reorden:</strong> @producto.ReorderLevel?.ToString("N0")<br />
                                     @if (producto.Discontinued)
                                     {
                                         <span class="text-danger fw-bold">Producto Descontinuado</span>

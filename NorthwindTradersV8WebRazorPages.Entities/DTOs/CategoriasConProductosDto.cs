@@ -1,6 +1,6 @@
 ﻿namespace NorthwindTradersV8WebRazorPages.Entities.DTOs
 {
-    public class CategoriasConProductosRptDto
+    public class CategoriasConProductosDto
     {
         public int? ProductID { get; set; }
         public string? ProductName { get; set; }
@@ -15,6 +15,5 @@
         public string? CategoryName { get; set; }
         // nombre de la compañia del proveedor
         public string? CompanyName { get; set; }
-
     }
 }

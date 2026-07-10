@@ -100,7 +100,7 @@ namespace NorthwindTradersV8WebRazorPages.BLL
                 Thread.Sleep(_tiempoDemora);
             return categoriaDAL.ObtenerCategoriasRpt();
         }
-        public List<CategoriasConProductosRptDto> ObtenerCategoriasConProductosRpt()
+        public List<CategoriasConProductosDto> ObtenerCategoriasConProductosRpt()
         {
             if (_ejecutarTiempoDemora)
                 Thread.Sleep(_tiempoDemora);
