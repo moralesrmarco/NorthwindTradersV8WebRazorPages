@@ -13,6 +13,7 @@
   <ItemGroup>
     
     <!-- Paquetes NuGet -->
+    <Folder Include="Pages\Productos\" />
     <PackageReference Include="ReportViewerCore.NETCore" Version="15.1.33" />
 
     <!-- Referencias a proyectos -->
@@ -37,13 +38,6 @@
       <CopyToPublishDirectory>Always</CopyToPublishDirectory>
     </Content>
 
-  </ItemGroup>
-
-  <ItemGroup>
-    <Compile Remove="Pages\Productos\**" />
-    <Content Remove="Pages\Productos\**" />
-    <EmbeddedResource Remove="Pages\Productos\**" />
-    <None Remove="Pages\Productos\**" />
   </ItemGroup>
 
 </Project>

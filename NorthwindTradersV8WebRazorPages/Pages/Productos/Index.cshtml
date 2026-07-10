@@ -1,90 +1,90 @@
 ﻿@page
 @model NorthwindTradersV8WebRazorPages.Pages.Productos.IndexModel
-
+@{
+    ViewData["Title"] = "Gestión de productos";
+}
 <h2>Lista de productos</h2>
 
-<a asp-page="Insertar" class="btn btn-sm btn-primary mb-3">
-    <i class="bi bi-plus-circle"></i> Nuevo producto
+<a asp-page="Insertar" 
+    class="btn btn-sm btn-primary mb-3"
+    data-show-overlay
+    asp-route-returnUrl="@Url.Page("Index", new { pageIndex = Model.PageIndex })"
+    title="Nuevo producto">
+    <i class="bi bi-plus-circle"></i> 
+    <span class="d-none d-md-inline"> Nuevo producto</span>
 </a>
-
-<nav aria-label="Page navigation">
-    <ul class="pagination justify-content-center">
-        <li class="page-item @(Model.PageIndex == 1 ? "disabled" : "")">
-            <a class="page-link" asp-page="Index" asp-route-pageIndex="@(Model.PageIndex - 1)">Anterior</a>
-        </li>
-
-        @for (int i = 1; i <= Model.TotalPages; i++)
-        {
-            <li class="page-item @(i == Model.PageIndex ? "active" : "")">
-                <a class="page-link" asp-page="Index" asp-route-pageIndex="@i">@i</a>
-            </li>
-        }
-
-        <li class="page-item @(Model.PageIndex == Model.TotalPages ? "disabled" : "")">
-            <a class="page-link" asp-page="Index" asp-route-pageIndex="@(Model.PageIndex + 1)">Siguiente</a>
-        </li>
-    </ul>
-</nav>
-
-<table class="table table-striped">
-    <thead>
-        <tr>
-            <th class="text-center">ID</th>
-            <th>Nombre</th>
-            <th class="text-center">Precio</th>
-            <th class="text-center">Unidades en inventario</th>
-            <th class="text-center">Descontinuado</th>
-            <th class="text-center">Acciones</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (System.Data.DataRow row in Model.Productos.Rows)
-        {
+<a asp-page="Buscar"
+   class="btn btn-sm btn-buscar mb-3"
+   data-show-overlay
+   title="Buscar">
+    <i class="bi bi-search"></i>
+    <span class="d-none d-md-inline"> Buscar producto</span>
+</a>
+<partial name="_Paginacion" model="Model.Paginacion" />
+<div class="table-responsive">
+    <table class="table table-striped">
+        <thead>
             <tr>
-                <td>@row["ProductID"]</td>
-                <td>@row["ProductName"]</td>
-                <td class="text-center">@string.Format("${0:N2}", row["UnitPrice"])</td>
-                <td class="text-center">@string.Format("{0:N0}", row["UnitsInStock"])</td>
-                <td class="text-center">
-                    @if ((bool)row["Discontinued"])
-                    {
-                        <span class="badge bg-danger">Sí</span>
-                    }
-                    else
-                    {
-                        <span class="badge bg-success">No</span>
-                    }
-                </td>
-                <td class="text-center">
-                    <a asp-page="Consultar" asp-route-id="@row["ProductID"]" class="btn btn-sm btn-success me-1">
-                        <i class="bi bi-search"></i> Consultar
-                    </a>
-                    <a asp-page="Editar" asp-route-id="@row["ProductID"]" class="btn btn-sm btn-warning me-1">
-                        <i class="bi bi-pencil"></i> Editar
-                    </a>
-                    <a asp-page="Eliminar" asp-route-id="@row["ProductID"]" class="btn btn-sm btn-danger me-1">
-                        <i class="bi bi-trash"></i> Eliminar
-                    </a>
-                </tr>
-        }
-    </tbody>
-</table>
-
-<nav aria-label="Page navigation">
-    <ul class="pagination justify-content-center">
-        <li class="page-item @(Model.PageIndex == 1 ? "disabled" : "")">
-            <a class="page-link" asp-page="Index" asp-route-pageIndex="@(Model.PageIndex - 1)">Anterior</a>
-        </li>
-
-        @for (int i = 1; i <= Model.TotalPages; i++)
-        {
-            <li class="page-item @(i == Model.PageIndex ? "active" : "")">
-                <a class="page-link" asp-page="Index" asp-route-pageIndex="@i">@i</a>
-            </li>
-        }
-
-        <li class="page-item @(Model.PageIndex == Model.TotalPages ? "disabled" : "")">
-            <a class="page-link" asp-page="Index" asp-route-pageIndex="@(Model.PageIndex + 1)">Siguiente</a>
-        </li>
-    </ul>
-</nav>
+                <th class="text-center">ID</th>
+                <th>Producto</th>
+                <th class="text-center">Precio</th>
+                <th class="text-center">Unidades en inventario</th>
+                <th class="text-center">Descontinuado</th>
+                <th class="text-center">Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (System.Data.DataRow row in Model.Productos.Rows)
+            {
+                <tr>
+                    <td>@row["ProductID"]</td>
+                    <td>@row["ProductName"]</td>
+                    <td class="text-center">@string.Format("${0:N2}", row["UnitPrice"])</td>
+                    <td class="text-center">@string.Format("{0:N0}", row["UnitsInStock"])</td>
+                    <td class="text-center">
+                        @if ((bool)row["Discontinued"])
+                        {
+                            <span class="badge bg-danger">Sí</span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-success">No</span>
+                        }
+                    </td>
+                    <td class="text-center text-nowrap">
+                        <a asp-page="Consultar" 
+                            asp-route-id="@row["ProductID"]" 
+                            data-show-overlay
+                            asp-route-returnUrl="@Url.Page("Index", new { pageIndex = Model.PageIndex })"
+                            class="btn btn-sm btn-success me-1 action-btn"
+                            title="Consultar">
+                            <i class="bi bi-check-square"></i>
+                            <span class="d-none d-md-inline"> Consultar</span>
+                        </a>
+                        <a asp-page="Editar" 
+                            asp-route-id="@row["ProductID"]" 
+                            data-show-overlay
+                            asp-route-returnUrl="@Url.Page("Index", new { pageIndex = Model.PageIndex })"
+                            class="btn btn-sm btn-warning me-1 action-btn"
+                            title="Editar">
+                            <i class="bi bi-pencil"></i>
+                            <span class="d-none d-md-inline"> Editar</span>
+                        </a>
+                        <a asp-page="Eliminar" 
+                            asp-route-id="@row["ProductID"]" 
+                            data-show-overlay
+                            asp-route-returnUrl="@Url.Page("Index", new { pageIndex = Model.PageIndex })"
+                            class="btn btn-sm btn-danger me-1 action-btn"
+                            title="Eliminar">
+                            <i class="bi bi-trash"></i>
+                            <span class="d-none d-md-inline"> Eliminar</span>
+                        </a>
+                    </tr>
+            }
+        </tbody>
+    </table>
+</div>
+<partial name="_Paginacion" model="Model.Paginacion" />
+@section Scripts {
+    <script src="~/js/loading-overlay.js"></script>
+}

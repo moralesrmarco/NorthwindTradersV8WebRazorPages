@@ -12,12 +12,16 @@ namespace NorthwindTradersV8WebRazorPages.Pages.Productos
         
         [BindProperty]
         public Producto? Producto { get; set; } = new Producto();
+        [BindProperty(SupportsGet = true)]
+        public string? ReturnUrl { get; set; }
 
         public ConsultarModel(IConfiguration configuration)
         {
             var connectionString = configuration.GetConnectionString("NorthwindConnection")
-                ?? throw new InvalidOperationException("Connection string not found"); 
-            productoBLL = new ProductoBLL(connectionString);
+                ?? throw new InvalidOperationException("Connection string not found");
+            bool ejecutarTiempoDemora = configuration.GetValue<bool>("AppSettings:ejecutarTiempoDemora");
+            int tiempoDemora = configuration.GetValue<int>("AppSettings:tiempoDemora");
+            productoBLL = new ProductoBLL(connectionString, ejecutarTiempoDemora, tiempoDemora);
         }
         public IActionResult OnGet(int id)
         {
