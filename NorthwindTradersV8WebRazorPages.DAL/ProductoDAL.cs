@@ -1,6 +1,7 @@
 ﻿using Microsoft.Data.SqlClient;
 using Microsoft.VisualBasic;
 using NorthwindTradersV8WebRazorPages.Entities;
+using NorthwindTradersV8WebRazorPages.Entities.DTOs;
 using System.Data;
 
 namespace NorthwindTradersV8WebRazorPages.DAL
@@ -12,7 +13,6 @@ namespace NorthwindTradersV8WebRazorPages.DAL
         {
             this.connectionString = connectionString;
         }
-
         public DataTable ObtenerProductosPaginados(int pageIndex, int pageSize, out int totalRegistros)
         {
             using var connection = new SqlConnection(connectionString);
@@ -31,8 +31,6 @@ namespace NorthwindTradersV8WebRazorPages.DAL
             // Segundo resultset = productos paginados
             return ds.Tables[1];
         }
-
-
         public int Insertar(Producto producto)
         {
             int numRegs = 0;
@@ -63,7 +61,6 @@ namespace NorthwindTradersV8WebRazorPages.DAL
             }
             return numRegs;
         }
-
         public int Actualizar(Producto producto)
         {
             int numRegs = 0;
@@ -121,7 +118,6 @@ namespace NorthwindTradersV8WebRazorPages.DAL
             }
             return numRegs;
         }
-
         public Producto? ObtenerProductoPorId(int id)
         {
             Producto? producto = null;
@@ -171,6 +167,23 @@ namespace NorthwindTradersV8WebRazorPages.DAL
                 throw;
             }
             return producto;
+        }
+        public DataTable BuscarProductos(ProductosBuscarDto filtro)
+        {
+            using var connection = new SqlConnection(connectionString);
+            using var cmd = new SqlCommand("SpProductoBuscarV4", connection);
+            cmd.CommandType = CommandType.StoredProcedure;
+            cmd.Parameters.AddWithValue("@IdIni", filtro.IdIni ?? 0);
+            cmd.Parameters.AddWithValue("@IdFin", filtro.IdFin ?? 0);
+            cmd.Parameters.AddWithValue("@Producto", string.IsNullOrEmpty(filtro.Producto) ? DBNull.Value : filtro.Producto);
+            cmd.Parameters.AddWithValue("@Categoria", filtro.Categoria.HasValue ? filtro.Categoria.Value : (object)DBNull.Value);
+            cmd.Parameters.AddWithValue("@Proveedor", filtro.Proveedor.HasValue ? filtro.Proveedor.Value : (object)DBNull.Value);
+            cmd.Parameters.AddWithValue("@OrdenadoPor", "PRODUCTID");
+            cmd.Parameters.AddWithValue("@AscDesc", "ASC");
+            using var adapter = new SqlDataAdapter(cmd);
+            var dt = new DataTable();
+            adapter.Fill(dt);
+            return dt;
         }
     }
 }

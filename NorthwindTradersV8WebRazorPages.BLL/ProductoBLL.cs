@@ -1,6 +1,7 @@
 ﻿using NorthwindTradersV8WebRazorPages.Common;
 using NorthwindTradersV8WebRazorPages.DAL;
 using NorthwindTradersV8WebRazorPages.Entities;
+using NorthwindTradersV8WebRazorPages.Entities.DTOs;
 using System.Data;
 
 namespace NorthwindTradersV8WebRazorPages.BLL
@@ -82,6 +83,12 @@ namespace NorthwindTradersV8WebRazorPages.BLL
             if (_ejecutarTiempoDemora)
                 Thread.Sleep(_tiempoDemora);
             return productoDAL.ObtenerProductoPorId(id);
+        }
+        public DataTable BuscarProductos(ProductosBuscarDto filtro)
+        {
+            if (_ejecutarTiempoDemora)
+                Thread.Sleep(_tiempoDemora);
+            return productoDAL.BuscarProductos(filtro);
         }
     }
 }
