@@ -13,6 +13,7 @@
   <ItemGroup>
     
     <!-- Paquetes NuGet -->
+    <Folder Include="Pages\Productos\Consultas\" />
     <PackageReference Include="ReportViewerCore.NETCore" Version="15.1.33" />
 
     <!-- Referencias a proyectos -->
