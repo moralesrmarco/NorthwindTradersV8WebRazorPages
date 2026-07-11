@@ -9,30 +9,33 @@ namespace NorthwindTradersV8WebRazorPages.Pages.Productos
     public class EliminarModel : PageModel
     {
         private readonly ProductoBLL _productoBLL;
-
         [BindProperty]
         public Producto? Producto { get; set; }
-
         [BindProperty]
         public string? CategoriaName { get; set; }
-
         [BindProperty]
         public string? ProveedorName { get; set; }
-
+        public bool BloquearEliminacion { get; set; }
+        [BindProperty(SupportsGet = true)]
+        public string? ReturnUrl { get; set; }
         public EliminarModel(IConfiguration configuration)
         {
             var connectionString = configuration.GetConnectionString("NorthwindConnection")
                 ?? throw new InvalidOperationException("Connection string not found");
-            _productoBLL = new ProductoBLL(connectionString);
+            bool ejecutarTiempoDemora = configuration.GetValue<bool>("AppSettings:ejecutarTiempoDemora");
+            int tiempoDemora = configuration.GetValue<int>("AppSettings:tiempoDemora");
+            _productoBLL = new ProductoBLL(connectionString, ejecutarTiempoDemora, tiempoDemora);
         }
         public IActionResult OnGet(int id)
         {
             var producto = _productoBLL.ObtenerProductoPorId(id);
-
             if (producto == null)
-                 TempData["Error"] = "<p>Producto no encontrado</p>" + StringsCommons.Nefep;
+            {
+                TempData["Error"] = "<p>Producto no encontrado</p>" + StringsCommons.Nefep;
+                BloquearEliminacion = true;
+            }
             else
-               Producto = producto;
+                Producto = producto;
             return Page();
         }
         public IActionResult OnPost()
@@ -42,6 +45,8 @@ namespace NorthwindTradersV8WebRazorPages.Pages.Productos
                 var resultado = _productoBLL.Eliminar(Producto);
                 if (resultado.Exito)
                 {
+                    if (!string.IsNullOrEmpty(ReturnUrl))
+                        return LocalRedirect(ReturnUrl);
                     return RedirectToPage("Index");
                 }
                 else
@@ -51,6 +56,8 @@ namespace NorthwindTradersV8WebRazorPages.Pages.Productos
                 // 🔹 Reconstruir las propiedades de navegación con los valores que viajaron en los hidden inputs
                 Producto.Categoria = new Categoria { CategoryName = CategoriaName };
                 Producto.Proveedor = new Proveedor { CompanyName = ProveedorName };
+                if (resultado.Codigo < 0)
+                    BloquearEliminacion = true;
             }
             return Page();
         }

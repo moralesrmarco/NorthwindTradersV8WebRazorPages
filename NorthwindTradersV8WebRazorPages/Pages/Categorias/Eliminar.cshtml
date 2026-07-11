@@ -5,6 +5,7 @@
 }
 <h2>Eliminar categoría</h2>
 <form method="post" class="form">
+    <p>¿Está seguro de eliminar la categoría con ID: <strong>@Model.Categoria?.CategoryID</strong> - Nombre de categoría: <strong>@Model.Categoria?.CategoryName</strong>?</p>
     @if (TempData["Error"] != null)
     {
         <div class="alert alert-danger">@Html.Raw(TempData["Error"])</div>
