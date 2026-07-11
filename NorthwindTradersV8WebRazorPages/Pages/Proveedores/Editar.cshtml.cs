@@ -57,7 +57,7 @@ namespace NorthwindTradersV8WebRazorPages.Pages.Proveedores
                             return LocalRedirect(ReturnUrl);
                         return RedirectToPage("Index");
                     }
-                    TempData["Error"] = $"<p>El proveedor <strong>{Proveedor.CompanyName}</strong>:</p>{resultado.Mensaje}";
+                    TempData["Error"] = $"<p>El proveedor <strong>{Proveedor.CompanyName}</strong>: </p>{resultado.Mensaje}";
                     if (resultado.Codigo < 0)
                         BloquearEdicion = true;
                 }
