@@ -1,6 +1,7 @@
 ﻿@page
 @model NorthwindTradersV8WebRazorPages.Pages.Productos.InsertarModel
 @{
+    ViewData["Title"] = "Insertar producto";
 }
 
 <h2>Nuevo producto</h2>
@@ -79,6 +80,26 @@
         </div>
     </div>
 
-    <button type="submit" class="btn btn-sm btn-success me-1"><i class="bi bi-save"></i> Guardar</button>
-    <a asp-page="Index" class="btn btn-sm btn-secondary me-1"><i class="bi bi-x-circle"></i> Cancelar</a>
+    <button type="submit" 
+            id="btnGuardar"
+            class="btn btn-sm btn-success me-1"
+            disabled="@Model.BloquearEdicion"
+            title="Guardar">
+        <i class="bi bi-save"></i> 
+        <span class="d-none d-md-inline"> Guardar</span>
+    </button>
+    <a href="@(Model.ReturnUrl ?? Url.Page("Index"))"
+       class="btn btn-sm btn-cancelar me-1"
+       title="Cancelar">
+        <i class="bi bi-x-circle"></i>
+        <span class="d-none d-md-inline"> Cancelar</span>
+    </a>
 </form>
+@section Scripts {
+    <script src="~/js/form-submit.js"></script>
+    <script>
+        $(function () {
+            configurarSubmitFormulario(null);
+        });
+    </script>
+}
