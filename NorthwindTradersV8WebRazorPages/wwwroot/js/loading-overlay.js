@@ -19,19 +19,20 @@ function ocultarLoadingOverlay() {
 document.addEventListener("DOMContentLoaded", function () {
     // Todos los formularios
     document.querySelectorAll("form").forEach(function (formulario) {
-        formulario.addEventListener("submit", function () {
+        formulario.addEventListener("submit", function (e) {
+            const boton = e.submitter;
+            if (boton && boton.hasAttribute("data-no-overlay")) {
+                return;
+            }
             mostrarLoadingOverlay();
         });
     });
     // Paginación
     document.querySelectorAll(".pagination a").forEach(function (link) {
-
         link.addEventListener("click", function () {
-
             if (!link.closest(".disabled")) {
                 mostrarLoadingOverlay();
             }
-
         });
     });
     // Menú de navegación
@@ -52,18 +53,19 @@ document.addEventListener("DOMContentLoaded", function () {
     });
     // Reportes PDF
     document.querySelectorAll("iframe[data-report-src]").forEach(function (iframe) {
-
         mostrarLoadingOverlay();
-
         iframe.addEventListener("load", function () {
-
             ocultarLoadingOverlay();
-
         });
-
         iframe.src = iframe.dataset.reportSrc;
-
     });
+    // Reportes PDF generados por POST
+    const visorReporte = document.getElementById("visorReporte");
+    if (visorReporte && !visorReporte.dataset.reportSrc) {
+        visorReporte.addEventListener("load", function () {
+            ocultarLoadingOverlay();
+        });
+    }
 });
 
 window.addEventListener("pageshow", function () {

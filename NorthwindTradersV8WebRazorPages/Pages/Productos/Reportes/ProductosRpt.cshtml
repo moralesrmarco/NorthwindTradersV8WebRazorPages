@@ -4,23 +4,192 @@
     ViewData["Title"] = "Reporte de productos";
 }
 <h2>@ViewData["Title"]</h2>
-<a asp-page-handler="Excel" class="btn btn-sm btn-success">
-    Excel
-</a>
 
-<a asp-page-handler="Word" class="btn btn-sm btn-primary">
-    Word
-</a>
+<ul class="nav nav-tabs" id="tabsReporte">
+    <li class="nav-item">
+        <button type="button"
+                class="nav-link active"
+                data-bs-toggle="tab"
+                data-bs-target="#todos">
+            Imprimir todos los productos
+        </button>
+    </li>
+    <li class="nav-item">
+        <button type="button"
+                class="nav-link"
+                data-bs-toggle="tab"
+                data-bs-target="#buscar">
+            Buscar un producto
+        </button>
+    </li>
+</ul>
+<div class="tab-content border border-top-0 p-3">
+    <div class="tab-pane fade show active" id="todos">
+        <form method="post" target="visorReporte">
+            <input type="hidden"
+                   asp-for="PestanaActiva" />
+            <div class="row">
+                <div class="col-md-4">
+                    <label>Ordenado por</label>
+                    <select asp-for="Filtro.OrdenadoPor"
+                            asp-items="Model.CamposOrden"
+                            class="form-select">
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <label>Dirección</label>
+                    <select asp-for="Filtro.AscDesc"
+                            asp-items="Model.Direcciones"
+                            class="form-select">
+                    </select>
+                </div>
+                <div class="col-md-4 d-flex align-items-end">
+                    <button type="submit"
+                            class="btn btn-primary"
+                            asp-page-handler="VerPdf">
+                        <i class="bi bi-printer"></i>
+                        Imprimir todos
+                    </button>
+                </div>
+            </div>
+            <button type="submit"
+                    class="btn btn-success"
+                    asp-page-handler="Excel"
+                    data-no-overlay="true">
+                Excel
+            </button>
+            <button type="submit"
+                    class="btn btn-primary"
+                    asp-page-handler="Word"
+                    data-no-overlay="true">
+                Word
+            </button>
+        </form>
+    </div>
 
+    <div class="tab-pane fade" id="buscar">
+        <form method="post" target="visorReporte">
+            <input type="hidden"
+                   asp-for="PestanaActiva" />
+            <div class="row g-3">
+                <div class="col-md-2">
+                    <label>ID inicial</label>
+                    <input asp-for="Filtro.IdIni"
+                           class="form-control" />
+                </div>
+                <div class="col-md-2">
+                    <label>ID final</label>
+                    <input asp-for="Filtro.IdFin"
+                           class="form-control" />
+                </div>
+                <div class="col-md-4">
+                    <label>Producto</label>
+                    <input asp-for="Filtro.Producto"
+                           class="form-control" />
+                </div>
+            </div>
+            <div class="row mt-3">
+                <div class="col-md-4">
+                    <label>Categoría</label>
+                    <select asp-for="Filtro.Categoria"
+                            asp-items="Model.Categorias"
+                            class="form-select">
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <label>Proveedor</label>
+                    <select asp-for="Filtro.Proveedor"
+                            asp-items="Model.Proveedores"
+                            class="form-select">
+                    </select>
+                </div>
+            </div>
+            <div class="row mt-3">
+                <div class="col-md-4">
+                    <label>Ordenado por</label>
+                    <select asp-for="Filtro.OrdenadoPor"
+                            asp-items="Model.CamposOrden"
+                            class="form-select">
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <label>Dirección</label>
+                    <select asp-for="Filtro.AscDesc"
+                            asp-items="Model.Direcciones"
+                            class="form-select">
+                    </select>
+                </div>
+            </div>
+            <div class="mt-4">
+                <button type="submit"
+                        class="btn btn-primary"
+                        asp-page-handler="VerPdf">
+                    <i class="bi bi-printer"></i>
+                    Imprimir
+                </button>
+                <button type="reset"
+                        class="btn btn-secondary">
+                    Limpiar
+                </button>
+            </div>
+            <button type="submit"
+                    class="btn btn-success"
+                    asp-page-handler="Excel">
+                Excel
+            </button>
+            <button type="submit"
+                    class="btn btn-primary"
+                    asp-page-handler="Word">
+                Word
+            </button>
+        </form>
+    </div>
+</div>
 <p>&nbsp;</p>
 
 <iframe id="visorReporte"
-        data-report-src="?handler=VerPdf"
+        name="visorReporte"
         width="100%"
         height="600"
         style="border:1px solid #ccc;">
 </iframe>
 
-@section Scripts {
+@* <iframe id="visorReporte"
+        data-report-src="?handler=VerPdf"
+        width="100%"
+        height="600"
+        style="border:1px solid #ccc;">
+</iframe>
+ *@
+@section Scripts{
     <script src="~/js/loading-overlay.js"></script>
+
+    <script>
+
+        document.querySelectorAll('[data-bs-toggle="tab"]').forEach(tab => {
+
+            tab.addEventListener('shown.bs.tab', function () {
+
+                document.querySelectorAll('input[name="PestanaActiva"]')
+                    .forEach(h => h.value = this.dataset.bsTarget);
+
+            });
+
+        });
+        const pestana = '@Model.PestanaActiva';
+
+        if (pestana) {
+
+        const boton = document.querySelector(
+        `[data-bs-target="${pestana}"]`
+        );
+
+        if (boton) {
+
+        new bootstrap.Tab(boton).show();
+
+        }
+
+        }
+    </script>
 }
