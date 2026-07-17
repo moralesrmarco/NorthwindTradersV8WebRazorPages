@@ -244,11 +244,11 @@ namespace NorthwindTradersV8WebRazorPages.DAL
                     cmd.Connection = con;
                     cmd.CommandType = CommandType.StoredProcedure;
                     cmd.CommandText = "SpProductoBuscarV4";
-                    cmd.Parameters.AddWithValue("@IdIni", criterios.IdIni);
-                    cmd.Parameters.AddWithValue("@IdFin", criterios.IdFin);
+                    cmd.Parameters.AddWithValue("@IdIni", criterios.IdIni ?? 0);
+                    cmd.Parameters.AddWithValue("@IdFin", criterios.IdFin ?? 0);
                     cmd.Parameters.AddWithValue("@Producto", criterios.Producto ?? string.Empty);
-                    cmd.Parameters.AddWithValue("@Categoria", criterios.Categoria);
-                    cmd.Parameters.AddWithValue("@Proveedor", criterios.Proveedor);
+                    cmd.Parameters.AddWithValue("@Categoria", criterios.Categoria ?? 0);
+                    cmd.Parameters.AddWithValue("@Proveedor", criterios.Proveedor ?? 0);
                     cmd.Parameters.AddWithValue("@OrdenadoPor", criterios.OrdenadoPor);
                     cmd.Parameters.AddWithValue("@AscDesc", criterios.AscDesc);
                     con.Open();

@@ -25,7 +25,7 @@
 </ul>
 <div class="tab-content border border-top-0 p-3">
     <div class="tab-pane fade show active" id="todos">
-        <form method="post" target="visorReporte">
+        <form method="post" target="visorReporte" class="frmPdf">
             <input type="hidden"
                    asp-for="PestanaActiva" />
             <div class="row">
@@ -46,41 +46,47 @@
                 <div class="col-md-4 d-flex align-items-end">
                     <button type="submit"
                             class="btn btn-primary"
-                            asp-page-handler="VerPdf">
+                            asp-page-handler="VerPdf"
+                            data-formato="pdf">
                         <i class="bi bi-printer"></i>
                         Imprimir todos
                     </button>
                 </div>
             </div>
-            <button type="submit"
-                    class="btn btn-success"
-                    asp-page-handler="Excel"
-                    data-no-overlay="true">
-                Excel
-            </button>
-            <button type="submit"
-                    class="btn btn-primary"
-                    asp-page-handler="Word"
-                    data-no-overlay="true">
-                Word
-            </button>
+            <br />
+                <button type="submit"
+                        class="btn btn-success"
+                        asp-page-handler="Excel"
+                        data-no-overlay="true"
+                        data-formato="excel">
+                    Excel
+                </button>
+                <button type="submit"
+                        class="btn btn-primary"
+                        asp-page-handler="Word"
+                        data-no-overlay="true"
+                        data-formato="word">
+                    Word
+                </button>
         </form>
     </div>
 
     <div class="tab-pane fade" id="buscar">
-        <form method="post" target="visorReporte">
+        <form method="post" target="visorReporte" class="frmPdf">
             <input type="hidden"
                    asp-for="PestanaActiva" />
             <div class="row g-3">
                 <div class="col-md-2">
                     <label>ID inicial</label>
                     <input asp-for="Filtro.IdIni"
-                           class="form-control" />
+                           class="form-control" 
+                           id="txtIdIni" />
                 </div>
                 <div class="col-md-2">
                     <label>ID final</label>
                     <input asp-for="Filtro.IdFin"
-                           class="form-control" />
+                           class="form-control" 
+                           id="txtIdFin" />
                 </div>
                 <div class="col-md-4">
                     <label>Producto</label>
@@ -123,7 +129,8 @@
             <div class="mt-4">
                 <button type="submit"
                         class="btn btn-primary"
-                        asp-page-handler="VerPdf">
+                        asp-page-handler="VerPdf"
+                        data-formato="pdf">
                     <i class="bi bi-printer"></i>
                     Imprimir
                 </button>
@@ -132,14 +139,19 @@
                     Limpiar
                 </button>
             </div>
+            <br />
             <button type="submit"
                     class="btn btn-success"
-                    asp-page-handler="Excel">
+                    asp-page-handler="Excel"
+                    data-no-overlay="true"
+                    data-formato="excel">
                 Excel
             </button>
             <button type="submit"
                     class="btn btn-primary"
-                    asp-page-handler="Word">
+                    asp-page-handler="Word"
+                    data-no-overlay="true"
+                    data-formato="word">
                 Word
             </button>
         </form>
@@ -154,16 +166,9 @@
         style="border:1px solid #ccc;">
 </iframe>
 
-@* <iframe id="visorReporte"
-        data-report-src="?handler=VerPdf"
-        width="100%"
-        height="600"
-        style="border:1px solid #ccc;">
-</iframe>
- *@
 @section Scripts{
     <script src="~/js/loading-overlay.js"></script>
-
+    <script src="~/js/form-buscar.js"></script>
     <script>
 
         document.querySelectorAll('[data-bs-toggle="tab"]').forEach(tab => {
@@ -191,5 +196,36 @@
         }
 
         }
+
+        // Configurar el formulario del reporte ProductosRpt
+        function esMovil() {
+        return window.innerWidth <= 768;
+        }
+
+        document.querySelectorAll(".frmPdf").forEach(function (frm) {
+
+        frm.addEventListener("submit", function (e) {
+
+        const boton = e.submitter;
+
+        if (!boton) return;
+
+        const formato = boton.dataset.formato;
+
+        if (formato === "pdf") {
+
+        frm.target = esMovil()
+        ? "_blank"
+        : "visorReporte";
+
+        } else {
+
+        frm.target = "_self";
+
+        }
+
+        });
+
+        });
     </script>
 }

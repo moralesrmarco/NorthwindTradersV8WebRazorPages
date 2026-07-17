@@ -4,7 +4,6 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.Reporting.NETCore;
 using NorthwindTradersV8WebRazorPages.BLL;
 using NorthwindTradersV8WebRazorPages.BLL.Services;
-using NorthwindTradersV8WebRazorPages.Entities;
 using NorthwindTradersV8WebRazorPages.Entities.DTOs;
 
 namespace NorthwindTradersV8WebRazorPages.Pages.Productos.Reportes
@@ -59,17 +58,6 @@ namespace NorthwindTradersV8WebRazorPages.Pages.Productos.Reportes
         {
             CargarCombos();
         }
-        //public IActionResult OnPostTodos()
-        //{
-        //    CargarCombos();
-        //    return Page();
-        //}
-
-        //public IActionResult OnPostBuscar()
-        //{
-        //    CargarCombos();
-        //    return Page();
-        //}
         private List<ProductoDto> ObtenerDatosReporte()
         {
             if (PestanaActiva == "#todos")
@@ -115,6 +103,7 @@ namespace NorthwindTradersV8WebRazorPages.Pages.Productos.Reportes
 
         public IActionResult OnPostExcel()
         {
+            CargarCombos();
             var reporte = CrearReporte();
             return File(
                 reporte.Render("EXCELOPENXML"),
@@ -124,6 +113,7 @@ namespace NorthwindTradersV8WebRazorPages.Pages.Productos.Reportes
 
         public IActionResult OnPostWord()
         {
+            CargarCombos();
             var reporte = CrearReporte();
             return File(
                 reporte.Render("WORDOPENXML"),
@@ -161,8 +151,8 @@ namespace NorthwindTradersV8WebRazorPages.Pages.Productos.Reportes
             }
             titulo = "» Reporte filtrado de productos «";
             subtitulo = "Filtrado por: ";
-            if (Filtro.IdIni != 0 && Filtro.IdFin != 0)
-                subtitulo += $" [ Id: {Filtro.IdIni} al {Filtro.IdFin} ] ";
+            if ((Filtro.IdIni != 0 && Filtro.IdFin != 0) && (Filtro.IdIni != null && Filtro.IdFin != null))
+                subtitulo += $" [ Id: {Filtro.IdIni?.ToString("N0")} al {Filtro.IdFin?.ToString("N0")} ] ";
             if (!string.IsNullOrWhiteSpace(Filtro.Producto))
                 subtitulo += $" [ Producto: {Filtro.Producto} ] ";
             if (Filtro.Categoria > 0)
@@ -182,8 +172,7 @@ namespace NorthwindTradersV8WebRazorPages.Pages.Productos.Reportes
                 titulo = "» Reporte de todos los productos «";
                 subtitulo = "";
             }
-            if (!string.IsNullOrEmpty(subtitulo))
-                subtitulo += $" Ordenado por: [ {ObtenerTextoOrden()} ] [ {ObtenerTextoDireccion()} ]";
+            subtitulo += $" Ordenado por: [ {ObtenerTextoOrden()} ] [ {ObtenerTextoDireccion()} ]";
         }
         private string ObtenerTextoOrden()
         {

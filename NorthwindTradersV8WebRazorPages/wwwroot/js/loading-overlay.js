@@ -71,3 +71,7 @@ document.addEventListener("DOMContentLoaded", function () {
 window.addEventListener("pageshow", function () {
     ocultarLoadingOverlay();
 });
+
+function esMovil() {
+    return /Android|iPhone|iPad|iPod|Opera Mini|IEMobile/i.test(navigator.userAgent);
+}
