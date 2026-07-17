@@ -1,0 +1,133 @@
+﻿@page
+@model NorthwindTradersV8WebRazorPages.Pages.Productos.Consultas.ListadoProductosModel
+@{
+    ViewData["Title"] = "Listado de Productos";
+}
+<h2>@ViewData["Title"]</h2>
+<ul class="nav nav-tabs mb-0">
+    <li class="nav-item">
+        <span class="nav-link active">
+            <i class="bi bi-search"></i>
+            Buscar un producto
+        </span>
+    </li>
+</ul>
+<div class="border border-top-0 p-3">
+        <form method="post">
+            <input type="hidden"
+                   asp-for="PestanaActiva" />
+            <div class="row g-3">
+                <div class="col-md-2">
+                    <label>ID inicial</label>
+                    <input asp-for="Filtro.IdIni"
+                           class="form-control"
+                           id="txtIdIni" />
+                </div>
+                <div class="col-md-2">
+                    <label>ID final</label>
+                    <input asp-for="Filtro.IdFin"
+                           class="form-control"
+                           id="txtIdFin" />
+                </div>
+                <div class="col-md-4">
+                    <label>Producto</label>
+                    <input asp-for="Filtro.Producto"
+                           class="form-control" />
+                </div>
+            </div>
+            <div class="row mt-3">
+                <div class="col-md-4">
+                    <label>Categoría</label>
+                    <select asp-for="Filtro.Categoria"
+                            asp-items="Model.Categorias"
+                            class="form-select">
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <label>Proveedor</label>
+                    <select asp-for="Filtro.Proveedor"
+                            asp-items="Model.Proveedores"
+                            class="form-select">
+                    </select>
+                </div>
+            </div>
+            <div class="row mt-3">
+                <div class="col-md-4">
+                    <label>Ordenado por</label>
+                    <select asp-for="Filtro.OrdenadoPor"
+                            asp-items="Model.CamposOrden"
+                            class="form-select">
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <label>Dirección</label>
+                    <select asp-for="Filtro.AscDesc"
+                            asp-items="Model.Direcciones"
+                            class="form-select">
+                    </select>
+                </div>
+            </div>
+            <div class="mt-4">
+                <button type="submit"
+                        class="btn btn-primary">
+                <i class="bi bi-search"></i>
+                    Buscar
+                </button>
+                <a asp-page="./ListadoProductos"
+                   class="btn btn-secondary"
+                    data-show-overlay>
+                    Limpiar
+                </a>
+            </div>
+        </form>
+</div>
+<div class="table-responsive">
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th class="text-center">Producto</th>
+                <th class="text-center">Cantidad por unidad</th>
+                <th class="text-center">Precio</th>
+                <th class="text-center">Unidades en inventario</th>
+                <th class="text-center">Unidades en pedido</th>
+                <th class="text-center">Nivel de reorden</th>
+                <th class="text-center">Descontinuado</th>
+                <th class="text-center">Categoría</th>
+                <th>Proveedor</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var producto in Model.Productos)
+            {
+                <tr>
+                    <td class="text-center">@producto.ProductID</td>
+                    <td>@producto.ProductName</td>
+                    <td class="text-center">@producto.QuantityPerUnit</td>
+                    <td>@producto.UnitPrice?.ToString("C2")</td>
+                    <td class="text-center">@producto.UnitsInStock?.ToString("N0")</td>
+                    <td class="text-center">@producto.UnitsOnOrder?.ToString("N0")</td>
+                    <td class="text-center">@producto.ReorderLevel?.ToString("N0")</td>
+                    @if (producto.Discontinued)
+                    {
+                        <td class="text-center">
+                            <span class="badge bg-danger">Descontinuado</span>
+                        </td>
+                    }
+                    else
+                    {
+                        <td class="text-center">
+                            <span class="badge bg-success">No</span>
+                        </td>
+                    }
+                    <td class="text-center">@producto.CategoryName</td>
+                    <td>@producto.CompanyName</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+ @section Scripts{
+    <script src="~/js/loading-overlay.js"></script>
+    <script src="~/js/form-buscar.js"></script>
+}
