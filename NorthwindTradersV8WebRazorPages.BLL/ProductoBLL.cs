@@ -102,5 +102,18 @@ namespace NorthwindTradersV8WebRazorPages.BLL
                 Thread.Sleep(_tiempoDemora);
             return productoDAL.ObtenerProductosRpt(criterios);
         }
+        public decimal ObtenerPrecioPromedio()
+        {
+            if (_ejecutarTiempoDemora)
+                Thread.Sleep(_tiempoDemora);
+            return productoDAL.ObtenerPrecioPromedio();
+        }
+        public DataTable ObtenerProductosPorEncimaDelPrecioPromedio()
+        {
+            if (_ejecutarTiempoDemora)
+                Thread.Sleep(_tiempoDemora);
+            return productoDAL.ObtenerProductosPorEncimaDelPrecioPromedio();
+        }
+
     }
 }

@@ -1,0 +1,55 @@
+﻿@page
+@model NorthwindTradersV8WebRazorPages.Pages.Productos.Consultas.ListadoAlfabeticoProductosModel
+@{
+    ViewData["Title"] = "Consulta alfabética de productos";
+}
+<h2>@ViewData["Title"]</h2>
+<div class="table-responsive">
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th class="text-center">Producto</th>
+                <th class="text-center">Cantidad por unidad</th>
+                <th class="text-center">Precio</th>
+                <th class="text-center">Unidades en inventario</th>
+                <th class="text-center">Unidades en pedido</th>
+                <th class="text-center">Nivel de reorden</th>
+                <th class="text-center">Descontinuado</th>
+                <th class="text-center">Categoría</th>
+                <th>Proveedor</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var producto in Model.Productos)
+            {
+                <tr>
+                    <td class="text-center">@producto.ProductID</td>
+                    <td>@producto.ProductName</td>
+                    <td class="text-center">@producto.QuantityPerUnit</td>
+                    <td>@producto.UnitPrice?.ToString("C2")</td>
+                    <td class="text-center">@producto.UnitsInStock?.ToString("N0")</td>
+                    <td class="text-center">@producto.UnitsOnOrder?.ToString("N0")</td>
+                    <td class="text-center">@producto.ReorderLevel?.ToString("N0")</td>
+                    @if (producto.Discontinued)
+                    {
+                        <td class="text-center">
+                            <span class="badge bg-danger">Descontinuado</span>
+                        </td>
+                    }
+                    else
+                    {
+                        <td class="text-center">
+                            <span class="badge bg-success">No</span>
+                        </td>
+                    }
+                    <td class="text-center">@producto.CategoryName</td>
+                    <td>@producto.CompanyName</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+@section Scripts{
+    <script src="~/js/loading-overlay.js"></script>
+}
