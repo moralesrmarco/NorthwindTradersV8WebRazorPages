@@ -1,0 +1,170 @@
+﻿@page
+@model NorthwindTradersV8WebRazorPages.Pages.Ventas.BuscarModel
+@{
+    ViewData["Title"] = "Buscar ventas";
+}
+<h2>@ViewData["Title"]</h2>
+<ul class="nav nav-tabs mb-0">
+    <li class="nav-item">
+        <span class="nav-link active">
+            <i class="bi bi-search"></i>
+            Buscar una venta
+        </span>
+    </li>
+</ul>
+<div class="border border-top-0 p-3">
+    <form method="post">
+        <div class="row g-3">
+            <div class="col-md-2">
+                <label>ID inicial</label>
+                <input asp-for="Filtro.IdIni"
+                       class="form-control"
+                       id="txtIdIni" />
+            </div>
+            <div class="col-md-2">
+                <label>ID final</label>
+                <input asp-for="Filtro.IdFin"
+                       class="form-control"
+                       id="txtIdFin" />
+            </div>
+            <div class="col-md-4">
+                <label>Cliente</label>
+                <input asp-for="Filtro.Cliente"
+                       class="form-control" />
+            </div>
+            <div class="col-md-4">
+                <label>Vendedor</label>
+                <input asp-for="Filtro.Empleado"
+                       class="form-control" />
+            </div>
+        </div>
+        <div class="row g-3">
+            <div class="col-md-4">
+                <label>Compañía transportista</label>
+                <input asp-for="Filtro.CompañiaT"
+                       class="form-control" />
+            </div>
+            <div class="col-md-4">
+                <label>Enviar a</label>
+                <input asp-for="Filtro.DirigidoA"
+                       class="form-control" />
+            </div>
+
+        </div>
+        <div class="row mt-3">
+            <div class="col-md-4">
+                <label>Fecha de venta inicial</label>
+                <input asp-for="Filtro.FVentaIni"
+                       class="form-control"
+                       type="date" />
+            </div>
+            <div class="col-md-4">
+                <label>Fecha de venta final</label>
+                <input asp-for="Filtro.FVentaFin"
+                       class="form-control"
+                       type="date" />
+            </div>
+            <div class="col-md-4">
+                <div class="mt-4">
+                    <label asp-for="Filtro.FVentaNull" class="me-2">
+                        Fecha de venta nula
+                    </label>
+                    <input asp-for="Filtro.FVentaNull"
+                           class="form-check-input" />
+                </div>
+            </div>
+        </div>
+        <div class="row mt-3">
+            <div class="col-md-4">
+                <label>Fecha de entrega inicial</label>
+                <input asp-for="Filtro.FRequeridoIni"
+                       class="form-control"
+                       type="date" />
+            </div>
+            <div class="col-md-4">
+                <label>Fecha de entrega final</label>
+                <input asp-for="Filtro.FRequeridoFin"
+                       class="form-control"
+                       type="date" />
+            </div>
+            <div class="col-md-4">
+                <div class="mt-4">
+                    <label asp-for="Filtro.FRequeridoNull" class="me-2">
+                        Fecha de entrega nula
+                    </label>
+                    <input asp-for="Filtro.FRequeridoNull"
+                           class="form-check-input" />
+                </div>
+            </div>
+        </div>
+        <div class="row mt-3">
+            <div class="col-md-4">
+                <label>Fecha de envío inicial</label>
+                <input asp-for="Filtro.FEnvioIni"
+                       class="form-control"
+                       type="date" />
+            </div>
+            <div class="col-md-4">
+                <label>Fecha de envío final</label>
+                <input asp-for="Filtro.FEnvioFin"
+                       class="form-control"
+                       type="date" />
+            </div>
+            <div class="col-md-4">
+                <div class="mt-4">
+                    <label asp-for="Filtro.FEnvioNull" class="me-2">
+                        Fecha de envío nula
+                    </label>
+                    <input asp-for="Filtro.FEnvioNull"
+                           class="form-check-input" />
+                </div>
+            </div>
+        </div>
+        <div class="mt-4">
+            <button type="submit"
+                    class="btn btn-primary">
+                <i class="bi bi-search"></i>
+                Buscar
+            </button>
+            <a asp-page="./ListadoProductos"
+               class="btn btn-secondary"
+               data-show-overlay>
+                Limpiar
+            </a>
+        </div>
+    </form>
+</div>
+
+<div class="table-responsive">
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th class="text-center">Id</th>
+                <th>Cliente</th>
+                <th>Nombre de contacto</th>
+                <th class="text-center">Fecha de venta</th>
+                <th class="text-center">Fecha de entrega</th>
+                <th class="text-center">Fecha de envío</th>
+                <th class="text-center">Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var venta in Model.Ventas)
+            {
+                <tr>
+                    <td class="text-center">@venta.OrderID</td>
+                    <td>@venta.CustomerCompanyName</td>
+                    <td>@venta.CustomerContactName</td>
+                    <td>@venta.OrderDate?.ToString("yyyy-MM-dd")</td>
+                    <td>@venta.RequiredDate?.ToString("yyyy-MM-dd")</td>
+                    <td>@venta.ShippedDate?.ToString("yyyy-MM-dd")</td>
+                    <td>
+                        <a asp-page="./Detalles" asp-route-id="@venta.OrderID" class="btn btn-sm btn-outline-primary">
+                            <i class="bi bi-eye"></i>
+                        </a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

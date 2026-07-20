@@ -1,0 +1,105 @@
+﻿@page
+@model NorthwindTradersV8WebRazorPages.Pages.Ventas.IndexModel
+@{
+    ViewData["Title"] = "Gestión de ventas";
+}
+<h2>@ViewData["Title"]</h2>
+<a asp-page="Insertar"
+   class="btn btn-sm btn-primary mb-3"
+   data-show-overlay
+   asp-route-returnUrl="@Url.Page("Index", new { pageIndex = Model.PageIndex })"
+   title="Nuevo producto">
+    <i class="bi bi-plus-circle"></i>
+    <span class="d-none d-md-inline"> Nueva venta</span>
+</a>
+<a asp-page="Buscar"
+   class="btn btn-sm btn-buscar mb-3"
+   data-show-overlay
+   title="Buscar">
+    <i class="bi bi-search"></i>
+    <span class="d-none d-md-inline"> Buscar venta</span>
+</a>
+<partial name="_Paginacion" model="Model.Paginacion" />
+
+<div class="table-responsive">
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th class="text-center">Id</th>
+                <th>Cliente</th>
+                <th>Nombre de contacto</th>
+                <th class="text-center">Fecha de venta</th>
+                <th class="text-center">Fecha de entrega</th>
+                <th class="text-center">Fecha de envío</th>
+                <th class="text-center">Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (System.Data.DataRow row in Model.Ventas.Rows)
+            {
+                <tr>
+                    <td class="text-center">@row["OrderID"]</td>
+                    <td>@row["CompanyName"]</td>
+                    <td>@row["ContactName"]</td>
+                    <td class="text-end">
+                        @(
+                            row["OrderDate"] == DBNull.Value
+                                ? ""
+                                : Html.Raw(((DateTime)row["OrderDate"])
+                                    .ToString("ddd dd' de 'MMM' de 'yyyy<br/>hh:mm:ss tt"))
+                        )
+                    </td>
+                    <td class="text-end">
+                        @(
+                            row["RequiredDate"] == DBNull.Value
+                                ? ""
+                                : Html.Raw(((DateTime)row["RequiredDate"])
+                                    .ToString("ddd dd' de 'MMM' de 'yyyy<br/>hh:mm:ss tt"))
+                        )
+                    </td>
+                    <td class="text-end">
+                        @(
+                            row["ShippedDate"] == DBNull.Value
+                                ? ""
+                                : Html.Raw(((DateTime)row["ShippedDate"])
+                                    .ToString("ddd dd' de 'MMM' de 'yyyy<br/>hh:mm:ss tt"))
+                        )
+                    </td>
+                    <td class="text-center text-nowrap">
+                        <a asp-page="Consultar"
+                           asp-route-id="@row["OrderID"]"
+                           data-show-overlay
+                           asp-route-returnUrl="@Url.Page("Index", new { pageIndex = Model.PageIndex })"
+                           class="btn btn-sm btn-success me-1 action-btn"
+                           title="Consultar">
+                            <i class="bi bi-eye"></i>
+                            <span class="d-none d-md-inline"> Consultar</span>
+                        </a>
+                        <a asp-page="Editar"
+                           asp-route-id="@row["OrderID"]"
+                           data-show-overlay
+                           asp-route-returnUrl="@Url.Page("Index", new { pageIndex = Model.PageIndex })"
+                           class="btn btn-sm btn-warning me-1 action-btn"
+                           title="Editar">
+                            <i class="bi bi-pencil"></i>
+                            <span class="d-none d-md-inline"> Editar</span>
+                        </a>
+                        <a asp-page="Eliminar"
+                           asp-route-id="@row["OrderID"]"
+                           data-show-overlay
+                           asp-route-returnUrl="@Url.Page("Index", new { pageIndex = Model.PageIndex })"
+                           class="btn btn-sm btn-danger me-1 action-btn"
+                           title="Eliminar">
+                            <i class="bi bi-trash"></i>
+                            <span class="d-none d-md-inline"> Eliminar</span>
+                        </a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+<partial name="_Paginacion" model="Model.Paginacion" />
+@section Scripts {
+    <script src="~/js/loading-overlay.js"></script>
+}
