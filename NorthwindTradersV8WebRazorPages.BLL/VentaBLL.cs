@@ -1,4 +1,5 @@
 ﻿using NorthwindTradersV8WebRazorPages.DAL;
+using NorthwindTradersV8WebRazorPages.Entities;
 using NorthwindTradersV8WebRazorPages.Entities.DTOs;
 using System.Data;
 
@@ -32,6 +33,12 @@ namespace NorthwindTradersV8WebRazorPages.BLL
             if (_ejecutarTiempoDemora)
                 Thread.Sleep(_tiempoDemora);
             return ventaDAL.ObtenerVentasBuscadasPaginadas(filtro, pageIndex, pageSize, out totalRegistros);
+        }
+        public VentaDto? ObtenerVentaPorId(int id)
+        {
+            if (_ejecutarTiempoDemora)
+                Thread.Sleep(_tiempoDemora);
+            return ventaDAL.ObtenerVentaPorId(id);
         }
 
     }

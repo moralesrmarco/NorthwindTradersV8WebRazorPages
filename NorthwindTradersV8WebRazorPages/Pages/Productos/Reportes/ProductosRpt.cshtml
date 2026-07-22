@@ -166,14 +166,14 @@
         style="border:1px solid #ccc;">
 </iframe>
 
-@section Scripts{
+@section Scripts {
     <script src="~/js/loading-overlay.js"></script>
     <script src="~/js/form-buscar.js"></script>
     <script>
 
         document.querySelectorAll('[data-bs-toggle="tab"]').forEach(tab => {
 
-            tab.addEventListener('shown.bs.tab', function () {
+            tab.addEventListener('shown.bs.tab', function() {
 
                 document.querySelectorAll('input[name="PestanaActiva"]')
                     .forEach(h => h.value = this.dataset.bsTarget);
@@ -185,46 +185,46 @@
 
         if (pestana) {
 
-        const boton = document.querySelector(
-        `[data-bs-target="${pestana}"]`
-        );
+            const boton = document.querySelector(
+                `[data-bs-target="${pestana}"]`
+            );
 
-        if (boton) {
+            if (boton) {
 
-        new bootstrap.Tab(boton).show();
+                new bootstrap.Tab(boton).show();
 
-        }
+            }
 
         }
 
         // Configurar el formulario del reporte ProductosRpt
         function esMovil() {
-        return window.innerWidth <= 768;
+            return window.innerWidth <= 768;
         }
 
-        document.querySelectorAll(".frmPdf").forEach(function (frm) {
+        document.querySelectorAll(".frmPdf").forEach(function(frm) {
 
-        frm.addEventListener("submit", function (e) {
+            frm.addEventListener("submit", function(e) {
 
-        const boton = e.submitter;
+                const boton = e.submitter;
 
-        if (!boton) return;
+                if (!boton) return;
 
-        const formato = boton.dataset.formato;
+                const formato = boton.dataset.formato;
 
-        if (formato === "pdf") {
+                if (formato === "pdf") {
 
-        frm.target = esMovil()
-        ? "_blank"
-        : "visorReporte";
+                    frm.target = esMovil()
+                        ? "_blank"
+                        : "visorReporte";
 
-        } else {
+                } else {
 
-        frm.target = "_self";
+                    frm.target = "_self";
 
-        }
+                }
 
-        });
+            });
 
         });
     </script>
