@@ -1,0 +1,110 @@
+﻿@page
+@using System.Globalization
+@model NorthwindTradersV8WebRazorPages.Pages.Ventas.InsertarModel
+@{
+    ViewData["Title"] = "Insertar venta";
+}
+<h2>Nueva venta</h2>
+
+<form method="post" class="form">
+
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger">@Html.Raw(TempData["Error"])</div>
+    }
+
+    <fieldset class="border rounded p-3 mb-3">
+        <legend class="float-none w-auto px-2 fs-6">
+            <strong>Registro de la venta</strong>
+        </legend>
+        <div class="row mb-3">
+            <div class="col-md-6">
+                <label asp-for="Venta.CustomerCompanyName" class="form-label">Cliente</label>
+                <select id="cboCliente" asp-for="Venta.CustomerCompanyName"
+                        asp-items="Model.Clientes"
+                        class="form-select">
+                </select>
+                <span asp-validation-for="Venta.CustomerCompanyName" class="text-danger"></span>
+            </div>
+            <div class="col-md-6">
+                <label asp-for="Venta.EmployeeName" class="form-label">Vendedor</label>
+                <select id="cboVendedor" asp-for="Venta.EmployeeName"
+                        asp-items="Model.Vendedores"
+                        class="form-select">
+                </select>
+                <span asp-validation-for="Venta.EmployeeName" class="text-danger"></span>
+            </div>
+        </div>
+        <div class="row mb-3">
+            <div class="col-md-4">
+                <label asp-for="Venta.OrderDate" class="form-label">Fecha de venta</label>
+                <input asp-for="Venta.OrderDate" class="form-control" type="date" />
+                <span asp-validation-for="Venta.OrderDate" class="text-danger"></span>
+            </div>
+            <div class="col-md-4">
+                <label asp-for="Venta.RequiredDate" class="form-label">Fecha requerido</label>
+                <input asp-for="Venta.RequiredDate" class="form-control" type="date" />
+                <span asp-validation-for="Venta.RequiredDate" class="text-danger"></span>
+            </div>
+            <div class="col-md-4">
+                <label asp-for="Venta.ShippedDate" class="form-label">Fecha de envío</label>
+                <input asp-for="Venta.ShippedDate" class="form-control" type="date" />
+                <span asp-validation-for="Venta.ShippedDate" class="text-danger"></span>
+            </div>
+        </div>
+        <fieldset class="border rounded p-3 mb-3">
+            <legend class="float-none w-auto px-2 fs-6">
+                <strong>Forma de envío:</strong>
+            </legend>
+            <div class="row mb-3">
+                <div class="col-md-4">
+                    <label asp-for="Venta.ShipperCompanyName" class="form-label">Compañía transportista</label>
+                    <select id="cboCompañia" asp-for="Venta.ShipperCompanyName"
+                            asp-items="Model.Transportistas"
+                            class="form-select">
+                    </select>
+                    <span asp-validation-for="Venta.ShipperCompanyName" class="text-danger"></span>
+                </div>
+                <div class="col-md-4">
+                    <label asp-for="Venta.ShipName" class="form-label">Enviar a</label>
+                    <input asp-for="Venta.ShipName" class="form-control" />
+                </div>
+                <div class="col-md-4">
+                    <label asp-for="Venta.ShipAddress" class="form-label">Domicilio</label>
+                    <input asp-for="Venta.ShipAddress" class="form-control" />
+                </div>
+            </div>
+            <div class="row mb-3">
+                <div class="col-md-4">
+                    <label asp-for="Venta.ShipCity" class="form-label">Ciudad</label>
+                    <input asp-for="Venta.ShipCity" class="form-control" />
+                </div>
+                <div class="col-md-4">
+                    <label asp-for="Venta.ShipRegion" class="form-label">Región</label>
+                    <input asp-for="Venta.ShipRegion" class="form-control" />
+                </div>
+                <div class="col-md-4">
+                    <label asp-for="Venta.ShipPostalCode" class="form-label">Código postal</label>
+                    <input asp-for="Venta.ShipPostalCode" class="form-control" />
+                </div>
+            </div>
+            <div class="row mb-3">
+                <div class="col-md-4">
+                    <label asp-for="Venta.ShipCountry" class="form-label">País</label>
+                    <input asp-for="Venta.ShipCountry" class="form-control" />
+                </div>
+                <div class="col-md-4">
+                    <label asp-for="Venta.Freight" class="form-label">Cargo por envío $</label>
+                    <input asp-for="Venta.Freight" class="form-control" />
+                </div>
+            </div>
+        </fieldset>
+        <fieldset class="border rounded p-3 mb-3">
+            <legend class="float-none w-auto px-2 fs-6">
+                <strong>Agregar producto a la venta:</strong>
+            </legend>
+
+        </fieldset>
+    </fieldset>
+    
+</form>

@@ -43,5 +43,9 @@ namespace NorthwindTradersV8WebRazorPages.BLL.Services
             }
             return paisesKvp;
         }
+        public List<ComboItemDto> ObtenerClientesCbo()
+        {
+            return comboDataHelper.LlenarCbo("SpClienteObtenerCbo");
+        }
     }
 }
