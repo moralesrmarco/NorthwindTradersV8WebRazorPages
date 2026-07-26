@@ -13,7 +13,6 @@ namespace NorthwindTradersV8WebRazorPages.BLL.Services
             comboDataHelper = new ComboDataHelper(connectionString);
             categoriaDAL = new CategoriaDAL(connectionString);
         }
-
         public List<ComboItemDto> ObtenerCategoriasCbo()
         {
             return comboDataHelper.LlenarCbo("SpCategoriaObtenerCbo");

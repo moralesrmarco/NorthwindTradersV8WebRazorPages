@@ -139,5 +139,41 @@ namespace NorthwindTradersV8WebRazorPages.DAL
             }
             return venta;
         }
+        public EnvioInformacionDto? ObtenerUltimaInformacionDeEnvio(string customerId)
+        {
+            EnvioInformacionDto? envioInformacion = null;
+            try
+            {
+                using (var con = new SqlConnection(connectionString))
+                using (var cmd = new SqlCommand("SpVentaObtenerUltimaInformacionDeEnvio", con))
+                using (var da = new SqlDataAdapter(cmd))
+                {
+                    cmd.CommandType = CommandType.StoredProcedure;
+                    cmd.Parameters.AddWithValue("@CustomerID", customerId);
+                    var dt = new DataTable();
+                    da.Fill(dt);
+                    if (dt.Rows.Count == 0)
+                        return null;
+                    DataRow row = dt.Rows[0];
+                    envioInformacion = new EnvioInformacionDto
+                    {
+                        ShipName = row["ShipName"] == DBNull.Value ? string.Empty : row["ShipName"].ToString(),
+                        ShipAddress = row["ShipAddress"] == DBNull.Value ? string.Empty : row["ShipAddress"].ToString(),
+                        ShipCity = row["ShipCity"] == DBNull.Value ? string.Empty : row["ShipCity"].ToString(),
+                        ShipRegion = row["ShipRegion"] == DBNull.Value ? string.Empty : row["ShipRegion"].ToString(),
+                        ShipPostalCode = row["ShipPostalCode"] == DBNull.Value ? string.Empty : row["ShipPostalCode"].ToString(),
+                        ShipCountry = row["ShipCountry"] == DBNull.Value ? string.Empty : row["ShipCountry"].ToString(),
+                        ShipVia = row["ShipVia"] == DBNull.Value
+                            ? null
+                            : Convert.ToInt32(row["ShipVia"])
+                    };
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Error al obtener la información de envío: " + ex.Message);
+            }
+            return envioInformacion;
+        }
     }
 }

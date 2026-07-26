@@ -1,0 +1,13 @@
+﻿namespace NorthwindTradersV8WebRazorPages.Entities.DTOs
+{
+    public class EnvioInformacionDto
+    {
+        public string? ShipName { get; set; }
+        public string? ShipAddress { get; set; }
+        public string? ShipCity { get; set; }
+        public string? ShipRegion { get; set; }
+        public string? ShipPostalCode { get; set; }
+        public string? ShipCountry { get; set; }
+        public int? ShipVia { get; set; }
+    }
+}

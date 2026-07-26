@@ -3,8 +3,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using NorthwindTradersV8WebRazorPages.BLL;
 using NorthwindTradersV8WebRazorPages.BLL.Services;
-using NorthwindTradersV8WebRazorPages.DAL;
-using NorthwindTradersV8WebRazorPages.Entities.DTOs;
+using NorthwindTradersV8WebRazorPages.ViewModels;
 
 namespace NorthwindTradersV8WebRazorPages.Pages.Ventas
 {
@@ -15,14 +14,23 @@ namespace NorthwindTradersV8WebRazorPages.Pages.Ventas
         private readonly ClienteService clienteService;
         private readonly EmpleadoService empleadoService;
         private readonly TransportistaService transportistaService;
-
+        private readonly CategoriaService categoriasService;
+        private readonly ProductoService productoService;
+        private readonly VentaService ventaService;
         [BindProperty]
-        public VentaDto? Venta { get; set; } = new VentaDto();
+        //public Venta? Venta { get; set; } = new Venta();
+        public VentaInsertarViewModel VentaVM { get; set; } = new();
         [BindProperty(SupportsGet = true)]
         public string? ReturnUrl { get; set; }
-        public required List<SelectListItem> Clientes { get; set; }
-        public required List<SelectListItem> Vendedores { get; set; }
-        public required List<SelectListItem> Transportistas { get; set; }
+        public List<SelectListItem> Clientes { get; set; }
+        public List<SelectListItem> Vendedores { get; set; }
+        public List<SelectListItem> Transportistas { get; set; }
+        public List<SelectListItem> Categorias { get; set; }
+        public List<SelectListItem> Productos { get; set; }
+        [BindProperty]
+        public VentaDetalleViewModel Detalle { get; set; } = new();
+        [BindProperty]
+        public List<VentaDetalleViewModel> Detalles { get; set; } = new(); 
         public InsertarModel(IConfiguration configuration)
         {
             var connectionString = configuration.GetConnectionString("NorthwindConnection")
@@ -33,13 +41,31 @@ namespace NorthwindTradersV8WebRazorPages.Pages.Ventas
             clienteService = new ClienteService(connectionString);
             empleadoService = new EmpleadoService(connectionString);
             transportistaService = new TransportistaService(connectionString);
+            categoriasService = new CategoriaService(connectionString);
+            productoService = new ProductoService(connectionString);
+            ventaService = new VentaService(connectionString);
+            Productos = new List<SelectListItem>
+            {
+                new SelectListItem
+                {
+                    Value = "",
+                    Text = "»--- Seleccione una categoría ---«"
+                }
+            };
         }
         public void OnGet()
         {
-            Venta.OrderDate = DateTime.Today;
-            Venta.RequiredDate = DateTime.Today;
-            Venta.ShippedDate = null;
+            VentaVM.OrderDate = DateTime.Today;
+            VentaVM.RequiredDate = DateTime.Today;
+            VentaVM.ShippedDate = DateTime.Today;
             CargarCombos();
+        }
+        public IActionResult OnPostAgregarProducto()
+        {
+            Detalles.Add(Detalle);
+            Detalle = new VentaDetalleViewModel();
+            CargarCombos();
+            return Page();
         }
         private void CargarCombos()
         {
@@ -59,6 +85,31 @@ namespace NorthwindTradersV8WebRazorPages.Pages.Ventas
                 Value= t.Value,
                 Text= t.Text,
             }).ToList();
+            Categorias = categoriasService.ObtenerCategoriasCbo().Select(c => new SelectListItem
+            {
+                Value = c.Value,
+                Text = c.Text
+            }).ToList();
+        }
+        public JsonResult OnGetProductosPorCategoria(int categoriaId)
+        {
+            var productos = productoService.ObtenerProductosPorCategoriaCbo(categoriaId);
+            return new JsonResult(productos);
+        }
+        public JsonResult OnGetUltimaInformacionEnvio(string customerId)
+        {
+            var informacion = ventaService.ObtenerUltimaInformacionDeEnvio(customerId);
+            return new JsonResult(informacion);
+        }
+        public JsonResult OnGetProductoCostoEInventario(int productId)
+        {
+            var producto = productoService.ObtenerProductoCostoEInventario(productId);
+            return new JsonResult(producto);
+        }
+        [IgnoreAntiforgeryToken]
+        public JsonResult OnPostCalcularDetalle([FromBody] VentaDetalleViewModel detalle)
+        {
+            return new JsonResult(detalle);
         }
     }
 }
