@@ -142,8 +142,8 @@
                     <span asp-validation-for="Detalle.Discount" class="text-danger"></span>
                 </div>
                 <div class="col-md-2 d-flex align-items-end">
-                    <button type="submit"
-                            asp-page-handler="AgregarProducto"
+                    <button type="button"
+                            id="btnAgregarProducto"
                             class="btn btn-primary"
                             title="Agregar">
                         <i class="bi bi-plus-lg"></i>
@@ -306,8 +306,9 @@
                             <th></th>
                         </tr>
                     </thead>
-                    <tbody>
-                        @for (int i = 0; i < Model.Detalles.Count; i++)
+                    <tbody id="tblDetalle">
+
+@*                         @for (int i = 0; i < Model.Detalles.Count; i++)
                         {
                             <tr>
                                 <td class="text-center">@(i + 1)</td>
@@ -352,7 +353,7 @@
                                 </td>
                                 <td>@Model.Detalles[i].ProductID</td>
                             </tr>
-                        }
+                        } *@
                     </tbody>
                 </table>
             </div>
@@ -453,70 +454,177 @@
                 },
                 data: JSON.stringify(detalle),
                 success: function(r) {
-
-                    console.log(r);
-
                     // Datos básicos
                     $("#Detalle_PrecioPorUnidadSinIVASinDescuento")
                         .val(r.precioPorUnidadSinIVASinDescuento);
-
                     $("#Detalle_IVADelPrecioPorUnidadSinDescuento")
                         .val(r.ivaDelPrecioPorUnidadSinDescuento);
-
                     $("#Detalle_PrecioPorUnidadSinIVADespuesDescuento")
                         .val(r.precioPorUnidadSinIVADespuesDescuento);
-
                     $("#Detalle_IVADelPrecioporUnidadDespuesDescuento")
                         .val(r.ivaDelPrecioporUnidadDespuesDescuento);
-
                     // Ahorros por unidad
                     $("#Detalle_AhorroPorUnidadSinIVA")
                         .val(r.ahorroPorUnidadSinIVA);
-
                     $("#Detalle_AhorroEnIVAPorUnidadDespuesDescuento")
                         .val(r.ahorroEnIVAPorUnidadDespuesDescuento);
-
                     $("#Detalle_AhorroTotalPorUnidadConIVA")
                         .val(r.ahorroTotalPorUnidadConIVA);
-
                     $("#Detalle_PrecioPorUnidadConIVADespuesDescuento")
                         .val(r.precioPorUnidadConIVADespuesDescuento);
-
                     // Subtotales del producto
                     $("#Detalle_SubtotalDelImporteConIVAIncluido")
                         .val(r.subtotalDelImporteConIVAIncluido);
-
                     $("#Detalle_SubtotalDelImporteSinIVASinDescuento")
                         .val(r.subtotalDelImporteSinIVASinDescuento);
-
                     $("#Detalle_SubtotalDelImporteDelIVASinDescuento")
                         .val(r.subtotalDelImporteDelIVASinDescuento);
-
                     $("#Detalle_SubtotalDelImporteSinIVAConDescuento")
                         .val(r.subtotalDelImporteSinIVAConDescuento);
-
                     $("#Detalle_SubtotalIVADespuesDelDescuento")
                         .val(r.subtotalIVADespuesDelDescuento);
-
                     // Ahorros subtotal
                     $("#Detalle_SubtotalDelAhorroSinIvaDespuesDescuento")
                         .val(r.subtotalDelAhorroSinIvaDespuesDescuento);
-
                     $("#Detalle_SubtotalDelAhorroEnIVADespuesDescuento")
                         .val(r.subtotalDelAhorroEnIVADespuesDescuento);
-
                     $("#Detalle_SubtotalDelAhorroTotalDespuesDescuento")
                         .val(r.subtotalDelAhorroTotalDespuesDescuento);
-
                     // Total del producto
                     $("#Detalle_Subtotal")
                         .val(r.subtotal);
-
                 },
                 error: function(xhr) {
                     console.log(xhr.responseText);
                 }
             });
+        }
+
+        function agregarProducto() {
+
+            let detalle = {
+                categoriaID: Number($("#cboCategoria").val()),
+                productID: Number($("#cboProducto").val()),
+                productName: $("#cboProducto option:selected").text(),
+                unitPrice: Number($("#Detalle_UnitPrice").val()),
+                unitsInStock: Number($("#Detalle_UnitsInStock").val()),
+                quantity: Number($("#Detalle_Quantity").val()),
+                discount: Number($("#Detalle_Discount").val()) / 100
+            };
+
+            $.ajax({
+                url: "?handler=AgregarDetalle",
+                type: "POST",
+                contentType: "application/json",
+                dataType: "json",
+                headers: {
+                    "RequestVerificationToken":
+                        $('input[name="__RequestVerificationToken"]').val()
+                },
+                data: JSON.stringify(detalle),
+
+                success: function(r) {
+                    if (r.lista && r.lista.length > 0) {
+                        llenarTabla(r.lista);
+                    }
+                },
+
+                error: function(xhr) {
+
+                    console.log("ERROR");
+                    console.log(xhr.status);
+                    console.log(xhr.responseText);
+
+                    alert("Error");
+                },
+
+                complete: function() {
+
+                }
+            });
+
+        }
+
+        function llenarTabla(lista) {
+
+            let html = "";
+
+            lista.forEach(function(item, indice) {
+
+                html += `
+                    <tr>
+                        <td class="text-center">${indice + 1}</td>
+
+                        <td>${item.productName}</td>
+
+                        <td class="text-center">
+                            ${Number(item.unitPrice).toLocaleString('es-MX',
+                    { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                        </td>
+
+                        <td class="text-center">
+                            ${item.quantity}
+                        </td>
+
+                        <td class="text-end">
+                            ${Number(item.subtotalDelImporteConIVAIncluido).toLocaleString('es-MX',
+                        { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                        </td>
+
+                        <td class="text-center">
+                            ${(item.discount * 100).toFixed(2)} %
+                        </td>
+
+                        <td class="text-end">
+                            ${Number(item.subtotalDelAhorroTotalDespuesDescuento).toLocaleString('es-MX',
+                            { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                        </td>
+
+                        <td class="text-end">
+                            ${Number(item.subtotalDelImporteConIVAConDescuento).toLocaleString('es-MX',
+                                { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                        </td>
+
+                        <td class="text-center">
+                            ${(item.tasaIVA * 100).toFixed(2)} %
+                        </td>
+
+                        <td class="text-end">
+                            ${Number(item.subtotalDelImporteSinIVAConDescuento).toLocaleString('es-MX',
+                                    { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                        </td>
+
+                        <td class="text-end">
+                            ${Number(item.subtotalIVADespuesDelDescuento).toLocaleString('es-MX',
+                                        { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                        </td>
+
+                        <td class="text-end fw-bold">
+                            ${Number(item.subtotal).toLocaleString('es-MX',
+                                            { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                        </td>
+
+                        <td class="text-center">
+                            <button type="button"
+                                    class="btn btn-sm btn-warning btnEditar"
+                                    data-index="${indice}">
+                                <i class="bi bi-pencil"></i>
+                            </button>
+
+                            <button type="button"
+                                    class="btn btn-sm btn-danger btnEliminar"
+                                    data-index="${indice}">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </td>
+
+                        <td class="d-none">
+                            ${item.productID}
+                        </td>
+                    </tr>`;
+            });
+
+            $("#tblDetalle").html(html);
         }
 
         $("#cboCategoria").change(function() {
@@ -534,6 +642,10 @@
         $("#Detalle_Quantity").on("input", calcularDetalle);
 
         $("#Detalle_Discount").on("input", calcularDetalle);
+
+        $("#btnAgregarProducto").click(function() {
+            agregarProducto();
+        });
     </script>
 
 }

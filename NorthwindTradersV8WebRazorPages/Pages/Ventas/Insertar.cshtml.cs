@@ -4,6 +4,8 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using NorthwindTradersV8WebRazorPages.BLL;
 using NorthwindTradersV8WebRazorPages.BLL.Services;
 using NorthwindTradersV8WebRazorPages.ViewModels;
+using System.Diagnostics;
+using System.Runtime.CompilerServices;
 
 namespace NorthwindTradersV8WebRazorPages.Pages.Ventas
 {
@@ -18,7 +20,6 @@ namespace NorthwindTradersV8WebRazorPages.Pages.Ventas
         private readonly ProductoService productoService;
         private readonly VentaService ventaService;
         [BindProperty]
-        //public Venta? Venta { get; set; } = new Venta();
         public VentaInsertarViewModel VentaVM { get; set; } = new();
         [BindProperty(SupportsGet = true)]
         public string? ReturnUrl { get; set; }
@@ -29,8 +30,8 @@ namespace NorthwindTradersV8WebRazorPages.Pages.Ventas
         public List<SelectListItem> Productos { get; set; }
         [BindProperty]
         public VentaDetalleViewModel Detalle { get; set; } = new();
-        [BindProperty]
-        public List<VentaDetalleViewModel> Detalles { get; set; } = new(); 
+        public List<VentaDetalleViewModel> Detalles { get; } = new();
+        private static readonly List<VentaDetalleViewModel> _detalleTemporal = new();
         public InsertarModel(IConfiguration configuration)
         {
             var connectionString = configuration.GetConnectionString("NorthwindConnection")
@@ -60,12 +61,17 @@ namespace NorthwindTradersV8WebRazorPages.Pages.Ventas
             VentaVM.ShippedDate = DateTime.Today;
             CargarCombos();
         }
-        public IActionResult OnPostAgregarProducto()
+        [IgnoreAntiforgeryToken]
+        public IActionResult OnPostAgregarDetalle(
+            [FromBody] VentaDetalleViewModel detalle)
         {
-            Detalles.Add(Detalle);
-            Detalle = new VentaDetalleViewModel();
-            CargarCombos();
-            return Page();
+            _detalleTemporal.Add(detalle);
+
+            return new JsonResult(new
+            {
+                count = _detalleTemporal.Count,
+                lista = _detalleTemporal
+            });
         }
         private void CargarCombos()
         {
