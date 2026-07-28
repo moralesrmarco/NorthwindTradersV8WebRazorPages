@@ -32,6 +32,8 @@ namespace NorthwindTradersV8WebRazorPages.Pages.Ventas
         public VentaDetalleViewModel Detalle { get; set; } = new();
         public List<VentaDetalleViewModel> Detalles { get; } = new();
         private static readonly List<VentaDetalleViewModel> _detalleTemporal = new();
+        [BindProperty]
+        public VentaTotalesViewModel Totales { get; set; } = new(); 
         public InsertarModel(IConfiguration configuration)
         {
             var connectionString = configuration.GetConnectionString("NorthwindConnection")
@@ -66,11 +68,12 @@ namespace NorthwindTradersV8WebRazorPages.Pages.Ventas
             [FromBody] VentaDetalleViewModel detalle)
         {
             _detalleTemporal.Add(detalle);
-
+            var totales = CalcularTotalesVenta();
             return new JsonResult(new
             {
                 count = _detalleTemporal.Count,
-                lista = _detalleTemporal
+                lista = _detalleTemporal,
+                totales = totales
             });
         }
         private void CargarCombos()
@@ -116,6 +119,26 @@ namespace NorthwindTradersV8WebRazorPages.Pages.Ventas
         public JsonResult OnPostCalcularDetalle([FromBody] VentaDetalleViewModel detalle)
         {
             return new JsonResult(detalle);
+        }
+        private VentaTotalesViewModel CalcularTotalesVenta()
+        {
+            return new VentaTotalesViewModel
+            {
+                NumeroProductos = _detalleTemporal.Count,
+                TotalUnidades = _detalleTemporal.Sum(x => x.Quantity),
+                TotalImporteConIVA =
+                    _detalleTemporal.Sum(x => x.SubtotalDelImporteConIVAIncluido),
+                TotalDescuento =
+                    _detalleTemporal.Sum(x => x.SubtotalDelAhorroTotalDespuesDescuento),
+                TotalImporteConDescuento =
+                    _detalleTemporal.Sum(x => x.SubtotalDelImporteConIVAConDescuento),
+                TotalImporteSinIVA =
+                    _detalleTemporal.Sum(x => x.SubtotalDelImporteSinIVAConDescuento),
+                TotalIVA =
+                    _detalleTemporal.Sum(x => x.SubtotalIVADespuesDelDescuento),
+                Total =
+                    _detalleTemporal.Sum(x => x.Subtotal)
+            };
         }
     }
 }

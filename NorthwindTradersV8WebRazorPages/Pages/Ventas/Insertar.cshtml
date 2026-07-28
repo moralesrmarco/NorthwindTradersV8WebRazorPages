@@ -240,47 +240,6 @@
                     </div>
                 </div>
             </fieldset>
-            <fieldset class="border rounded p-3 mb-3">
-                <legend class="float-none w-auto px-2 fs-6">
-                    <strong>Totales de la venta:</strong>
-                </legend>
-                <div class="row mb-3">
-                    <div class="col-md-3 d-flex flex-column">
-                        <label asp-for="Detalle.SubtotalDelImporteConIVAIncluido" class="form-label flex-grow-1">Número de productos</label>
-                        <input asp-for="Detalle.SubtotalDelImporteConIVAIncluido" class="form-control" readonly />
-                    </div>
-                    <div class="col-md-3 d-flex flex-column">
-                        <label asp-for="Detalle.SubtotalDelImporteSinIVASinDescuento" class="form-label flex-grow-1">Total de unidades</label>
-                        <input asp-for="Detalle.SubtotalDelImporteSinIVASinDescuento" class="form-control" readonly />
-                    </div>
-                    <div class="col-md-3 d-flex flex-column">
-                        <label asp-for="Detalle.SubtotalDelImporteDelIVASinDescuento" class="form-label flex-grow-1">Subtotal del importe $ <br /><small class="text-muted">(precio con IVA incluido)</small></label>
-                        <input asp-for="Detalle.SubtotalDelImporteDelIVASinDescuento" class="form-control" readonly />
-                    </div>
-                    <div class="col-md-3 d-flex flex-column">
-                        <label asp-for="Detalle.SubtotalDelImporteSinIVAConDescuento" class="form-label flex-grow-1">Subtotal del importe del descuento $</label>
-                        <input asp-for="Detalle.SubtotalDelImporteSinIVAConDescuento" class="form-control" readonly />
-                    </div>
-                </div>
-                <div class="row mb-3">
-                    <div class="col-md-3 d-flex flex-column">
-                        <label asp-for="Detalle.SubtotalIVADespuesDelDescuento" class="form-label flex-grow-1">Subtotal del importe con descuento $</label>
-                        <input asp-for="Detalle.SubtotalIVADespuesDelDescuento" class="form-control" readonly />
-                    </div>
-                    <div class="col-md-3 d-flex flex-column">
-                        <label asp-for="Detalle.SubtotalDelAhorroSinIvaDespuesDescuento" class="form-label flex-grow-1">Subtotal del importe sin IVA $</label>
-                        <input asp-for="Detalle.SubtotalDelAhorroSinIvaDespuesDescuento" class="form-control" readonly />
-                    </div>
-                    <div class="col-md-3 d-flex flex-column">
-                        <label asp-for="Detalle.SubtotalDelAhorroEnIVADespuesDescuento" class="form-label flex-grow-1">Subtotal del importe del IVA $ <br /><small class="text-muted">(incluido)</small></label>
-                        <input asp-for="Detalle.SubtotalDelAhorroEnIVADespuesDescuento" class="form-control" readonly />
-                    </div>
-                    <div class="col-md-3 d-flex flex-column">
-                        <label asp-for="Detalle.SubtotalDelAhorroTotalDespuesDescuento" class="form-label flex-grow-1"><strong>Total</strong></label>
-                        <input asp-for="Detalle.SubtotalDelAhorroTotalDespuesDescuento" class="form-control" readonly />
-                    </div>
-                </div>
-            </fieldset>
         </fieldset>
         <fieldset class="border rounded p-3 mb-3">
             <legend class="float-none w-auto px-2 fs-6">
@@ -303,59 +262,54 @@
                             <th class="text-center">Importe del IVA <br /><small class="text-muted">(incluido)</small></th>
                             <th class="text-center">Subtotal</th>
                             <th class="text-center" width="120">Acciones</th>
-                            <th></th>
+                            <th class="d-none"></th>
                         </tr>
                     </thead>
                     <tbody id="tblDetalle">
 
-@*                         @for (int i = 0; i < Model.Detalles.Count; i++)
-                        {
-                            <tr>
-                                <td class="text-center">@(i + 1)</td>
-                                <td>@Model.Detalles[i].ProductName</td>
-                                <td class="text-center">
-                                    @Model.Detalles[i].UnitPrice.ToString("N2")
-                                </td>
-                                <td class="text-center">
-                                    @Model.Detalles[i].Quantity
-                                </td>
-                                <td class="text-end">
-                                    @Model.Detalles[i].SubtotalDelImporteConIVAIncluido
-                                </td>
-                                <td class="text-center">
-                                    @Model.Detalles[i].Discount.ToString("P2")
-                                </td>
-                                <td class="text-end">
-                                    @Model.Detalles[i].SubtotalDelAhorroTotalDespuesDescuento
-                                </td>
-                                <td class="text-end">
-                                    @Model.Detalles[i].SubtotalDelImporteConIVAConDescuento
-                                </td>
-                                <td class="text-center">
-                                    @Model.Detalles[i].TasaIVA.ToString("P2")
-                                </td>
-                                <td class="text-end">
-                                    @Model.Detalles[i].SubtotalDelImporteSinIVAConDescuento
-                                </td>
-                                <td class="text-end">
-                                    @Model.Detalles[i].SubtotalIVADespuesDelDescuento
-                                </td>
-                                <td class="text-end fw-bold">
-                                    @Model.Detalles[i].Subtotal.ToString("N2")
-                                </td>
-                                <td>
-                                    <button class="btn btn-sm btn-warning">
-                                        <i class="bi bi-pencil"></i>
-                                    </button>
-                                    <button class="btn btn-sm btn-danger">
-                                        <i class="bi bi-trash"></i>
-                                    </button>
-                                </td>
-                                <td>@Model.Detalles[i].ProductID</td>
-                            </tr>
-                        } *@
                     </tbody>
                 </table>
+            </div>
+        </fieldset>
+        <fieldset class="border rounded p-3 mb-3">
+            <legend class="float-none w-auto px-2 fs-6">
+                <strong>Totales de la venta:</strong>
+            </legend>
+            <div class="row mb-3">
+                <div class="col-md-3 d-flex flex-column">
+                    <label asp-for="Totales.NumeroProductos" class="form-label flex-grow-1">Número de productos</label>
+                    <input asp-for="Totales.NumeroProductos" class="form-control" readonly />
+                </div>
+                <div class="col-md-3 d-flex flex-column">
+                    <label asp-for="Totales.TotalUnidades" class="form-label flex-grow-1">Total de unidades</label>
+                    <input asp-for="Totales.TotalUnidades" class="form-control" readonly />
+                </div>
+                <div class="col-md-3 d-flex flex-column">
+                    <label asp-for="Totales.TotalImporteConIVA" class="form-label flex-grow-1">Subtotal del importe $ <br /><small class="text-muted">(precio con IVA incluido)</small></label>
+                    <input asp-for="Totales.TotalImporteConIVA" class="form-control" readonly />
+                </div>
+                <div class="col-md-3 d-flex flex-column">
+                    <label asp-for="Totales.TotalDescuento" class="form-label flex-grow-1">Subtotal del importe del descuento $</label>
+                    <input asp-for="Totales.TotalDescuento" class="form-control" readonly />
+                </div>
+            </div>
+            <div class="row mb-3">
+                <div class="col-md-3 d-flex flex-column">
+                    <label asp-for="Totales.TotalImporteConDescuento" class="form-label flex-grow-1">Subtotal del importe con descuento $</label>
+                    <input asp-for="Totales.TotalImporteConDescuento" class="form-control" readonly />
+                </div>
+                <div class="col-md-3 d-flex flex-column">
+                    <label asp-for="Totales.TotalImporteSinIVA" class="form-label flex-grow-1">Subtotal del importe sin IVA $</label>
+                    <input asp-for="Totales.TotalImporteSinIVA" class="form-control" readonly />
+                </div>
+                <div class="col-md-3 d-flex flex-column">
+                    <label asp-for="Totales.TotalIVA" class="form-label flex-grow-1">Subtotal del importe del IVA $ <br /><small class="text-muted">(incluido)</small></label>
+                    <input asp-for="Totales.TotalIVA" class="form-control" readonly />
+                </div>
+                <div class="col-md-3 d-flex flex-column">
+                    <label asp-for="Totales.Total" class="form-label flex-grow-1"><strong>Total</strong></label>
+                    <input asp-for="Totales.Total" class="form-control" readonly />
+                </div>
             </div>
         </fieldset>
     </fieldset>
@@ -501,7 +455,6 @@
         }
 
         function agregarProducto() {
-
             let detalle = {
                 categoriaID: Number($("#cboCategoria").val()),
                 productID: Number($("#cboProducto").val()),
@@ -511,7 +464,6 @@
                 quantity: Number($("#Detalle_Quantity").val()),
                 discount: Number($("#Detalle_Discount").val()) / 100
             };
-
             $.ajax({
                 url: "?handler=AgregarDetalle",
                 type: "POST",
@@ -526,9 +478,9 @@
                 success: function(r) {
                     if (r.lista && r.lista.length > 0) {
                         llenarTabla(r.lista);
+                        mostrarTotales(r.totales);
                     }
                 },
-
                 error: function(xhr) {
 
                     console.log("ERROR");
@@ -537,94 +489,93 @@
 
                     alert("Error");
                 },
-
                 complete: function() {
 
                 }
             });
-
         }
 
         function llenarTabla(lista) {
-
             let html = "";
-
             lista.forEach(function(item, indice) {
-
                 html += `
                     <tr>
                         <td class="text-center">${indice + 1}</td>
-
                         <td>${item.productName}</td>
-
                         <td class="text-center">
                             ${Number(item.unitPrice).toLocaleString('es-MX',
                     { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                         </td>
-
                         <td class="text-center">
                             ${item.quantity}
                         </td>
-
                         <td class="text-end">
                             ${Number(item.subtotalDelImporteConIVAIncluido).toLocaleString('es-MX',
                         { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                         </td>
-
                         <td class="text-center">
                             ${(item.discount * 100).toFixed(2)} %
                         </td>
-
                         <td class="text-end">
                             ${Number(item.subtotalDelAhorroTotalDespuesDescuento).toLocaleString('es-MX',
                             { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                         </td>
-
                         <td class="text-end">
                             ${Number(item.subtotalDelImporteConIVAConDescuento).toLocaleString('es-MX',
                                 { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                         </td>
-
                         <td class="text-center">
                             ${(item.tasaIVA * 100).toFixed(2)} %
                         </td>
-
                         <td class="text-end">
                             ${Number(item.subtotalDelImporteSinIVAConDescuento).toLocaleString('es-MX',
                                     { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                         </td>
-
                         <td class="text-end">
                             ${Number(item.subtotalIVADespuesDelDescuento).toLocaleString('es-MX',
                                         { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                         </td>
-
                         <td class="text-end fw-bold">
                             ${Number(item.subtotal).toLocaleString('es-MX',
                                             { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                         </td>
-
                         <td class="text-center">
                             <button type="button"
                                     class="btn btn-sm btn-warning btnEditar"
                                     data-index="${indice}">
                                 <i class="bi bi-pencil"></i>
                             </button>
-
                             <button type="button"
                                     class="btn btn-sm btn-danger btnEliminar"
                                     data-index="${indice}">
                                 <i class="bi bi-trash"></i>
                             </button>
                         </td>
-
                         <td class="d-none">
                             ${item.productID}
                         </td>
                     </tr>`;
             });
-
             $("#tblDetalle").html(html);
+        }
+
+        function mostrarTotales(t) {
+            $("#Totales_NumeroProductos")
+                .val(t.numeroProductos);
+            $("#Totales_TotalUnidades")
+                .val(t.totalUnidades);
+            $("#Totales_TotalImporteConIVA")
+                .val(t.totalImporteConIVA);
+            $("#Totales_TotalDescuento")
+                .val(t.totalDescuento);
+            $("#Totales_TotalImporteConDescuento")
+                .val(t.totalImporteConDescuento);
+            $("#Totales_TotalImporteSinIVA")
+                .val(t.totalImporteSinIVA);
+            $("#Totales_TotalIVA")
+                .val(t.totalIVA);
+            $("#Totales_Total")
+                .val(t.total);
         }
 
         $("#cboCategoria").change(function() {
