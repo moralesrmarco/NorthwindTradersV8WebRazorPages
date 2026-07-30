@@ -11,8 +11,11 @@ namespace NorthwindTradersV8WebRazorPages.ViewModels
         public int? EmployeeID { get; set; }
         [Required(ErrorMessage = "Debe indicar la fecha de la venta.")]
         public DateTime? OrderDate { get; set; }
+        public TimeSpan? OrderTime { get; set; }
         public DateTime? RequiredDate { get; set; }
+        public TimeSpan? RequiredTime { get; set; }
         public DateTime? ShippedDate { get; set; }
+        public TimeSpan? ShippedTime { get; set; }
         public int? ShipVia { get; set; }
         public string? ShipName { get; set; }
         public string? ShipAddress { get; set; }

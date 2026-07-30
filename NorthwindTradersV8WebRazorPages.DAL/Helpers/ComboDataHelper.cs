@@ -57,6 +57,5 @@ namespace NorthwindTradersV8WebRazorPages.DAL.Helpers
             }
             return items;
         }
-
     }
 }

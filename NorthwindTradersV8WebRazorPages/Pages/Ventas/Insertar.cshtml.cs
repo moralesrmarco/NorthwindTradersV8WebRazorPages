@@ -4,8 +4,6 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using NorthwindTradersV8WebRazorPages.BLL;
 using NorthwindTradersV8WebRazorPages.BLL.Services;
 using NorthwindTradersV8WebRazorPages.ViewModels;
-using System.Diagnostics;
-using System.Runtime.CompilerServices;
 using System.Text.Json;
 
 namespace NorthwindTradersV8WebRazorPages.Pages.Ventas
@@ -77,6 +75,7 @@ namespace NorthwindTradersV8WebRazorPages.Pages.Ventas
                 HttpContext.Session.Remove(SessionDetalleVenta);
             }
             VentaVM.OrderDate = DateTime.Today;
+            VentaVM.OrderTime = DateTime.Now.TimeOfDay; 
             CargarCombos();
             Detalles = ObtenerDetalle();
             Totales = CalcularTotalesVenta(Detalles);
@@ -112,6 +111,11 @@ namespace NorthwindTradersV8WebRazorPages.Pages.Ventas
                 return BadRequest("La cantidad no puede ser mayor que las unidades en inventario.");
             }
             var lista = ObtenerDetalle();
+            // Validar producto duplicado
+            if (lista.Any(x => x.ProductID == detalle.ProductID))
+            {
+                return BadRequest("No se puede agregar un mismo producto más de una vez a la venta.");
+            }
             lista.Add(detalle);
             GuardarDetalle(lista);
             var totales = CalcularTotalesVenta(lista);
@@ -145,6 +149,28 @@ namespace NorthwindTradersV8WebRazorPages.Pages.Ventas
                 Value = c.Value,
                 Text = c.Text
             }).ToList();
+            if (Detalle.CategoriaID.HasValue)
+            {
+                Productos = productoService
+                    .ObtenerProductosPorCategoriaCbo(Detalle.CategoriaID.Value)
+                    .Select(p => new SelectListItem
+                    {
+                        Value = p.Value,
+                        Text = p.Text
+                    })
+                    .ToList();
+            }
+            else
+            {
+                Productos = new List<SelectListItem>
+                {
+                    new SelectListItem
+                    {
+                        Value = "",
+                        Text = "»--- Seleccione una categoría ---«"
+                    }
+                };
+            }
         }
         public JsonResult OnGetProductosPorCategoria(int categoriaId)
         {

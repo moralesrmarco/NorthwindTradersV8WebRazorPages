@@ -39,18 +39,44 @@
             </div>
         </div>
         <div class="row mb-3">
-            <div class="col-md-4">
-                <label asp-for="VentaVM.OrderDate" class="form-label">Fecha de venta</label>
-                <input asp-for="VentaVM.OrderDate" class="form-control" type="date" />
-                <span asp-validation-for="VentaVM.OrderDate" class="text-danger"></span>
+            <div class="col-md-2">
+                <label>Fecha de venta</label>
+                <input asp-for="VentaVM.OrderDate" type="date" class="form-control" />
             </div>
-            <div class="col-md-4">
-                <label asp-for="VentaVM.RequiredDate" class="form-label">Fecha requerido</label>
-                <input asp-for="VentaVM.RequiredDate" class="form-control" type="date" />
+            <div class="col-md-2">
+                <label>Hora</label>
+                <input type="time"
+                       id="VentaVM_OrderTime"
+                       name="VentaVM.OrderTime"
+                       value="@(Model.VentaVM.OrderTime?.ToString(@"hh\:mm"))"
+                       step="60"
+                       class="form-control" />
             </div>
-            <div class="col-md-4">
-                <label asp-for="VentaVM.ShippedDate" class="form-label">Fecha de envío</label>
-                <input asp-for="VentaVM.ShippedDate" class="form-control" type="date" />
+            <div class="col-md-2">
+                <label>Fecha requerido</label>
+                <input asp-for="VentaVM.RequiredDate" type="date" class="form-control" />
+            </div>
+            <div class="col-md-2">
+                <label>Hora</label>
+                <input type="time"
+                       id="VentaVM_RequiredTime"
+                       name="VentaVM.RequiredTime"
+                       value="@(Model.VentaVM.RequiredTime?.ToString(@"hh\:mm"))"
+                       step="60"
+                       class="form-control" />
+            </div>            
+            <div class="col-md-2">
+                <label>Fecha de envío</label>
+                <input asp-for="VentaVM.ShippedDate" type="date" class="form-control" />
+            </div>
+            <div class="col-md-2">
+                <label>Hora</label>
+                <input type="time"
+                       id="VentaVM_ShippedTime"
+                       name="VentaVM.ShippedTime"
+                       value="@(Model.VentaVM.ShippedTime?.ToString(@"hh\:mm"))"
+                       step="60"
+                       class="form-control" />
             </div>
         </div>
         <fieldset class="border rounded p-3 mb-3">
@@ -326,6 +352,7 @@
         <div class="d-flex justify-content-end gap-2 mb-3">
 
             <button type="submit"
+                    id="btnGenerarVenta"
                     asp-page-handler="GenerarVenta"
                     formnovalidate
                     class="btn btn-success"
@@ -516,6 +543,23 @@
                 $("#Detalle_Quantity").focus().select();
                 return;
             }
+            // ===== VALIDAR PRODUCTO DUPLICADO =====
+            let productoId = Number($("#cboProducto").val());
+            let repetido = false;
+            $("#tblDetalle tr").each(function() {
+                let id = Number($(this).find("td:last").text().trim());
+
+                if (id === productoId) {
+                    repetido = true;
+                    return false; // break
+                }
+            });
+            if (repetido) {
+                alert("No se puede agregar un mismo producto más de una vez a la venta.");
+                $("#cboProducto").focus();
+                return;
+            }
+            // ===== FIN VALIDACIÓN =====
             let detalle = {
                 categoriaID: Number($("#cboCategoria").val()),
                 productID: Number($("#cboProducto").val()),
@@ -715,6 +759,13 @@
             $(this).select();
         });
 
+        $("#btnGenerarVenta").click(function(e) {
+            if ($("#cboProducto").val() != "") {
+                e.preventDefault();
+                alert("Se ha seleccionado un producto y no lo ha agregado a la venta.");
+                $("#Detalle_Quantity").focus();
+            }
+        });
 
         $("#btnAgregarProducto").click(function() {
             agregarProducto();
