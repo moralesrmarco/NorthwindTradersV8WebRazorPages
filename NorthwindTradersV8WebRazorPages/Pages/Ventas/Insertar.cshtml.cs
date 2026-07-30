@@ -226,6 +226,52 @@ namespace NorthwindTradersV8WebRazorPages.Pages.Ventas
             {
                 TempData["Error"] = "Debe agregar al menos un producto a la venta.";
             }
+            // Construir Fecha/Hora de la venta
+            DateTime? fechaHoraVenta = null;
+            if (VentaVM.OrderDate.HasValue && VentaVM.OrderTime.HasValue)
+            {
+                fechaHoraVenta = VentaVM.OrderDate.Value.Date + VentaVM.OrderTime.Value;
+            }
+
+            // Construir Fecha/Hora requerida
+            DateTime? fechaHoraRequerido = null;
+            if (VentaVM.RequiredDate.HasValue && VentaVM.RequiredTime.HasValue)
+            {
+                fechaHoraRequerido = VentaVM.RequiredDate.Value.Date + VentaVM.RequiredTime.Value;
+            }
+
+            // Construir Fecha/Hora de envío
+            DateTime? fechaHoraEnvio = null;
+            if (VentaVM.ShippedDate.HasValue && VentaVM.ShippedTime.HasValue)
+            {
+                fechaHoraEnvio = VentaVM.ShippedDate.Value.Date + VentaVM.ShippedTime.Value;
+            }
+            // 1. Validar Requerido vs Venta
+            if (fechaHoraVenta.HasValue &&
+                fechaHoraRequerido.HasValue &&
+                fechaHoraRequerido.Value < fechaHoraVenta.Value)
+            {
+                ModelState.AddModelError(
+                    "VentaVM.RequiredTime",
+                    "La fecha y hora requerida no pueden ser anteriores a la venta.");
+            }
+            // 2. Validar Envío vs Venta
+            if (fechaHoraVenta.HasValue &&
+                fechaHoraEnvio.HasValue &&
+                fechaHoraEnvio.Value < fechaHoraVenta.Value)
+            {
+                ModelState.AddModelError(
+                    "VentaVM.ShippedTime",
+                    "La fecha y hora de envío no pueden ser anteriores a la venta.");
+            }
+            if (fechaHoraEnvio.HasValue &&
+                fechaHoraRequerido.HasValue &&
+                fechaHoraEnvio.Value > fechaHoraRequerido.Value)
+            {
+                ModelState.AddModelError(
+                    "VentaVM.ShippedTime",
+                    "La fecha y hora de envío no pueden ser posteriores a la fecha y hora requeridas.");
+            }
             if (!ModelState.IsValid || lista.Count == 0)
             {
                 Detalles = lista;
