@@ -5,7 +5,10 @@
     ViewData["Title"] = "Insertar venta";
 }
 <h2>Nueva venta</h2>
-
+@if (!ViewData.ModelState.IsValid)
+{
+    <div asp-validation-summary="All" class="alert alert-danger"></div>
+}
 <form method="post" class="form">
 
     @if (TempData["Error"] != null)
@@ -44,12 +47,10 @@
             <div class="col-md-4">
                 <label asp-for="VentaVM.RequiredDate" class="form-label">Fecha requerido</label>
                 <input asp-for="VentaVM.RequiredDate" class="form-control" type="date" />
-                <span asp-validation-for="VentaVM.RequiredDate" class="text-danger"></span>
             </div>
             <div class="col-md-4">
                 <label asp-for="VentaVM.ShippedDate" class="form-label">Fecha de envío</label>
                 <input asp-for="VentaVM.ShippedDate" class="form-control" type="date" />
-                <span asp-validation-for="VentaVM.ShippedDate" class="text-danger"></span>
             </div>
         </div>
         <fieldset class="border rounded p-3 mb-3">
@@ -63,7 +64,6 @@
                             asp-items="Model.Transportistas"
                             class="form-select">
                     </select>
-                    <span asp-validation-for="VentaVM.ShipVia" class="text-danger"></span>
                 </div>
                 <div class="col-md-4">
                     <label asp-for="VentaVM.ShipName" class="form-label">Enviar a</label>
@@ -95,7 +95,19 @@
                 </div>
                 <div class="col-md-4">
                     <label asp-for="VentaVM.Freight" class="form-label">Cargo por envío $</label>
-                    <input asp-for="VentaVM.Freight" class="form-control" />
+                    <input asp-for="VentaVM.Freight"
+                           class="form-control"
+                           type="number"
+                           step="1"
+                           min="0" />
+                </div>
+                <div class="col-md-4 d-flex align-items-end">
+                    <button type="button"
+                            id="btnLimpiarEnvio"
+                            class="btn btn-warning">
+                        <i class="bi bi-eraser"></i>
+                        Limpiar forma de envío
+                    </button>
                 </div>
             </div>
         </fieldset>
@@ -110,7 +122,6 @@
                             asp-items="Model.Categorias"
                             class="form-select">
                     </select>
-                    <span asp-validation-for="Detalle.CategoriaID" class="text-danger"></span>
                 </div>
                 <div class="col-md-6">
                     <label asp-for="Detalle.ProductID" class="form-label">Producto</label>
@@ -118,7 +129,6 @@
                             asp-items="Model.Productos"
                             class="form-select">
                     </select>
-                    <span asp-validation-for="Detalle.ProductID" class="text-danger"></span>
                 </div>
             </div>
             <div class="row mb-3">
@@ -129,17 +139,18 @@
                 <div class="col-md-3 d-flex flex-column">
                     <label asp-for="Detalle.UnitsInStock" class="form-label flex-grow-1"><strong>Unidades en inventario</strong></label>
                     <input asp-for="Detalle.UnitsInStock" class="form-control" readonly />
-                
                 </div>
                 <div class="col-md-2 d-flex flex-column">
                     <label asp-for="Detalle.Quantity" class="form-label flex-grow-1">Cantidad</label>
                     <input asp-for="Detalle.Quantity" class="form-control" />
-                    <span asp-validation-for="Detalle.Quantity" class="text-danger"></span>
                 </div>
                 <div class="col-md-2 d-flex flex-column">
                     <label asp-for="Detalle.Discount" class="form-label flex-grow-1">Descuento (%)</label>
-                    <input asp-for="Detalle.Discount" class="form-control" placeholder="Ejemplo: 10%" />
-                    <span asp-validation-for="Detalle.Discount" class="text-danger"></span>
+                    <input asp-for="Detalle.Discount"
+                           class="form-control"
+                           type="number"
+                           step="1"
+                           min="0" />
                 </div>
                 <div class="col-md-2 d-flex align-items-end">
                     <button type="button"
@@ -246,7 +257,7 @@
                 <strong>Detalle de la venta:</strong>
             </legend>
             <div class="table-responsive">
-                <table class="table table-bordered table-hover table-striped align-middle">
+                <table class="table table-bordered table-hover table-striped align-middle" style="font-size:0.75rem;">
                     <thead class="table-light">
                         <tr>
                             <th class ="text-center">N°</th>
@@ -312,6 +323,35 @@
                 </div>
             </div>
         </fieldset>
+        <div class="d-flex justify-content-end gap-2 mb-3">
+
+            <button type="submit"
+                    asp-page-handler="GenerarVenta"
+                    formnovalidate
+                    class="btn btn-success"
+                    title="Generar venta">
+                <i class="bi bi-check-circle"></i>
+                <span class="d-none d-md-inline"> Generar venta</span>
+            </button>
+
+            <button type="submit"
+                    asp-page-handler="NuevaVenta"
+                    formnovalidate
+                    class="btn btn-primary"
+                    title="Nueva venta">
+                <i class="bi bi-file-earmark-plus"></i>
+                <span class="d-none d-md-inline"> Nueva venta</span>
+            </button>
+
+            <button type="submit"
+                    asp-page-handler="NotaRemision"
+                    class="btn btn-warning"
+                    title="Nota de remisión">
+                <i class="bi bi-printer"></i>
+                <span class="d-none d-md-inline">Nota de remisión</span>
+            </button>
+
+        </div>
     </fieldset>
     
 </form>
@@ -455,6 +495,27 @@
         }
 
         function agregarProducto() {
+            if ($("#cboCategoria").val() == "") {
+                alert("Debe seleccionar una categoría.");
+                $("#cboCategoria").focus();
+                return;
+            }
+            if ($("#cboProducto").val() == "") {
+                alert("Debe seleccionar un producto.");
+                $("#cboProducto").focus();
+                return;
+            }
+            if (Number($("#Detalle_Quantity").val()) <= 0) {
+                alert("La cantidad debe ser mayor que 0.");
+                $("#Detalle_Quantity").focus().select();
+                return;
+            }
+            if (Number($("#Detalle_Quantity").val()) >
+                Number($("#Detalle_UnitsInStock").val())) {
+                alert("La cantidad no puede ser mayor que las unidades en inventario.");
+                $("#Detalle_Quantity").focus().select();
+                return;
+            }
             let detalle = {
                 categoriaID: Number($("#cboCategoria").val()),
                 productID: Number($("#cboProducto").val()),
@@ -479,18 +540,11 @@
                     if (r.lista && r.lista.length > 0) {
                         llenarTabla(r.lista);
                         mostrarTotales(r.totales);
+                        limpiarCapturaProducto();
                     }
                 },
                 error: function(xhr) {
-
-                    console.log("ERROR");
-                    console.log(xhr.status);
-                    console.log(xhr.responseText);
-
-                    alert("Error");
-                },
-                complete: function() {
-
+                    alert(xhr.responseText);
                 }
             });
         }
@@ -514,7 +568,9 @@
                         { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                         </td>
                         <td class="text-center">
-                            ${(item.discount * 100).toFixed(2)} %
+                            <nobr>
+                                ${(item.discount * 100).toFixed(2)} %
+                            </nobr>
                         </td>
                         <td class="text-end">
                             ${Number(item.subtotalDelAhorroTotalDespuesDescuento).toLocaleString('es-MX',
@@ -525,7 +581,9 @@
                                 { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                         </td>
                         <td class="text-center">
-                            ${(item.tasaIVA * 100).toFixed(2)} %
+                            <nobr>
+                                ${(item.tasaIVA * 100).toFixed(2)} %
+                            </nobr>
                         </td>
                         <td class="text-end">
                             ${Number(item.subtotalDelImporteSinIVAConDescuento).toLocaleString('es-MX',
@@ -578,6 +636,57 @@
                 .val(t.total);
         }
 
+        function limpiarCapturaProducto() {
+
+            // Regresar el producto a "Seleccione"
+            $("#cboProducto").val("");
+
+            // Limpiar datos del producto
+            $("#Detalle_UnitPrice").val(0);
+            $("#Detalle_UnitsInStock").val(0);
+
+            // Valores por defecto
+            $("#Detalle_Quantity").val(0);
+            $("#Detalle_Discount").val(0);
+
+            // Limpiar cálculos
+            $("#Detalle_PrecioPorUnidadSinIVASinDescuento").val(0);
+            $("#Detalle_IVADelPrecioPorUnidadSinDescuento").val(0);
+            $("#Detalle_PrecioPorUnidadSinIVADespuesDescuento").val(0);
+            $("#Detalle_IVADelPrecioporUnidadDespuesDescuento").val(0);
+
+            $("#Detalle_AhorroPorUnidadSinIVA").val(0);
+            $("#Detalle_AhorroEnIVAPorUnidadDespuesDescuento").val(0);
+            $("#Detalle_AhorroTotalPorUnidadConIVA").val(0);
+            $("#Detalle_PrecioPorUnidadConIVADespuesDescuento").val(0);
+
+            $("#Detalle_SubtotalDelImporteConIVAIncluido").val(0);
+            $("#Detalle_SubtotalDelImporteSinIVASinDescuento").val(0);
+            $("#Detalle_SubtotalDelImporteDelIVASinDescuento").val(0);
+            $("#Detalle_SubtotalDelImporteSinIVAConDescuento").val(0);
+            $("#Detalle_SubtotalIVADespuesDelDescuento").val(0);
+
+            $("#Detalle_SubtotalDelAhorroSinIvaDespuesDescuento").val(0);
+            $("#Detalle_SubtotalDelAhorroEnIVADespuesDescuento").val(0);
+            $("#Detalle_SubtotalDelAhorroTotalDespuesDescuento").val(0);
+
+            $("#Detalle_Subtotal").val(0);
+
+            // Dejar el foco en Producto
+            $("#cboProducto").focus();
+        }
+
+        $("#btnLimpiarEnvio").click(function() {
+            $("#cboCompañia").val("");
+            $("#VentaVM_ShipName").val("");
+            $("#VentaVM_ShipAddress").val("");
+            $("#VentaVM_ShipCity").val("");
+            $("#VentaVM_ShipRegion").val("");
+            $("#VentaVM_ShipPostalCode").val("");
+            $("#VentaVM_ShipCountry").val("");
+            $("#VentaVM_Freight").val(0);
+        });
+
         $("#cboCategoria").change(function() {
             cargarProductos($(this).val());
         });
@@ -594,9 +703,27 @@
 
         $("#Detalle_Discount").on("input", calcularDetalle);
 
+        $("#Detalle_Quantity").focus(function() {
+            $(this).select();
+        });
+
+        $("#Detalle_Discount").focus(function() {
+            $(this).select();
+        });
+        
+        $("#VentaVM_Freight").focus(function() {
+            $(this).select();
+        });
+
+
         $("#btnAgregarProducto").click(function() {
             agregarProducto();
         });
-    </script>
+
+        var detalleVenta = @Html.Raw(Model.DetallesJson);
+        if (detalleVenta.length > 0) {
+            llenarTabla(detalleVenta);
+        }
+        mostrarTotales(@Html.Raw(Model.TotalesJson));</script>
 
 }

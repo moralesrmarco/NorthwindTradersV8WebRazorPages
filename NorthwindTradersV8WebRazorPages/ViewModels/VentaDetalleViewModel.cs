@@ -2,8 +2,8 @@
 {
     public class VentaDetalleViewModel
     {
-        public int CategoriaID { get; set; }
-        public int ProductID { get; set; }
+        public int? CategoriaID { get; set; }
+        public int? ProductID { get; set; }
         public string? ProductName { get; set; }
         public decimal UnitPrice { get; set; }
         public short UnitsInStock { get; set; }

@@ -1,9 +1,15 @@
-﻿namespace NorthwindTradersV8WebRazorPages.ViewModels
+﻿using System.ComponentModel.DataAnnotations;
+
+namespace NorthwindTradersV8WebRazorPages.ViewModels
 {
     public class VentaInsertarViewModel
     {
+        [Required(ErrorMessage = "Debe seleccionar un cliente.")]
         public string? CustomerID { get; set; } = "";
+        [Range(1, int.MaxValue,
+            ErrorMessage = "Debe seleccionar un vendedor.")]
         public int? EmployeeID { get; set; }
+        [Required(ErrorMessage = "Debe indicar la fecha de la venta.")]
         public DateTime? OrderDate { get; set; }
         public DateTime? RequiredDate { get; set; }
         public DateTime? ShippedDate { get; set; }
@@ -14,7 +20,7 @@
         public string? ShipRegion { get; set; }
         public string? ShipPostalCode { get; set; }
         public string? ShipCountry { get; set; }
-        public decimal? Freight { get; set; }
+        public decimal Freight { get; set; }
         public List<VentaDetalleViewModel> Detalles { get; set; } = new();
     }
 }

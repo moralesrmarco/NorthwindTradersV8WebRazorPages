@@ -6,6 +6,7 @@ using NorthwindTradersV8WebRazorPages.BLL.Services;
 using NorthwindTradersV8WebRazorPages.ViewModels;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
+using System.Text.Json;
 
 namespace NorthwindTradersV8WebRazorPages.Pages.Ventas
 {
@@ -30,10 +31,22 @@ namespace NorthwindTradersV8WebRazorPages.Pages.Ventas
         public List<SelectListItem> Productos { get; set; }
         [BindProperty]
         public VentaDetalleViewModel Detalle { get; set; } = new();
-        public List<VentaDetalleViewModel> Detalles { get; } = new();
-        private static readonly List<VentaDetalleViewModel> _detalleTemporal = new();
+        public List<VentaDetalleViewModel> Detalles { get; set; } = new();
+        private const string SessionDetalleVenta = "DetalleVenta";
         [BindProperty]
-        public VentaTotalesViewModel Totales { get; set; } = new(); 
+        public VentaTotalesViewModel Totales { get; set; } = new();
+        public string DetallesJson => JsonSerializer.Serialize(
+            Detalles,
+            new JsonSerializerOptions
+            {
+                PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+            });
+        public string TotalesJson => JsonSerializer.Serialize(
+            Totales,
+            new JsonSerializerOptions
+            {
+                PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+            });
         public InsertarModel(IConfiguration configuration)
         {
             var connectionString = configuration.GetConnectionString("NorthwindConnection")
@@ -41,6 +54,7 @@ namespace NorthwindTradersV8WebRazorPages.Pages.Ventas
             bool ejecutarTiempoDemora = configuration.GetValue<bool>("AppSettings:ejecutarTiempoDemora");
             int tiempoDemora = configuration.GetValue<int>("AppSettings:tiempoDemora");
             ventaBLL = new VentaBLL(connectionString, ejecutarTiempoDemora, tiempoDemora);
+            ventaDetalleBLL = new VentaDetalleBLL(connectionString);
             clienteService = new ClienteService(connectionString);
             empleadoService = new EmpleadoService(connectionString);
             transportistaService = new TransportistaService(connectionString);
@@ -56,23 +70,55 @@ namespace NorthwindTradersV8WebRazorPages.Pages.Ventas
                 }
             };
         }
-        public void OnGet()
+        public void OnGet(bool nueva = true)
         {
+            if (nueva)
+            {
+                HttpContext.Session.Remove(SessionDetalleVenta);
+            }
             VentaVM.OrderDate = DateTime.Today;
-            VentaVM.RequiredDate = DateTime.Today;
-            VentaVM.ShippedDate = DateTime.Today;
             CargarCombos();
+            Detalles = ObtenerDetalle();
+            Totales = CalcularTotalesVenta(Detalles);
+        }
+        public IActionResult OnGetNueva(string? returnUrl)
+        {
+            HttpContext.Session.Remove(SessionDetalleVenta);
+            return RedirectToPage(new
+            {
+                returnUrl
+            });
         }
         [IgnoreAntiforgeryToken]
         public IActionResult OnPostAgregarDetalle(
             [FromBody] VentaDetalleViewModel detalle)
         {
-            _detalleTemporal.Add(detalle);
-            var totales = CalcularTotalesVenta();
+            if (detalle.CategoriaID <= 0)
+            {
+                return BadRequest("Debe seleccionar una categoría.");
+            }
+
+            if (detalle.ProductID <= 0)
+            {
+                return BadRequest("Debe seleccionar un producto.");
+            }
+
+            if (detalle.Quantity <= 0)
+            {
+                return BadRequest("La cantidad debe ser mayor que cero.");
+            }
+            if (detalle.Quantity > detalle.UnitsInStock)
+            {
+                return BadRequest("La cantidad no puede ser mayor que las unidades en inventario.");
+            }
+            var lista = ObtenerDetalle();
+            lista.Add(detalle);
+            GuardarDetalle(lista);
+            var totales = CalcularTotalesVenta(lista);
             return new JsonResult(new
             {
-                count = _detalleTemporal.Count,
-                lista = _detalleTemporal,
+                count = lista.Count,
+                lista = lista,
                 totales = totales
             });
         }
@@ -120,25 +166,97 @@ namespace NorthwindTradersV8WebRazorPages.Pages.Ventas
         {
             return new JsonResult(detalle);
         }
-        private VentaTotalesViewModel CalcularTotalesVenta()
+        private VentaTotalesViewModel CalcularTotalesVenta(List<VentaDetalleViewModel> lista)
         {
             return new VentaTotalesViewModel
             {
-                NumeroProductos = _detalleTemporal.Count,
-                TotalUnidades = _detalleTemporal.Sum(x => x.Quantity),
+                NumeroProductos = lista.Count,
+                TotalUnidades = lista.Sum(x => x.Quantity),
                 TotalImporteConIVA =
-                    _detalleTemporal.Sum(x => x.SubtotalDelImporteConIVAIncluido),
+                    lista.Sum(x => x.SubtotalDelImporteConIVAIncluido),
                 TotalDescuento =
-                    _detalleTemporal.Sum(x => x.SubtotalDelAhorroTotalDespuesDescuento),
+                    lista.Sum(x => x.SubtotalDelAhorroTotalDespuesDescuento),
                 TotalImporteConDescuento =
-                    _detalleTemporal.Sum(x => x.SubtotalDelImporteConIVAConDescuento),
+                    lista.Sum(x => x.SubtotalDelImporteConIVAConDescuento),
                 TotalImporteSinIVA =
-                    _detalleTemporal.Sum(x => x.SubtotalDelImporteSinIVAConDescuento),
+                    lista.Sum(x => x.SubtotalDelImporteSinIVAConDescuento),
                 TotalIVA =
-                    _detalleTemporal.Sum(x => x.SubtotalIVADespuesDelDescuento),
+                    lista.Sum(x => x.SubtotalIVADespuesDelDescuento),
                 Total =
-                    _detalleTemporal.Sum(x => x.Subtotal)
+                    lista.Sum(x => x.Subtotal)
             };
+        }
+        public IActionResult OnPostGenerarVenta()
+        {
+            CargarCombos();
+            if (!VentaVM.EmployeeID.HasValue || VentaVM.EmployeeID <= 0)
+            {
+                ModelState.AddModelError(
+                    "VentaVM.EmployeeID",
+                    "Debe seleccionar un vendedor.");
+            }
+            var lista = ObtenerDetalle();
+            if (lista.Count == 0)
+            {
+                TempData["Error"] = "Debe agregar al menos un producto a la venta.";
+            }
+            if (!ModelState.IsValid || lista.Count == 0)
+            {
+                Detalles = lista;
+                Totales = CalcularTotalesVenta(lista);
+                return Page();
+            }
+
+            // Guardar la venta
+            // Guardar encabezado
+            // int idVenta = ventaBLL.Insertar(...);
+
+            // Guardar detalle
+            // foreach(var d in lista)
+            //     ventaDetalleBLL.Insertar(idVenta,d);
+
+            HttpContext.Session.Remove(SessionDetalleVenta);
+
+            TempData["Mensaje"] = "La venta se registró correctamente.";
+
+            return RedirectToPage("Insertar");
+        }
+        public IActionResult OnPostNuevaVenta()
+        {
+            HttpContext.Session.Remove(SessionDetalleVenta);
+            return RedirectToPage();
+        }
+        //public IActionResult OnPostNotaRemision()
+        //{
+        //    if (_detalleTemporal.Count == 0)
+        //    {
+        //        TempData["Error"] = "Debe agregar productos.";
+        //        CargarCombos();
+        //        return Page();
+        //    }
+
+        //    //Guardar
+
+        //    //Generar PDF
+
+        //    return File(pdfBytes,
+        //                "application/pdf",
+        //                "NotaRemision.pdf");
+        //}
+        private List<VentaDetalleViewModel> ObtenerDetalle()
+        {
+            var json = HttpContext.Session.GetString(SessionDetalleVenta);
+
+            if (string.IsNullOrEmpty(json))
+                return new List<VentaDetalleViewModel>();
+
+            return JsonSerializer.Deserialize<List<VentaDetalleViewModel>>(json)!;
+        }
+        private void GuardarDetalle(List<VentaDetalleViewModel> lista)
+        {
+            var json = JsonSerializer.Serialize(lista);
+
+            HttpContext.Session.SetString(SessionDetalleVenta, json);
         }
     }
 }

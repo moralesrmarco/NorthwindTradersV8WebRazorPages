@@ -1,22 +1,20 @@
 ﻿function mostrarLoadingOverlay() {
-
     const overlay = document.getElementById("loadingOverlay");
-
     if (overlay) {
         overlay.style.display = "block";
     }
 }
 
 function ocultarLoadingOverlay() {
-
     const overlay = document.getElementById("loadingOverlay");
-
     if (overlay) {
         overlay.style.display = "none";
     }
 }
 
 document.addEventListener("DOMContentLoaded", function () {
+
+    ocultarLoadingOverlay();
     // Todos los formularios
     document.querySelectorAll("form").forEach(function (formulario) {
         formulario.addEventListener("submit", function (e) {

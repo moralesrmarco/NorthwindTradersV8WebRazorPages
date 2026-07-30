@@ -5,12 +5,13 @@
 }
 <h2>@ViewData["Title"]</h2>
 <a asp-page="Insertar"
+   asp-page-handler="Nueva"
    class="btn btn-sm btn-primary mb-3"
    data-show-overlay
    asp-route-returnUrl="@Url.Page("Index", new { pageIndex = Model.PageIndex })"
-   title="Nuevo producto">
-    <i class="bi bi-plus-circle"></i>
-    <span class="d-none d-md-inline"> Nueva venta</span>
+   title="Nueva venta">
+    <i class="bi bi-file-earmark-plus"></i>
+    <span class="d-none d-md-inline">Nueva venta</span>
 </a>
 <a asp-page="Buscar"
    class="btn btn-sm btn-buscar mb-3"
