@@ -45,6 +45,18 @@ namespace NorthwindTradersV8WebRazorPages.Pages.Ventas
             {
                 PropertyNamingPolicy = JsonNamingPolicy.CamelCase
             });
+        public bool VentaGuardada
+        {
+            get
+            {
+                return TempData["VentaGuardada"] != null;
+            }
+            set
+            {
+                if (value)
+                    value = true;
+            }
+        }
         public InsertarModel(IConfiguration configuration)
         {
             var connectionString = configuration.GetConnectionString("NorthwindConnection")
@@ -286,12 +298,12 @@ namespace NorthwindTradersV8WebRazorPages.Pages.Ventas
             // Guardar detalle
             // foreach(var d in lista)
             //     ventaDetalleBLL.Insertar(idVenta,d);
-
-            HttpContext.Session.Remove(SessionDetalleVenta);
-
+            
+            VentaGuardada = true;
             TempData["Mensaje"] = "La venta se registró correctamente.";
-
-            return RedirectToPage("Insertar");
+            Detalles = lista;
+            Totales = CalcularTotalesVenta(lista);
+            return Page();
         }
         public IActionResult OnPostNuevaVenta()
         {
@@ -329,6 +341,54 @@ namespace NorthwindTradersV8WebRazorPages.Pages.Ventas
             var json = JsonSerializer.Serialize(lista);
 
             HttpContext.Session.SetString(SessionDetalleVenta, json);
+        }
+        [IgnoreAntiforgeryToken]
+        public IActionResult OnPostEliminarDetalle([FromBody] int indice)
+        {
+            var lista = ObtenerDetalle();
+
+            if (indice < 0 || indice >= lista.Count)
+            {
+                return BadRequest("Producto no encontrado.");
+            }
+
+            lista.RemoveAt(indice);
+
+            GuardarDetalle(lista);
+
+            var totales = CalcularTotalesVenta(lista);
+
+            return new JsonResult(new
+            {
+                lista,
+                totales
+            });
+        }
+        [IgnoreAntiforgeryToken]
+        public IActionResult OnPostEditarDetalle([FromBody] int indice)
+        {
+            var lista = ObtenerDetalle();
+
+            if (indice < 0 || indice >= lista.Count)
+            {
+                return BadRequest("Producto no encontrado.");
+            }
+
+            var detalle = lista[indice];
+
+            // Lo quitamos temporalmente
+            lista.RemoveAt(indice);
+
+            GuardarDetalle(lista);
+
+            var totales = CalcularTotalesVenta(lista);
+
+            return new JsonResult(new
+            {
+                detalle,
+                lista,
+                totales
+            });
         }
     }
 }

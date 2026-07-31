@@ -9,7 +9,13 @@
 {
     <div asp-validation-summary="All" class="alert alert-danger"></div>
 }
-<form method="post" class="form">
+@if (TempData["Mensaje"] != null)
+{
+    <div class="alert alert-success">
+        @TempData["Mensaje"]
+    </div>
+}
+<form method="post" id="frmVenta" class="form">
 
     @if (TempData["Error"] != null)
     {
@@ -371,21 +377,21 @@
             </button>
 
             <button type="submit"
+                    id="btnNotaRemision"
                     asp-page-handler="NotaRemision"
                     class="btn btn-warning"
-                    title="Nota de remisión">
+                    title="Nota de remisión"
+                    disabled="@(Model.VentaGuardada)">
                 <i class="bi bi-printer"></i>
                 <span class="d-none d-md-inline">Nota de remisión</span>
             </button>
-
         </div>
     </fieldset>
     
 </form>
 @section Scripts {
-
     <script>
-        function cargarProductos(categoriaId)
+        function cargarProductos(categoriaId, productoSeleccionado)
         {
             $("#cboProducto").empty();
             // Si el usuario volvió a seleccionar "Seleccione"
@@ -408,6 +414,8 @@
                                 .text(item.text)
                         );
                     });
+                    if (productoSeleccionado)
+                        $("#cboProducto").val(productoSeleccionado);
                 });
         }
 
@@ -720,6 +728,63 @@
             $("#cboProducto").focus();
         }
 
+        function eliminarProducto(indice) {
+            if (!confirm("¿Desea eliminar este producto de la venta?"))
+                return;
+            $.ajax({
+                url: "?handler=EliminarDetalle",
+                type: "POST",
+                contentType: "application/json",
+                headers: {
+                    "RequestVerificationToken":
+                        $('input[name="__RequestVerificationToken"]').val()
+                },
+                data: JSON.stringify(indice),
+                success: function (r) {
+                    llenarTabla(r.lista);
+                    mostrarTotales(r.totales);
+                    if (r.lista.length == 0) {
+                        limpiarCapturaProducto();
+                    }
+                },
+                error: function (xhr) {
+                    alert(xhr.responseText);
+                }
+            });
+        }
+        
+        function editarProducto(indice) {
+            $.ajax({
+                url: "?handler=EditarDetalle",
+                type: "POST",
+                contentType: "application/json",
+                headers: {
+                    "RequestVerificationToken":
+                        $('input[name="__RequestVerificationToken"]').val()
+                },
+                data: JSON.stringify(indice),
+                success: function(r) {
+                    llenarTabla(r.lista);
+                    mostrarTotales(r.totales);
+                    // Cargar nuevamente la captura
+                    $("#cboCategoria").val(r.detalle.categoriaID);
+                    cargarProductos(
+                        r.detalle.categoriaID,
+                        r.detalle.productID
+                    );
+                    $("#Detalle_UnitPrice").val(r.detalle.unitPrice);
+                    $("#Detalle_UnitsInStock").val(r.detalle.unitsInStock);
+                    $("#Detalle_Quantity").val(r.detalle.quantity);
+                    $("#Detalle_Discount").val(r.detalle.discount * 100);
+                    calcularDetalle();
+                    $("#Detalle_Quantity").focus().select();
+                },
+                error: function(xhr) {
+                    alert(xhr.responseText);
+                }
+            });
+        }
+
         $("#btnLimpiarEnvio").click(function() {
             $("#cboCompañia").val("");
             $("#VentaVM_ShipName").val("");
@@ -759,22 +824,57 @@
             $(this).select();
         });
 
-        $("#btnGenerarVenta").click(function(e) {
-            if ($("#cboProducto").val() != "") {
-                e.preventDefault();
-                alert("Se ha seleccionado un producto y no lo ha agregado a la venta.");
-                $("#Detalle_Quantity").focus();
-            }
+        // Registrar qué botón envió el formulario
+        let botonSubmit = null;
+
+        $("#btnGenerarVenta, #btnNotaRemision, button[asp-page-handler='NuevaVenta']").on("click", function() {
+            botonSubmit = this.id;
+        });
+
+
+        $(document).on("click", ".btnEliminar", function() {
+            let indice = Number($(this).data("index"));
+            eliminarProducto(indice);
+        });
+
+        $(document).on("click", ".btnEditar", function() {
+            let indice = Number($(this).data("index"));
+            editarProducto(indice);
         });
 
         $("#btnAgregarProducto").click(function() {
             agregarProducto();
         });
 
+        $("#frmVenta").on("submit", function(e) {
+            // Existe un producto seleccionado que no se ha agregado
+            if ($("#cboProducto").val() != "") {
+                alert("Se ha seleccionado un producto y no lo ha agregado a la venta.");
+                $("#Detalle_Quantity").focus();
+                return false;
+            }
+            // Validaciones de jQuery Validate
+            if (!$(this).valid()) {
+                return true;
+            }
+            // Debe existir al menos un producto
+            if ($("#tblDetalle tr").length === 0) {
+                alert("Debe agregar al menos un producto.");
+                return false;
+            }
+            // Todas las validaciones pasaron
+            if (botonSubmit === "btnGenerarVenta") {
+                $("#btnGenerarVenta")
+                    .prop("disabled", true)
+                    .html('<i class="bi bi-hourglass-split"></i> Generando venta...');
+            } 
+            return true;
+        });
+
         var detalleVenta = @Html.Raw(Model.DetallesJson);
         if (detalleVenta.length > 0) {
             llenarTabla(detalleVenta);
         }
-        mostrarTotales(@Html.Raw(Model.TotalesJson));</script>
-
+        mostrarTotales(@Html.Raw(Model.TotalesJson));
+    </script>
 }
