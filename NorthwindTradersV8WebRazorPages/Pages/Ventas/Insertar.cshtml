@@ -362,8 +362,9 @@
                     asp-page-handler="GenerarVenta"
                     formnovalidate
                     class="btn btn-success"
-                    title="Generar venta">
-                <i class="bi bi-check-circle"></i>
+                    title="Generar venta"
+                    disabled="@(Model.VentaGuardada)">
+                <i class="bi bi-floppy"></i>
                 <span class="d-none d-md-inline"> Generar venta</span>
             </button>
 
@@ -381,7 +382,7 @@
                     asp-page-handler="NotaRemision"
                     class="btn btn-warning"
                     title="Nota de remisión"
-                    disabled="@(Model.VentaGuardada)">
+                    disabled="@(!Model.VentaGuardada)">
                 <i class="bi bi-printer"></i>
                 <span class="d-none d-md-inline">Nota de remisión</span>
             </button>
@@ -863,11 +864,6 @@
                 return false;
             }
             // Todas las validaciones pasaron
-            if (botonSubmit === "btnGenerarVenta") {
-                $("#btnGenerarVenta")
-                    .prop("disabled", true)
-                    .html('<i class="bi bi-hourglass-split"></i> Generando venta...');
-            } 
             return true;
         });
 

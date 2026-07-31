@@ -51,11 +51,6 @@ namespace NorthwindTradersV8WebRazorPages.Pages.Ventas
             {
                 return TempData["VentaGuardada"] != null;
             }
-            set
-            {
-                if (value)
-                    value = true;
-            }
         }
         public InsertarModel(IConfiguration configuration)
         {
@@ -298,8 +293,8 @@ namespace NorthwindTradersV8WebRazorPages.Pages.Ventas
             // Guardar detalle
             // foreach(var d in lista)
             //     ventaDetalleBLL.Insertar(idVenta,d);
-            
-            VentaGuardada = true;
+            // Simular tiempo de guardado de la venta
+            TempData["VentaGuardada"] = true;
             TempData["Mensaje"] = "La venta se registró correctamente.";
             Detalles = lista;
             Totales = CalcularTotalesVenta(lista);
