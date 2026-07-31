@@ -136,9 +136,16 @@
                 <div class="col-md-4 d-flex align-items-end">
                     <button type="button"
                             id="btnLimpiarEnvio"
-                            class="btn btn-warning">
+                            class="btn btn-sm btn-warning">
                         <i class="bi bi-eraser"></i>
                         Limpiar forma de envío
+                    </button>
+                    &nbsp;&nbsp;
+                    <button type="button"
+                            id="btnSeleccionarEnvio"
+                            class="btn btn-sm btn-primary">
+                        <i class="bi bi-check-square"></i>
+                        Seleccionar forma de envío
                     </button>
                 </div>
             </div>
@@ -182,7 +189,8 @@
                            class="form-control"
                            type="number"
                            step="1"
-                           min="0" />
+                           min="0" 
+                           max="95.00" />
                 </div>
                 <div class="col-md-2 d-flex align-items-end">
                     <button type="button"
@@ -356,42 +364,61 @@
             </div>
         </fieldset>
         <div class="d-flex justify-content-end gap-2 mb-3">
-
             <button type="submit"
                     id="btnGenerarVenta"
                     asp-page-handler="GenerarVenta"
                     formnovalidate
-                    class="btn btn-success"
+                    class="btn btn-sm btn-success"
                     title="Generar venta"
                     disabled="@(Model.VentaGuardada)">
                 <i class="bi bi-floppy"></i>
                 <span class="d-none d-md-inline"> Generar venta</span>
             </button>
-
             <button type="submit"
+                    id="btnNuevaVenta" 
                     asp-page-handler="NuevaVenta"
                     formnovalidate
-                    class="btn btn-primary"
+                    class="btn btn-sm btn-primary"
                     title="Nueva venta">
                 <i class="bi bi-file-earmark-plus"></i>
                 <span class="d-none d-md-inline"> Nueva venta</span>
             </button>
-
             <button type="submit"
                     id="btnNotaRemision"
                     asp-page-handler="NotaRemision"
-                    class="btn btn-warning"
+                    class="btn btn-sm btn-warning"
                     title="Nota de remisión"
                     disabled="@(!Model.VentaGuardada)">
                 <i class="bi bi-printer"></i>
                 <span class="d-none d-md-inline">Nota de remisión</span>
             </button>
+            <a href="@(Model.ReturnUrl ?? Url.Page("Index"))"
+               class="btn btn-sm btn-cancelar"
+               title="Cancelar">
+                <i class="bi bi-x-circle"></i>
+                <span class="d-none d-md-inline"> Cancelar</span>
+            </a>
         </div>
     </fieldset>
     
 </form>
 @section Scripts {
     <script>
+
+        $(function() {
+            // Mostrar overlay al cancelar
+            $('.btn-cancelar').on('click', function() {
+                mostrarLoadingOverlay();
+            });
+            // Ocultar overlay cuando la página se muestra nuevamente
+            window.addEventListener('pageshow', function() {
+                const overlay = document.getElementById('loadingOverlay');
+                if (overlay) {
+                    overlay.style.display = 'none';
+                }
+            });
+        });
+
         function cargarProductos(categoriaId, productoSeleccionado)
         {
             $("#cboProducto").empty();
@@ -550,6 +577,12 @@
                 Number($("#Detalle_UnitsInStock").val())) {
                 alert("La cantidad no puede ser mayor que las unidades en inventario.");
                 $("#Detalle_Quantity").focus().select();
+                return;
+            }
+            let descuento = Number($("#Detalle_Discount").val());
+            if (descuento < 0 || descuento > 95.00) {
+                alert("El descuento debe estar entre 0 y 95.00%.");
+                $("#Detalle_Discount").focus().select();
                 return;
             }
             // ===== VALIDAR PRODUCTO DUPLICADO =====
@@ -828,10 +861,9 @@
         // Registrar qué botón envió el formulario
         let botonSubmit = null;
 
-        $("#btnGenerarVenta, #btnNotaRemision, button[asp-page-handler='NuevaVenta']").on("click", function() {
+        $("#btnGenerarVenta, #btnNotaRemision, #btnNuevaVenta").on("click", function() {
             botonSubmit = this.id;
         });
-
 
         $(document).on("click", ".btnEliminar", function() {
             let indice = Number($(this).data("index"));
@@ -850,20 +882,30 @@
         $("#frmVenta").on("submit", function(e) {
             // Existe un producto seleccionado que no se ha agregado
             if ($("#cboProducto").val() != "") {
+                e.preventDefault();
+                e.stopImmediatePropagation();
                 alert("Se ha seleccionado un producto y no lo ha agregado a la venta.");
                 $("#Detalle_Quantity").focus();
                 return false;
             }
             // Validaciones de jQuery Validate
             if (!$(this).valid()) {
-                return true;
+                e.preventDefault();
+                e.stopImmediatePropagation();
+                return false;
             }
             // Debe existir al menos un producto
             if ($("#tblDetalle tr").length === 0) {
+                e.preventDefault();
+                e.stopImmediatePropagation(); 
                 alert("Debe agregar al menos un producto.");
                 return false;
             }
-            // Todas las validaciones pasaron
+            // Mostrar overlay solamente para Generar venta y Nota remisión
+            if (botonSubmit === "btnGenerarVenta" ||
+                botonSubmit === "btnNotaRemision") {
+                mostrarLoadingOverlay();
+            }            // Todas las validaciones pasaron
             return true;
         });
 

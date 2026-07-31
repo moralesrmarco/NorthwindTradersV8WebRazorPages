@@ -3,6 +3,8 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using NorthwindTradersV8WebRazorPages.BLL;
 using NorthwindTradersV8WebRazorPages.BLL.Services;
+using NorthwindTradersV8WebRazorPages.Common;
+using NorthwindTradersV8WebRazorPages.Entities;
 using NorthwindTradersV8WebRazorPages.ViewModels;
 using System.Text.Json;
 
@@ -11,7 +13,6 @@ namespace NorthwindTradersV8WebRazorPages.Pages.Ventas
     public class InsertarModel : PageModel
     {
         private readonly VentaBLL ventaBLL;
-        private readonly VentaDetalleBLL ventaDetalleBLL;
         private readonly ClienteService clienteService;
         private readonly EmpleadoService empleadoService;
         private readonly TransportistaService transportistaService;
@@ -59,7 +60,6 @@ namespace NorthwindTradersV8WebRazorPages.Pages.Ventas
             bool ejecutarTiempoDemora = configuration.GetValue<bool>("AppSettings:ejecutarTiempoDemora");
             int tiempoDemora = configuration.GetValue<int>("AppSettings:tiempoDemora");
             ventaBLL = new VentaBLL(connectionString, ejecutarTiempoDemora, tiempoDemora);
-            ventaDetalleBLL = new VentaDetalleBLL(connectionString);
             clienteService = new ClienteService(connectionString);
             empleadoService = new EmpleadoService(connectionString);
             transportistaService = new TransportistaService(connectionString);
@@ -234,26 +234,17 @@ namespace NorthwindTradersV8WebRazorPages.Pages.Ventas
                 TempData["Error"] = "Debe agregar al menos un producto a la venta.";
             }
             // Construir Fecha/Hora de la venta
-            DateTime? fechaHoraVenta = null;
-            if (VentaVM.OrderDate.HasValue && VentaVM.OrderTime.HasValue)
-            {
-                fechaHoraVenta = VentaVM.OrderDate.Value.Date + VentaVM.OrderTime.Value;
-            }
-
+            var fechaHoraVenta = CombinarFechaHora(
+                VentaVM.OrderDate,
+                VentaVM.OrderTime);
             // Construir Fecha/Hora requerida
-            DateTime? fechaHoraRequerido = null;
-            if (VentaVM.RequiredDate.HasValue && VentaVM.RequiredTime.HasValue)
-            {
-                fechaHoraRequerido = VentaVM.RequiredDate.Value.Date + VentaVM.RequiredTime.Value;
-            }
-
+            var fechaHoraRequerido = CombinarFechaHora(
+                VentaVM.RequiredDate,
+                VentaVM.RequiredTime);
             // Construir Fecha/Hora de envío
-            DateTime? fechaHoraEnvio = null;
-            if (VentaVM.ShippedDate.HasValue && VentaVM.ShippedTime.HasValue)
-            {
-                fechaHoraEnvio = VentaVM.ShippedDate.Value.Date + VentaVM.ShippedTime.Value;
-            }
-            // 1. Validar Requerido vs Venta
+            var fechaHoraEnvio = CombinarFechaHora(
+                VentaVM.ShippedDate,
+                VentaVM.ShippedTime);            // 1. Validar Requerido vs Venta
             if (fechaHoraVenta.HasValue &&
                 fechaHoraRequerido.HasValue &&
                 fechaHoraRequerido.Value < fechaHoraVenta.Value)
@@ -285,17 +276,24 @@ namespace NorthwindTradersV8WebRazorPages.Pages.Ventas
                 Totales = CalcularTotalesVenta(lista);
                 return Page();
             }
-
-            // Guardar la venta
-            // Guardar encabezado
-            // int idVenta = ventaBLL.Insertar(...);
-
-            // Guardar detalle
-            // foreach(var d in lista)
-            //     ventaDetalleBLL.Insertar(idVenta,d);
-            // Simular tiempo de guardado de la venta
+            var venta = ConstruirVenta(lista);
+            int orderId;
+            byte[] rowVersion;
+            ResultadoOperacion resultado =
+                ventaBLL.InsertarVentaCompleta(
+                    venta,
+                    out orderId,
+                    out rowVersion);
+            if (!resultado.Exito)
+            {
+                ModelState.AddModelError("", resultado.Mensaje);
+                Detalles = lista;
+                Totales = CalcularTotalesVenta(lista);
+                return Page();
+            }
+            HttpContext.Session.Remove(SessionDetalleVenta);
             TempData["VentaGuardada"] = true;
-            TempData["Mensaje"] = "La venta se registró correctamente.";
+            TempData["Mensaje"] = $"La venta N° {orderId} se registró correctamente.";
             Detalles = lista;
             Totales = CalcularTotalesVenta(lista);
             return Page();
@@ -384,6 +382,58 @@ namespace NorthwindTradersV8WebRazorPages.Pages.Ventas
                 lista,
                 totales
             });
+        }
+        private Venta ConstruirVenta(List<VentaDetalleViewModel> detalles)
+        {
+            var fechaHoraVenta = CombinarFechaHora(VentaVM.OrderDate, VentaVM.OrderTime);
+            var fechaHoraRequerido = CombinarFechaHora(VentaVM.RequiredDate, VentaVM.RequiredTime);
+            var fechaHoraEnvio = CombinarFechaHora(VentaVM.ShippedDate, VentaVM.ShippedTime);
+            var venta = new Venta
+            {
+                Cliente = new Cliente
+                {
+                    CustomerID = VentaVM.CustomerID
+                },
+                Empleado = new Empleado
+                {
+                    EmployeeID = VentaVM.EmployeeID.Value
+                },
+                Transportista = new Transportista
+                {
+                    ShipperID = VentaVM.ShipVia ?? 0
+                },
+                OrderDate = fechaHoraVenta,
+                RequiredDate = fechaHoraRequerido,
+                ShippedDate = fechaHoraEnvio,
+                ShipName = VentaVM.ShipName,
+                ShipAddress = VentaVM.ShipAddress,
+                ShipCity = VentaVM.ShipCity,
+                ShipRegion = VentaVM.ShipRegion,
+                ShipPostalCode = VentaVM.ShipPostalCode,
+                ShipCountry = VentaVM.ShipCountry,
+                Freight = VentaVM.Freight,
+                VentaDetalles = new List<VentaDetalle>()
+            };
+            foreach (var item in detalles)
+            {
+                venta.VentaDetalles.Add(new VentaDetalle
+                {
+                    Producto = new Producto
+                    {
+                        ProductID = item.ProductID!.Value 
+                    },
+                    Quantity = item.Quantity,
+                    UnitPrice = item.UnitPrice,
+                    Discount = item.Discount,
+                });
+            }
+            return venta;
+        }
+        private static DateTime? CombinarFechaHora(DateTime? fecha, TimeSpan? hora)
+        {
+            if (!fecha.HasValue)
+                return null;
+            return fecha.Value.Date + (hora ?? TimeSpan.Zero);
         }
     }
 }

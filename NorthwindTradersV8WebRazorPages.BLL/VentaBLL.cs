@@ -1,5 +1,6 @@
 ﻿using NorthwindTradersV8WebRazorPages.Common;
 using NorthwindTradersV8WebRazorPages.DAL;
+using NorthwindTradersV8WebRazorPages.Entities;
 using NorthwindTradersV8WebRazorPages.Entities.DTOs;
 using System.Data;
 
@@ -21,6 +22,19 @@ namespace NorthwindTradersV8WebRazorPages.BLL
             ventaDAL = new VentaDAL(connectionString);
             _ejecutarTiempoDemora = ejecutarTiempoDemora;
             _tiempoDemora = tiempoDemora;
+        }
+        public ResultadoOperacion InsertarVentaCompleta(Venta venta, out int orderId, out byte[] rowVersion)
+        {
+            var resultado = new ResultadoOperacion();
+            int numRegs = ventaDAL.InsertarVentaCompleta(venta, out orderId, out rowVersion);
+            resultado.Codigo = numRegs;
+            if (numRegs > 0)
+                resultado.Exito = true;
+            else
+                resultado.Mensaje = StringsCommons.Nfrs;
+            if (_ejecutarTiempoDemora)
+                Thread.Sleep(_tiempoDemora);
+            return resultado;
         }
         public ResultadoOperacion Eliminar(VentaDto venta)
         {
