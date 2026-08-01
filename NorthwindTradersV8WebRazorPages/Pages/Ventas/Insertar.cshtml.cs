@@ -435,5 +435,10 @@ namespace NorthwindTradersV8WebRazorPages.Pages.Ventas
                 return null;
             return fecha.Value.Date + (hora ?? TimeSpan.Zero);
         }
+        public JsonResult OnGetFormasEnvioCliente(string customerId)
+        {
+            var lista = ventaService.ObtenerFormasEnvio(customerId);
+            return new JsonResult(lista);
+        }
     }
 }

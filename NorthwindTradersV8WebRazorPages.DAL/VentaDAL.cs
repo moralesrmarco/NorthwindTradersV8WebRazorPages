@@ -171,12 +171,12 @@ namespace NorthwindTradersV8WebRazorPages.DAL
                     returnParameter.Direction = ParameterDirection.ReturnValue;
                     con.Open();
                     cmd.ExecuteNonQuery();
-                    paramProductoExcede.Value = paramProductoExcede.Value == DBNull.Value ? string.Empty : paramProductoExcede.Value; 
+                    paramProductoExcede.Value = paramProductoExcede.Value == DBNull.Value ? string.Empty : paramProductoExcede.Value;
                     numRegs = (int)returnParameter.Value;
                     productoExcede = paramProductoExcede.Value.ToString();
                 }
             }
-            catch (Exception ex) 
+            catch (Exception ex)
             {
                 throw new Exception("Error al eliminar la venta " + ex.Message);
             }
@@ -196,7 +196,7 @@ namespace NorthwindTradersV8WebRazorPages.DAL
                         var ds = new DataSet();
                         dap.Fill(ds);
                         totalRegistros = Convert.ToInt32(ds.Tables[0].Rows[0]["TotalRegistros"]);
-                        return ds.Tables[1]; 
+                        return ds.Tables[1];
                     }
                 }
             }
@@ -317,6 +317,55 @@ namespace NorthwindTradersV8WebRazorPages.DAL
                 throw new Exception("Error al obtener la información de envío: " + ex.Message);
             }
             return envioInformacion;
+        }
+        public List<EnvioInformacionDto> ObtenerFormasEnvio(string customerID)
+        {
+            List<EnvioInformacionDto> lista = new();
+            using (SqlConnection cn = new SqlConnection(connectionString))
+            {
+                using (SqlCommand cmd = new SqlCommand(
+                    "SpVentaObtenerFormasEnvio", cn))
+                {
+                    cmd.CommandType = CommandType.StoredProcedure;
+                    cmd.Parameters.AddWithValue(
+                        "@CustomerID",
+                        customerID
+                    );
+                    cn.Open();
+                    using (SqlDataReader dr = cmd.ExecuteReader())
+                    {
+                        while (dr.Read())
+                        {
+                            lista.Add(new EnvioInformacionDto
+                            {
+                                CompanyName = dr["CompanyName"].ToString() ?? "",
+                                ShipName = dr["ShipName"] == DBNull.Value
+                                    ? null
+                                    : dr["ShipName"].ToString(),
+                                ShipAddress = dr["ShipAddress"] == DBNull.Value
+                                    ? null
+                                    : dr["ShipAddress"].ToString(),
+                                ShipCity = dr["ShipCity"] == DBNull.Value
+                                    ? null
+                                    : dr["ShipCity"].ToString(),
+                                ShipRegion = dr["ShipRegion"] == DBNull.Value
+                                    ? null
+                                    : dr["ShipRegion"].ToString(),
+                                ShipPostalCode = dr["ShipPostalCode"] == DBNull.Value
+                                    ? null
+                                    : dr["ShipPostalCode"].ToString(),
+                                ShipCountry = dr["ShipCountry"] == DBNull.Value
+                                    ? null
+                                    : dr["ShipCountry"].ToString(),
+                                ShipVia = dr["ShipVia"] == DBNull.Value
+                                    ? null
+                                    : Convert.ToInt32(dr["ShipVia"])
+                            });
+                        }
+                    }
+                }
+            }
+            return lista;
         }
     }
 }

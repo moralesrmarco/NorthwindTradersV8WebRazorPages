@@ -402,8 +402,56 @@
             </a>
         </div>
     </fieldset>
-    
 </form>
+<div class="modal fade"
+     id="modalFormasEnvio"
+     tabindex="-1"
+     aria-labelledby="modalFormasEnvioLabel"
+     aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalFormasEnvioLabel">
+                    Seleccionar forma de envío
+                </h5>
+                <button type="button"
+                        class="btn-close"
+                        data-bs-dismiss="modal">
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="table-responsive">
+                    <table id="tblFormasEnvio"
+                        class="table table-bordered table-hover table-striped align-middle"
+                        style="font-size:0.65rem;">
+                        <thead class="table-light">
+                            <tr>
+                                <th class="text-center">Compañía transportista</th>
+                                <th class="text-center">Enviar a</th>
+                                <th class="text-center">Domicilio</th>
+                                <th class="text-center">Ciudad</th>
+                                <th class="text-center">Región</th>
+                                <th class="text-center">Código postal</th>
+                                <th class="text-center">País</th>
+                                <th class="d-none"></th>
+                                <th class="text-center" width="100">Acción</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tbodyFormasEnvio">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button"
+                        class="btn btn-secondary"
+                        data-bs-dismiss="modal">
+                    Cerrar
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
 @section Scripts {
     <script>
 
@@ -821,6 +869,76 @@
             });
         }
 
+        function cargarFormasEnvio() {
+            let customerId = $("#cboCliente").val();
+            if (customerId == "") {
+                alert("Debe seleccionar un cliente.");
+                return;
+            }
+            $.getJSON(
+                "?handler=FormasEnvioCliente",
+                { customerId: customerId },
+                function(lista) {
+                    llenarTablaFormasEnvio(lista);
+                    new bootstrap.Modal(
+                        document.getElementById("modalFormasEnvio")
+                    ).show();
+                }
+            );
+        }
+
+        function llenarTablaFormasEnvio(lista) {
+            let html = "";
+            lista.forEach(function(item, indice) {
+                html += `
+                <tr>
+                    <td>${item.companyName ?? ""}</td>
+                    <td>${item.shipName ?? ""}</td>
+                    <td>${item.shipAddress ?? ""}</td>
+                    <td>${item.shipCity ?? ""}</td>
+                    <td>${item.shipRegion ?? ""}</td>
+                    <td>${item.shipPostalCode ?? ""}</td>
+                    <td>${item.shipCountry ?? ""}</td>
+                    <td class="d-none">${item.shipVia}</td>
+                    <td class="text-center">
+                        <button
+                            type="button"
+                            class="btn btn-sm btn-primary btnSeleccionar"
+                            data-index="${indice}">
+                            Seleccionar
+                        </button>
+                    </td>
+                </tr>`;
+            });
+            $("#tbodyFormasEnvio").html(html);
+        }
+        $(document).on("click", ".btnSeleccionar", function() {
+            let indice = $(this).data("index");
+            let fila = $("#tbodyFormasEnvio tr")
+                .eq(indice);
+            $("#VentaVM_ShipName")
+                .val(fila.find("td:eq(1)").text());
+            $("#VentaVM_ShipAddress")
+                .val(fila.find("td:eq(2)").text());
+            $("#VentaVM_ShipCity")
+                .val(fila.find("td:eq(3)").text());
+            $("#VentaVM_ShipRegion")
+                .val(fila.find("td:eq(4)").text());
+            $("#VentaVM_ShipPostalCode")
+                .val(fila.find("td:eq(5)").text());
+            $("#VentaVM_ShipCountry")
+                .val(fila.find("td:eq(6)").text());
+            // Seleccionar compañía transportista
+            let shipVia = fila.find("td:eq(7)").text();
+            $("#cboCompañia")
+                .val(shipVia)
+                .trigger("change");
+            let modal = bootstrap.Modal.getInstance(
+                document.getElementById("modalFormasEnvio")
+            );
+            modal.hide();
+        });
+
         $("#btnLimpiarEnvio").click(function() {
             $("#cboCompañia").val("");
             $("#VentaVM_ShipName").val("");
@@ -910,11 +1028,14 @@
             }            // Todas las validaciones pasaron
             return true;
         });
-
+        $("#btnSeleccionarEnvio").click(function() {
+            cargarFormasEnvio();
+        });
         var detalleVenta = @Html.Raw(Model.DetallesJson);
         if (detalleVenta.length > 0) {
             llenarTabla(detalleVenta);
         }
         mostrarTotales(@Html.Raw(Model.TotalesJson));
+
     </script>
 }

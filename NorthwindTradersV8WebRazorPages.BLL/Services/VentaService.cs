@@ -14,5 +14,9 @@ namespace NorthwindTradersV8WebRazorPages.BLL.Services
         {
             return ventaDAL.ObtenerUltimaInformacionDeEnvio(customerId);
         }
+        public List<EnvioInformacionDto> ObtenerFormasEnvio(string customerId)
+        {
+            return ventaDAL.ObtenerFormasEnvio(customerId);
+        }
     }
 }

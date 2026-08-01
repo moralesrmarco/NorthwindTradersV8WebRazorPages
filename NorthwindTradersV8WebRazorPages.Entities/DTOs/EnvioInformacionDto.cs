@@ -2,6 +2,7 @@
 {
     public class EnvioInformacionDto
     {
+        public string CompanyName { get; set; } = ""; 
         public string? ShipName { get; set; }
         public string? ShipAddress { get; set; }
         public string? ShipCity { get; set; }
