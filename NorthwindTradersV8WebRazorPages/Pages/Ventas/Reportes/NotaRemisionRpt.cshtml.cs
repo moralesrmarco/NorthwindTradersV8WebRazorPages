@@ -3,6 +3,9 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Reporting.NETCore;
 using NorthwindTradersV8WebRazorPages.BLL;
 using System.Data;
+using PdfSharpCore.Pdf;
+using PdfSharpCore.Pdf.IO;
+using NorthwindTradersV8WebRazorPages.Helpers;
 
 namespace NorthwindTradersV8WebRazorPages.Pages.Ventas.Reportes
 {
@@ -38,6 +41,9 @@ namespace NorthwindTradersV8WebRazorPages.Pages.Ventas.Reportes
             {
                 report.LoadReportDefinition(stream);
             }
+            //=========================================
+            // Datos (se obtienen UNA sola vez)
+            //=========================================
             DataTable dtDummy = new DataTable("DataSetDummy");
             dtDummy.Columns.Add("Dummy_", typeof(int));
             dtDummy.Rows.Add(1);
@@ -45,6 +51,9 @@ namespace NorthwindTradersV8WebRazorPages.Pages.Ventas.Reportes
             if (venta == null)
                 throw new Exception($"No se encontró la venta con OrderID = {orderId}");
             var detalle = ventaDetalleBLL.ObtenerVentaDetallePorVentaId(orderId);
+            //=========================================
+            // REPORTE CLIENTE
+            //=========================================
             report.DataSources.Add(
                 new ReportDataSource("DataSetDummy", dtDummy));
             report.DataSources.Add(
@@ -57,8 +66,35 @@ namespace NorthwindTradersV8WebRazorPages.Pages.Ventas.Reportes
                 new ReportParameter("FechaHora", $"Fecha: {strFecha}"),
                 new ReportParameter("Para", "Para: Cliente.")
             });
-            byte[] pdf = report.Render("PDF");
-            return File(pdf, "application/pdf");
+            byte[] pdfCliente = report.Render("PDF");
+            //=========================================
+            // REPORTE CONTROL INTERNO
+            //=========================================
+            report.DataSources.Clear();
+            report.DataSources.Add(
+                new ReportDataSource("DataSetDummy", dtDummy));
+            report.DataSources.Add(
+                new ReportDataSource("DataSetVenta", venta));
+            report.DataSources.Add(
+                new ReportDataSource("DataSet1", detalle));
+            report.SetParameters(new[]
+            {
+                new ReportParameter("PedidoId", orderId.ToString()),
+                new ReportParameter("FechaHora", $"Fecha: {strFecha}"),
+                new ReportParameter("Para", "Para: Control interno.")
+            });
+            byte[] pdfControl = report.Render("PDF");
+            //=========================================
+            // COMBINAR
+            //=========================================
+            var helper = new ReporteServicePdfHelper();
+            byte[] pdfFinal = helper.CombinarPDFs(
+                new[]
+                {
+                    pdfCliente,
+                    pdfControl
+                });
+            return File(pdfFinal, "application/pdf");
         }
     }
 }
