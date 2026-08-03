@@ -1,7 +1,7 @@
 ﻿using Microsoft.Reporting.NETCore;
 using PdfSharpCore.Pdf;
 using PdfSharpCore.Pdf.IO;
-
+// se necesita instalar el paquete PdfSharpCore desde NuGet
 namespace NorthwindTradersV8WebRazorPages.Helpers
 {
     public class ReporteServicePdfHelper

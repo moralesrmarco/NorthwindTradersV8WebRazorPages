@@ -3,8 +3,6 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Reporting.NETCore;
 using NorthwindTradersV8WebRazorPages.BLL;
 using System.Data;
-using PdfSharpCore.Pdf;
-using PdfSharpCore.Pdf.IO;
 using NorthwindTradersV8WebRazorPages.Helpers;
 
 namespace NorthwindTradersV8WebRazorPages.Pages.Ventas.Reportes
