@@ -46,13 +46,15 @@ namespace NorthwindTradersV8WebRazorPages.Pages.Ventas
             {
                 PropertyNamingPolicy = JsonNamingPolicy.CamelCase
             });
-        public bool VentaGuardada
+        public bool VentaGuardada 
         {
             get
             {
                 return TempData["VentaGuardada"] != null;
             }
         }
+        [BindProperty]
+        public int OrderID { get; set; }
         public InsertarModel(IConfiguration configuration)
         {
             var connectionString = configuration.GetConnectionString("NorthwindConnection")
@@ -292,6 +294,9 @@ namespace NorthwindTradersV8WebRazorPages.Pages.Ventas
                 return Page();
             }
             HttpContext.Session.Remove(SessionDetalleVenta);
+            OrderID = orderId;
+            // Elimina el valor antiguo (0)
+            ModelState.Remove(nameof(OrderID));
             TempData["VentaGuardada"] = true;
             TempData["Mensaje"] = $"La venta N° {orderId} se registró correctamente.";
             Detalles = lista;
@@ -305,20 +310,19 @@ namespace NorthwindTradersV8WebRazorPages.Pages.Ventas
         }
         //public IActionResult OnPostNotaRemision()
         //{
-        //    if (_detalleTemporal.Count == 0)
+        //    if (OrderID <= 0)
         //    {
-        //        TempData["Error"] = "Debe agregar productos.";
-        //        CargarCombos();
+        //        ModelState.AddModelError(
+        //            string.Empty,
+        //            "No se encontró el número de la venta guardada.");
         //        return Page();
         //    }
-
-        //    //Guardar
-
-        //    //Generar PDF
-
-        //    return File(pdfBytes,
-        //                "application/pdf",
-        //                "NotaRemision.pdf");
+        //    return RedirectToPage(
+        //        "/Ventas/Reportes/NotaRemisionRpt",
+        //        new
+        //        {
+        //            orderId = OrderID
+        //        });
         //}
         private List<VentaDetalleViewModel> ObtenerDetalle()
         {
