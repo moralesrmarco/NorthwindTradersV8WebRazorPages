@@ -112,5 +112,61 @@ namespace NorthwindTradersV8WebRazorPages.BLL
             dt.Rows.Add(dr);
             return dt;
         }
+        public Venta? ObtenerVentaPorId2(int orderId)
+        {
+            if (_ejecutarTiempoDemora)
+                Thread.Sleep(_tiempoDemora);
+            return ventaDAL.ObtenerVentaPorId2(orderId);
+        }
+        public byte[] ActualizarEncabezado(ActualizarEncabezadoRequest request)
+        {
+            var rowVersion = Convert.FromBase64String(request.RowVersion);
+            DateTime? orderDate = CombinarFechaHora(
+                request.OrderDate,
+                request.OrderTime);
+            DateTime? requiredDate = CombinarFechaHora(
+                request.RequiredDate,
+                request.RequiredTime);
+            DateTime? shippedDate = CombinarFechaHora(
+                request.ShippedDate,
+                request.ShippedTime);
+            return ventaDAL.ActualizarEncabezado(
+                request.OrderID,
+                request.CustomerID,
+                request.EmployeeID,
+                orderDate,
+                requiredDate,
+                shippedDate,
+                rowVersion);
+        }
+        private DateTime? CombinarFechaHora(
+            DateTime? fecha,
+            string? hora)
+        {
+            if (!fecha.HasValue)
+                return null;
+            if (TimeSpan.TryParse(hora, out TimeSpan tiempo))
+            {
+                return fecha.Value.Date.Add(tiempo);
+            }
+            return fecha.Value.Date;
+        }
+        public byte[] ActualizarEnvio(
+            ActualizarEnvioRequest request)
+        {
+            var rowVersion =
+                Convert.FromBase64String(request.RowVersion);
+            return ventaDAL.ActualizarEnvio(
+                request.OrderID,
+                request.ShipName,
+                request.ShipAddress,
+                request.ShipCity,
+                request.ShipRegion,
+                request.ShipPostalCode,
+                request.ShipCountry,
+                request.ShipVia,
+                request.Freight,
+                rowVersion);
+        }
     }
 }

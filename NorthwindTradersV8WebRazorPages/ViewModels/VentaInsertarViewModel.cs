@@ -4,6 +4,7 @@ namespace NorthwindTradersV8WebRazorPages.ViewModels
 {
     public class VentaInsertarViewModel
     {
+        public int OrderID { get; set; }
         [Required(ErrorMessage = "Debe seleccionar un cliente.")]
         public string? CustomerID { get; set; } = "";
         [Range(1, int.MaxValue,
@@ -24,6 +25,7 @@ namespace NorthwindTradersV8WebRazorPages.ViewModels
         public string? ShipPostalCode { get; set; }
         public string? ShipCountry { get; set; }
         public decimal Freight { get; set; }
+        public byte[]? RowVersion { get; set; }
         public List<VentaDetalleViewModel> Detalles { get; set; } = new();
     }
 }

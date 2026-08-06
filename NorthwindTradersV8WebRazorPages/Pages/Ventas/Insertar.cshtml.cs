@@ -303,27 +303,6 @@ namespace NorthwindTradersV8WebRazorPages.Pages.Ventas
             Totales = CalcularTotalesVenta(lista);
             return Page();
         }
-        public IActionResult OnPostNuevaVenta()
-        {
-            HttpContext.Session.Remove(SessionDetalleVenta);
-            return RedirectToPage();
-        }
-        //public IActionResult OnPostNotaRemision()
-        //{
-        //    if (OrderID <= 0)
-        //    {
-        //        ModelState.AddModelError(
-        //            string.Empty,
-        //            "No se encontró el número de la venta guardada.");
-        //        return Page();
-        //    }
-        //    return RedirectToPage(
-        //        "/Ventas/Reportes/NotaRemisionRpt",
-        //        new
-        //        {
-        //            orderId = OrderID
-        //        });
-        //}
         private List<VentaDetalleViewModel> ObtenerDetalle()
         {
             var json = HttpContext.Session.GetString(SessionDetalleVenta);

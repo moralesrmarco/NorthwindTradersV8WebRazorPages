@@ -35,7 +35,13 @@ namespace NorthwindTradersV8WebRazorPages.DAL
                                 Producto = new Producto
                                 {
                                     ProductID = rdr.GetInt32(rdr.GetOrdinal("ProductID")),
-                                    ProductName = rdr.IsDBNull(rdr.GetOrdinal("ProductName")) ? null : rdr.GetString(rdr.GetOrdinal("ProductName"))
+                                    ProductName = rdr.IsDBNull(rdr.GetOrdinal("ProductName")) ? null : rdr.GetString(rdr.GetOrdinal("ProductName")),
+                                    Categoria = rdr.IsDBNull(rdr.GetOrdinal("CategoryID"))
+                                        ? null
+                                        : new Categoria
+                                        {
+                                            CategoryID = rdr.GetInt32(rdr.GetOrdinal("CategoryID"))
+                                        }
                                 },
                                 UnitPrice = rdr.GetDecimal(rdr.GetOrdinal("UnitPrice")),
                                 Quantity = rdr.GetInt16(rdr.GetOrdinal("Quantity")),
