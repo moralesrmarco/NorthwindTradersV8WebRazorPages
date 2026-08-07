@@ -44,7 +44,8 @@ namespace NorthwindTradersV8WebRazorPages.Entities
         // Tasa de IVA (ej. 0.16 = 16%)
         //public decimal TasaIVA => Utils.TasaIVA; // no es necesario redondear tasa porque ya es exacto.
 
-        public decimal TasaIVA => 0.16m; //ConfiguracionFiscal.TasaIVA;
+        //public decimal TasaIVA => 0.16m; //ConfiguracionFiscal.TasaIVA;
+        public decimal TasaIVA { get; set; } = 0.16m;
 
         // Base sin IVA (separando el impuesto del precio con IVA)
         // Precio unitario sin IVA después del descuento

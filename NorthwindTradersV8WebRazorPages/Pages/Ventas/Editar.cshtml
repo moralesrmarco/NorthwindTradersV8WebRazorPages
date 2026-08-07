@@ -761,15 +761,21 @@
                 return;
             }
             // ===== FIN VALIDACIÓN =====
-            let detalle = {
-                categoriaID: Number($("#cboCategoria").val()),
-                productID: Number($("#cboProducto").val()),
-                productName: $("#cboProducto option:selected").text(),
-                unitPrice: Number($("#Detalle_UnitPrice").val()),
-                unitsInStock: Number($("#Detalle_UnitsInStock").val()),
-                quantity: Number($("#Detalle_Quantity").val()),
-                discount: Number($("#Detalle_Discount").val()) / 100
+            // ===== CREAR REQUEST PARA EL BACKEND =====
+            let request = {
+                OrderID: Number($("#VentaVM_OrderID").val()),
+                RowVersion: $("#VentaVM_RowVersion").val(),
+                Detalle: {
+                    CategoriaID: Number($("#cboCategoria").val()),
+                    ProductID: Number($("#cboProducto").val()),
+                    ProductName: $("#cboProducto option:selected").text(),
+                    UnitPrice: Number($("#Detalle_UnitPrice").val()),
+                    UnitsInStock: Number($("#Detalle_UnitsInStock").val()),
+                    Quantity: Number($("#Detalle_Quantity").val()),
+                    Discount: Number($("#Detalle_Discount").val()) / 100
+                }
             };
+
             $.ajax({
                 url: "?handler=AgregarDetalle",
                 type: "POST",
@@ -779,14 +785,24 @@
                     "RequestVerificationToken":
                         $('input[name="__RequestVerificationToken"]').val()
                 },
-                data: JSON.stringify(detalle),
+                data: JSON.stringify(request),
 
                 success: function(r) {
-                    if (r.lista && r.lista.length > 0) {
+                    console.log("Respuesta completa:", r);
+                    console.log("Lista recibida:", r.lista);
+                    if (r.success) {
+                        // Actualizar RowVersion de la venta
+                        $("#VentaVM_RowVersion").val(r.rowVersion);
+                        // Actualizar tabla con los datos reales de la BD
                         llenarTabla(r.lista);
+                        // Actualizar totales
                         mostrarTotales(r.totales);
+                        // Limpiar captura del producto
                         limpiarCapturaProducto();
                     }
+                    else {
+                        alert(r.message);
+                    } 
                 },
                 error: function(xhr) {
                     alert(xhr.responseText);
@@ -1057,6 +1073,8 @@
             $("#VentaVM_ShipPostalCode").val("");
             $("#VentaVM_ShipCountry").val("");
             $("#VentaVM_Freight").val(0);
+            // Guardar inmediatamente los cambios en la BD
+            actualizarEnvio();
         });
 
         $("#cboCategoria").change(function() {

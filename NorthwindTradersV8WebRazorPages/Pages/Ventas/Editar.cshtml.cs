@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using NorthwindTradersV8WebRazorPages.BLL;
 using NorthwindTradersV8WebRazorPages.BLL.Services;
 using NorthwindTradersV8WebRazorPages.Common;
+using NorthwindTradersV8WebRazorPages.Entities;
 using NorthwindTradersV8WebRazorPages.Entities.DTOs;
 using NorthwindTradersV8WebRazorPages.ViewModels;
 using System.Text.Json;
@@ -121,6 +122,7 @@ namespace NorthwindTradersV8WebRazorPages.Pages.Ventas
                 Quantity = d.Quantity,
                 Discount = d.Discount
             }).ToList();
+            GuardarDetalle(Detalles);
             Totales = CalcularTotalesVenta(Detalles);
             return Page();
         }
@@ -250,6 +252,120 @@ namespace NorthwindTradersV8WebRazorPages.Pages.Ventas
                     mensaje = ex.Message
                 });
             }
+        }
+        public JsonResult OnGetFormasEnvioCliente(string customerId)
+        {
+            var lista = ventaService.ObtenerFormasEnvio(customerId);
+            return new JsonResult(lista);
+        }
+        public IActionResult OnPostEditarDetalle([FromBody] int indice)
+        {
+            var lista = ObtenerDetalle();
+            if (indice < 0 || indice >= lista.Count)
+            {
+                return BadRequest("Producto no encontrado.");
+            }
+            var detalle = lista[indice];
+            // Lo quitamos temporalmente
+            lista.RemoveAt(indice);
+            GuardarDetalle(lista);
+            var totales = CalcularTotalesVenta(lista);
+            return new JsonResult(new
+            {
+                detalle,
+                lista,
+                totales
+            });
+        }
+        private List<VentaDetalleViewModel> ObtenerDetalle()
+        {
+            var json = HttpContext.Session.GetString(SessionDetalleVenta);
+            if (string.IsNullOrEmpty(json))
+                return new List<VentaDetalleViewModel>();
+            return JsonSerializer.Deserialize<List<VentaDetalleViewModel>>(json)!;
+        }
+        private void GuardarDetalle(List<VentaDetalleViewModel> lista)
+        {
+            var json = JsonSerializer.Serialize(lista);
+            HttpContext.Session.SetString(SessionDetalleVenta, json);
+        }
+        public JsonResult OnPostAgregarDetalle([FromBody] AgregarDetalleRequest request)
+        {
+            try
+            {
+                if (!request.Detalle.ProductID.HasValue)
+                {
+                    return new JsonResult(new
+                    {
+                        success = false,
+                        message = "Debe seleccionar un producto x."
+                    });
+                }
+                var detalle = new VentaDetalle
+                {
+                    Venta = new Venta
+                    {
+                        OrderID = request.OrderID,
+                        RowVersion = string.IsNullOrEmpty(request.RowVersion)
+                            ? null
+                            : Convert.FromBase64String(request.RowVersion)
+                    },
+                    Producto = new Producto
+                    {
+                        ProductID = request.Detalle.ProductID.Value
+                    },
+                    UnitPrice = request.Detalle.UnitPrice,
+                    Quantity = request.Detalle.Quantity,
+                    Discount = request.Detalle.Discount,
+                    TasaIVA = request.Detalle.TasaIVA
+                };
+                ventaDetalleBLL.InsertarDetalle(detalle);
+                // El DAL ya actualizó este valor después del SP
+                VentaVM.RowVersion = detalle.Venta.RowVersion;
+                // Obtener datos actuales desde BD
+                var lista = ventaDetalleBLL
+                            .ObtenerDetallesPorVentaId(request.OrderID);
+                var listaViewModel = lista.Select(x => new VentaDetalleViewModel
+                {
+                    ProductID = x.Producto.ProductID,
+                    ProductName = x.Producto.ProductName,
+                    Quantity = x.Quantity,
+                    UnitPrice = x.UnitPrice,
+                    Discount = x.Discount,
+                    TasaIVA = x.TasaIVA
+                }).ToList();
+                var totales = CalcularTotalesVenta(listaViewModel);
+                return new JsonResult(new
+                {
+                    success = true,
+                    rowVersion = Convert.ToBase64String(
+                        detalle.Venta.RowVersion),
+                    lista = listaViewModel,
+                    totales
+                });
+            }
+            catch (Exception ex)
+            {
+                return new JsonResult(new
+                {
+                    success = false,
+                    message = ex.Message
+                });
+            }
+        }
+        public JsonResult OnGetProductosPorCategoria(int categoriaId)
+        {
+            var productos = productoService.ObtenerProductosPorCategoriaCbo(categoriaId);
+            return new JsonResult(productos);
+        }
+        public JsonResult OnGetProductoCostoEInventario(int productId)
+        {
+            var producto = productoService.ObtenerProductoCostoEInventario(productId);
+            return new JsonResult(producto);
+        }
+        public JsonResult OnPostCalcularDetalle([FromBody] VentaDetalleViewModel detalle)
+        {
+            return new JsonResult(detalle);
         }
     }
 }

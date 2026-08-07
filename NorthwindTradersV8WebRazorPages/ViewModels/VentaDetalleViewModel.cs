@@ -9,7 +9,7 @@
         public short UnitsInStock { get; set; }
         public short Quantity { get; set; }
         public decimal Discount { get; set; }
-        public decimal TasaIVA => 0.16m; //ConfiguracionFiscal.TasaIVA;
+        public decimal TasaIVA { get; set; } = 0.16m; //ConfiguracionFiscal.TasaIVA;
         // Base sin IVA (separando el impuesto del precio con IVA)
         // Precio unitario sin IVA después del descuento
         public decimal PrecioBaseSinIva => Math.Round(PrecioPorUnidadConIVADespuesDescuento / (1 + TasaIVA), 2, MidpointRounding.AwayFromZero);
