@@ -988,33 +988,71 @@
             });
         }
 
-        function editarProducto(indice) {
+        function editarProducto(productID, rowVersion) {
+
+            let request = {
+                OrderID: Number($("#VentaVM_OrderID").val()),
+
+                ProductID: productID,
+
+                RowVersion: rowVersion
+            };
+
             $.ajax({
                 url: "?handler=EditarDetalle",
+
                 type: "POST",
-                contentType: "application/json",
+
+                contentType: "application/json; charset=utf-8",
+
                 headers: {
                     "RequestVerificationToken":
                         $('input[name="__RequestVerificationToken"]').val()
                 },
-                data: JSON.stringify(indice),
+
+                data: JSON.stringify(request),
+
                 success: function(r) {
-                    llenarTabla(r.lista);
-                    mostrarTotales(r.totales);
-                    // Cargar nuevamente la captura
-                    $("#cboCategoria").val(r.detalle.categoriaID);
-                    cargarProductos(
-                        r.detalle.categoriaID,
-                        r.detalle.productID
-                    );
-                    $("#Detalle_UnitPrice").val(r.detalle.unitPrice);
-                    $("#Detalle_UnitsInStock").val(r.detalle.unitsInStock);
-                    $("#Detalle_Quantity").val(r.detalle.quantity);
-                    $("#Detalle_Discount").val(r.detalle.discount * 100);
-                    calcularDetalle();
-                    $("#Detalle_Quantity").focus().select();
+
+                    if (r.success) {
+
+                        llenarTabla(r.lista);
+
+                        mostrarTotales(r.totales);
+
+                        $("#cboCategoria")
+                            .val(r.detalle.categoriaID);
+
+                        cargarProductos(
+                            r.detalle.categoriaID,
+                            r.detalle.productID
+                        );
+
+                        $("#Detalle_UnitPrice")
+                            .val(r.detalle.unitPrice);
+
+                        $("#Detalle_UnitsInStock")
+                            .val(r.detalle.unitsInStock);
+
+                        $("#Detalle_Quantity")
+                            .val(r.detalle.quantity);
+
+                        $("#Detalle_Discount")
+                            .val(r.detalle.discount * 100);
+
+                        calcularDetalle();
+
+                        $("#Detalle_Quantity")
+                            .focus()
+                            .select();
+                    }
+                    else {
+                        alert(r.message);
+                    }
                 },
+
                 error: function(xhr) {
+                    console.error(xhr);
                     alert(xhr.responseText);
                 }
             });
