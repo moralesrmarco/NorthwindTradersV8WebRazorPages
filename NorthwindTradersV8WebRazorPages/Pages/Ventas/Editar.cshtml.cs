@@ -120,7 +120,10 @@ namespace NorthwindTradersV8WebRazorPages.Pages.Ventas
                 CategoriaID = d.Producto.Categoria?.CategoryID,
                 UnitPrice = d.UnitPrice,
                 Quantity = d.Quantity,
-                Discount = d.Discount
+                Discount = d.Discount,
+                RowVersion = d.RowVersion == null
+                    ? null
+                    : Convert.ToBase64String(d.RowVersion)
             }).ToList();
             GuardarDetalle(Detalles);
             Totales = CalcularTotalesVenta(Detalles);
@@ -332,7 +335,10 @@ namespace NorthwindTradersV8WebRazorPages.Pages.Ventas
                     Quantity = x.Quantity,
                     UnitPrice = x.UnitPrice,
                     Discount = x.Discount,
-                    TasaIVA = x.TasaIVA
+                    TasaIVA = x.TasaIVA,
+                    RowVersion = x.RowVersion == null
+                        ? null
+                        : Convert.ToBase64String(x.RowVersion)
                 }).ToList();
                 var totales = CalcularTotalesVenta(listaViewModel);
                 return new JsonResult(new
@@ -366,6 +372,106 @@ namespace NorthwindTradersV8WebRazorPages.Pages.Ventas
         public JsonResult OnPostCalcularDetalle([FromBody] VentaDetalleViewModel detalle)
         {
             return new JsonResult(detalle);
+        }
+        public JsonResult OnPostEliminarDetalle(
+            [FromBody] EliminarDetalleRequest request)
+        {
+            try
+            {
+                if (request == null)
+                {
+                    return new JsonResult(new
+                    {
+                        success = false,
+                        message = "Datos inválidos."
+                    });
+                }
+                if (request.OrderID <= 0)
+                {
+                    return new JsonResult(new
+                    {
+                        success = false,
+                        message = "El OrderID no es válido."
+                    });
+                }
+                if (request.ProductID <= 0)
+                {
+                    return new JsonResult(new
+                    {
+                        success = false,
+                        message = "El ProductID no es válido."
+                    });
+                }
+                if (string.IsNullOrWhiteSpace(request.RowVersion))
+                {
+                    return new JsonResult(new
+                    {
+                        success = false,
+                        message = "No se recibió la RowVersion del detalle."
+                    });
+                }
+                if (string.IsNullOrWhiteSpace(request.VentaRowVersion))
+                {
+                    return new JsonResult(new
+                    {
+                        success = false,
+                        message = "No se recibió la RowVersion de la venta."
+                    });
+                }
+                var detalle = new VentaDetalle
+                {
+                    Venta = new Venta
+                    {
+                        OrderID = request.OrderID,
+
+                        RowVersion = Convert.FromBase64String(request.VentaRowVersion)
+                    },
+                    Producto = new Producto
+                    {
+                        ProductID = request.ProductID
+                    },
+                    RowVersion = Convert.FromBase64String(request.RowVersion)
+                };
+                ventaDetalleBLL.EliminarDetalle(detalle);
+                // Actualizar RowVersion de la venta
+                VentaVM.RowVersion =
+                    detalle.Venta.RowVersion;
+                // Obtener datos actuales desde BD
+                var lista = ventaDetalleBLL
+                    .ObtenerDetallesPorVentaId(request.OrderID);
+                var listaViewModel = lista.Select(x =>
+                    new VentaDetalleViewModel
+                    {
+                        ProductID = x.Producto.ProductID,
+                        ProductName = x.Producto.ProductName,
+                        Quantity = x.Quantity,
+                        UnitPrice = x.UnitPrice,
+                        Discount = x.Discount,
+                        TasaIVA = x.TasaIVA,
+                        RowVersion = x.RowVersion == null
+                            ? null
+                            : Convert.ToBase64String(
+                                x.RowVersion)
+                    }).ToList();
+                var totales =
+                    CalcularTotalesVenta(listaViewModel);
+                return new JsonResult(new
+                {
+                    success = true,
+                    rowVersion = Convert.ToBase64String(
+                        detalle.Venta.RowVersion),
+                    lista = listaViewModel,
+                    totales
+                });
+            }
+            catch (Exception ex)
+            {
+                return new JsonResult(new
+                {
+                    success = false,
+                    message = ex.Message
+                });
+            }
         }
     }
 }

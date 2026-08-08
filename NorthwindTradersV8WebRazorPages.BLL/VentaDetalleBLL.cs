@@ -34,5 +34,9 @@ namespace NorthwindTradersV8WebRazorPages.BLL
         {
             return ventaDetalleDAL.ObtenerDetallesPorVentaId(orderID);
         }
+        public void EliminarDetalle(VentaDetalle detalle)
+        {
+            ventaDetalleDAL.EliminarDetalle(detalle);
+        }
     }
 }

@@ -4,6 +4,7 @@
     {
         public int OrderID { get; set; }
         public int ProductID { get; set; }
-        public string RowVersionStr { get; set; } = string.Empty;
+        public string? RowVersion { get; set; }
+        public string? VentaRowVersion { get; set; }
     }
 }

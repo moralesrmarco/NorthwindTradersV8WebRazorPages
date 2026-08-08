@@ -811,6 +811,7 @@
         }
 
         function llenarTabla(lista) {
+            console.log("LISTA RECIBIDA:", lista);
             let html = "";
             lista.forEach(function(item, indice) {
                 html += `
@@ -861,12 +862,15 @@
                                 <td class="text-center">
                                     <button type="button"
                                             class="btn btn-sm btn-warning btnEditar"
-                                            data-index="${indice}">
+                                            data-product-id="${item.productID}"
+                                            data-row-version="${item.rowVersion}">
                                         <i class="bi bi-pencil"></i>
                                     </button>
                                     <button type="button"
                                             class="btn btn-sm btn-danger btnEliminar"
-                                            data-index="${indice}">
+                                            data-index="${indice}"
+                                            data-product-id="${item.productID}"
+                                            data-row-version="${item.rowVersion}">                  
                                         <i class="bi bi-trash"></i>
                                     </button>
                                 </td>
@@ -937,27 +941,49 @@
             $("#cboProducto").focus();
         }
 
-        function eliminarProducto(indice) {
-            if (!confirm("¿Desea eliminar este producto de la venta?"))
+        function eliminarProducto(productID, rowVersion) {
+            if (!confirm("¿Está seguro de eliminar este producto?")) {
                 return;
+            }
+            let request = {
+                OrderID: Number($("#VentaVM_OrderID").val()),
+                ProductID: productID,
+                RowVersion: rowVersion,
+                VentaRowVersion: $("#VentaVM_RowVersion").val()
+            };
+            console.log("Request eliminar detalle:");
+            console.log(request);
             $.ajax({
-                url: "?handler=EliminarDetalle",
                 type: "POST",
-                contentType: "application/json",
+                url: "?handler=EliminarDetalle",
+                contentType: "application/json; charset=utf-8",
                 headers: {
                     "RequestVerificationToken":
                         $('input[name="__RequestVerificationToken"]').val()
                 },
-                data: JSON.stringify(indice),
+                data: JSON.stringify(request),
                 success: function(r) {
-                    llenarTabla(r.lista);
-                    mostrarTotales(r.totales);
-                    if (r.lista.length == 0) {
-                        limpiarCapturaProducto();
+                    console.log("Respuesta eliminar:");
+                    console.log(r);
+                    if (r.success) {
+                        // Actualizar RowVersion de Orders
+                        $("#VentaVM_RowVersion")
+                            .val(r.rowVersion);
+                        // Actualizar tabla
+                        llenarTabla(r.lista);
+                        // Actualizar totales
+                        mostrarTotales(r.totales);
+                    }
+                    else {
+
+                        alert(r.message);
                     }
                 },
                 error: function(xhr) {
-                    alert(xhr.responseText);
+                    console.error(xhr);
+                    alert(
+                        "Ocurrió un error al eliminar el detalle."
+                    );
                 }
             });
         }
@@ -1113,13 +1139,20 @@
         });
 
         $(document).on("click", ".btnEliminar", function() {
-            let indice = Number($(this).data("index"));
-            eliminarProducto(indice);
+            const productID = Number($(this).data("product-id"));
+            const rowVersion = $(this).data("row-version");
+            eliminarProducto(productID, rowVersion);
         });
 
         $(document).on("click", ".btnEditar", function() {
-            let indice = Number($(this).data("index"));
-            editarProducto(indice);
+            const productID =
+                Number($(this).data("product-id"));
+            const rowVersion =
+                $(this).data("row-version");
+            editarProducto(
+                productID,
+                rowVersion
+            );
         });
 
         $("#btnAgregarProducto").click(function() {
