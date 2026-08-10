@@ -204,6 +204,13 @@
                         <i class="bi bi-plus-lg"></i>
                         <span class="d-none d-md-inline"> Agregar</span>
                     </button>
+                    <button type="button"
+                            id="btnCancelarEdicion"
+                            class="btn btn-sm btn-secondary ms-2 d-none"
+                            title="Cancelar edición">
+                        <i class="bi bi-x-circle"></i>
+                        <span class="d-none d-md-inline"> Cancelar</span>
+                    </button>
                 </div>
             </div>
             <div class="row mb-3">
@@ -580,7 +587,7 @@
             });
         });
 
-        function cargarProductos(categoriaId, productoSeleccionado) {
+        function cargarProductos(categoriaId, productoSeleccionado, alTerminar) {
             $("#cboProducto").empty();
             // Si el usuario volvió a seleccionar "Seleccione"
             if (categoriaId == "") {
@@ -589,6 +596,8 @@
                         .val("")
                         .text("»--- Seleccione una categoría ---«")
                 );
+                if (alTerminar)
+                    alTerminar();
                 return;
             }
             $.getJSON(
@@ -604,6 +613,8 @@
                     });
                     if (productoSeleccionado)
                         $("#cboProducto").val(productoSeleccionado);
+                    if (alTerminar)
+                        alTerminar();
                 });
         }
 
@@ -715,6 +726,8 @@
                 }
             });
         }
+
+        let detalleEnEdicion = null;
 
         function agregarProducto() {
             if ($("#cboCategoria").val() == "") {
@@ -989,73 +1002,127 @@
         }
 
         function editarProducto(productID, rowVersion) {
-
-            let request = {
+            const request = {
                 OrderID: Number($("#VentaVM_OrderID").val()),
-
                 ProductID: productID,
-
                 RowVersion: rowVersion
             };
-
             $.ajax({
-                url: "?handler=EditarDetalle",
-
+                url: "?handler=ObtenerDetalleEditar",
                 type: "POST",
-
                 contentType: "application/json; charset=utf-8",
-
+                contentType: "application/json",
                 headers: {
                     "RequestVerificationToken":
                         $('input[name="__RequestVerificationToken"]').val()
                 },
-
                 data: JSON.stringify(request),
-
                 success: function(r) {
-
                     if (r.success) {
-
-                        llenarTabla(r.lista);
-
-                        mostrarTotales(r.totales);
-
-                        $("#cboCategoria")
-                            .val(r.detalle.categoriaID);
-
+                        detalleEnEdicion = {
+                            productID: r.detalle.productID,
+                            rowVersion: r.detalle.rowVersion
+                        };
+                        $("#cboCategoria").val(r.detalle.categoriaID);
                         cargarProductos(
                             r.detalle.categoriaID,
-                            r.detalle.productID
+                            r.detalle.productID,
+                            function() {
+                                $("#Detalle_UnitPrice")
+                                    .val(r.detalle.unitPrice);
+                                $("#Detalle_UnitsInStock")
+                                    .val(r.detalle.unitsInStock);
+                                $("#Detalle_Quantity")
+                                    .val(r.detalle.quantity);
+                                $("#Detalle_Discount")
+                                    .val(r.detalle.discount * 100);
+                                $("#cboCategoria, #cboProducto")
+                                    .prop("disabled", true);
+                                $("#btnAgregarProducto")
+                                    .attr("title", "Guardar cambios")
+                                    .find("span")
+                                    .text(" Guardar cambios");
+                                $("#btnAgregarProducto i")
+                                    .attr("class", "bi bi-floppy");
+                                $("#btnCancelarEdicion")
+                                    .removeClass("d-none");
+                                calcularDetalle();
+                                $("#Detalle_Quantity").focus().select();
+                            }
                         );
-
-                        $("#Detalle_UnitPrice")
-                            .val(r.detalle.unitPrice);
-
-                        $("#Detalle_UnitsInStock")
-                            .val(r.detalle.unitsInStock);
-
-                        $("#Detalle_Quantity")
-                            .val(r.detalle.quantity);
-
-                        $("#Detalle_Discount")
-                            .val(r.detalle.discount * 100);
-
-                        calcularDetalle();
-
-                        $("#Detalle_Quantity")
-                            .focus()
-                            .select();
                     }
                     else {
                         alert(r.message);
                     }
                 },
-
                 error: function(xhr) {
                     console.error(xhr);
                     alert(xhr.responseText);
                 }
             });
+        }
+
+        function actualizarDetalle() {
+            const quantity = Number($("#Detalle_Quantity").val());
+            const discount = Number($("#Detalle_Discount").val()) / 100;
+            if (quantity <= 0) {
+                alert("La cantidad debe ser mayor que 0.");
+                $("#Detalle_Quantity").focus().select();
+                return;
+            }
+            if (discount < 0 || discount > 0.95) {
+                alert("El descuento debe estar entre 0 y 95.00%.");
+                $("#Detalle_Discount").focus().select();
+                return;
+            }
+
+            const request = {
+                OrderID: Number($("#VentaVM_OrderID").val()),
+                ProductID: detalleEnEdicion.productID,
+                Quantity: quantity,
+                Discount: discount,
+                VentaDetalleRowVersion: detalleEnEdicion.rowVersion,
+                VentaRowVersion: $("#VentaVM_RowVersion").val()
+            };
+            $.ajax({
+                url: "?handler=ActualizarDetalle",
+                type: "POST",
+                contentType: "application/json",
+                headers: {
+                    "RequestVerificationToken":
+                        $('input[name="__RequestVerificationToken"]').val()
+                },
+                data: JSON.stringify(request),
+                success: function(r) {
+                    if (r.success) {
+                        $("#VentaVM_RowVersion").val(r.rowVersion);
+                        llenarTabla(r.lista);
+                        mostrarTotales(r.totales);
+                        salirModoEdicion();
+                    }
+                    else {
+                        alert(r.message);
+                    }
+                },
+                error: function(xhr) {
+                    console.error(xhr);
+                    alert("Ocurrió un error al actualizar el detalle.");
+                }
+            });
+        }
+
+        function salirModoEdicion() {
+            detalleEnEdicion = null;
+            $("#cboCategoria, #cboProducto").prop("disabled", false);
+            $("#btnAgregarProducto")
+                .attr("title", "Agregar")
+                .find("span")
+                .text(" Agregar");
+            $("#btnAgregarProducto i").attr("class", "bi bi-plus-lg");
+            $("#btnCancelarEdicion").addClass("d-none");
+            $("#cboCategoria").val("");
+            cargarProductos("");
+            limpiarCapturaProducto();
         }
 
         function cargarFormasEnvio() {
@@ -1194,7 +1261,16 @@
         });
 
         $("#btnAgregarProducto").click(function() {
-            agregarProducto();
+            if (detalleEnEdicion) {
+                actualizarDetalle();
+            }
+            else {
+                agregarProducto();
+            }
+        });
+
+        $("#btnCancelarEdicion").click(function() {
+            salirModoEdicion();
         });
 
         $("#frmVenta").on("submit", function(e) {

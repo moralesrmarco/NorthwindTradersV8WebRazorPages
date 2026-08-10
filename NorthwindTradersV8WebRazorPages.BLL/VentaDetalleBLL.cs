@@ -38,5 +38,9 @@ namespace NorthwindTradersV8WebRazorPages.BLL
         {
             ventaDetalleDAL.EliminarDetalle(detalle);
         }
+        public void ActualizarDetalle(VentaDetalle detalle)
+        {
+            ventaDetalleDAL.ActualizarDetalle(detalle);
+        }
     }
 }

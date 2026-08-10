@@ -33,7 +33,6 @@ namespace NorthwindTradersV8WebRazorPages.Pages.Ventas
         [BindProperty]
         public VentaDetalleViewModel Detalle { get; set; } = new();
         public List<VentaDetalleViewModel> Detalles { get; set; } = new();
-        private const string SessionDetalleVenta = "DetalleVenta";
         [BindProperty]
         public VentaTotalesViewModel Totales { get; set; } = new();
         public string DetallesJson => JsonSerializer.Serialize(
@@ -112,20 +111,8 @@ namespace NorthwindTradersV8WebRazorPages.Pages.Ventas
                 Freight = venta.Freight ?? 0m,
                 RowVersion = venta.RowVersion
             };
-            var detalles = ventaDetalleBLL.ObtenerVentaDetallePorVentaId(id);
-            Detalles = detalles.Select(d => new VentaDetalleViewModel
-            {
-                ProductID = d.Producto.ProductID,
-                ProductName = d.Producto.ProductName,
-                CategoriaID = d.Producto.Categoria?.CategoryID,
-                UnitPrice = d.UnitPrice,
-                Quantity = d.Quantity,
-                Discount = d.Discount,
-                RowVersion = d.RowVersion == null
-                    ? null
-                    : Convert.ToBase64String(d.RowVersion)
-            }).ToList();
-            GuardarDetalle(Detalles);
+            var detalles = ventaDetalleBLL.ObtenerDetallesPorVentaId(id);
+            Detalles = CrearListaViewModel(detalles);
             Totales = CalcularTotalesVenta(Detalles);
             return Page();
         }
@@ -261,36 +248,86 @@ namespace NorthwindTradersV8WebRazorPages.Pages.Ventas
             var lista = ventaService.ObtenerFormasEnvio(customerId);
             return new JsonResult(lista);
         }
-        public IActionResult OnPostEditarDetalle([FromBody] int indice)
+        public JsonResult OnPostObtenerDetalleEditar(
+            [FromBody] ObtenerDetalleEditarRequest request)
         {
-            var lista = ObtenerDetalle();
-            if (indice < 0 || indice >= lista.Count)
+            try
             {
-                return BadRequest("Producto no encontrado.");
+                if (request == null || request.OrderID <= 0 || request.ProductID <= 0)
+                {
+                    return new JsonResult(new
+                    {
+                        success = false,
+                        message = "Los datos del detalle no son válidos."
+                    });
+                }
+                if (string.IsNullOrWhiteSpace(request.RowVersion))
+                {
+                    return new JsonResult(new
+                    {
+                        success = false,
+                        message = "No se recibió la RowVersion del detalle."
+                    });
+                }
+
+                var rowVersion = Convert.FromBase64String(request.RowVersion);
+                var detalle = ventaDetalleBLL
+                    .ObtenerDetallesPorVentaId(request.OrderID)
+                    .FirstOrDefault(d => d.Producto.ProductID == request.ProductID);
+                if (detalle == null)
+                {
+                    return new JsonResult(new
+                    {
+                        success = false,
+                        message = "El detalle ya no existe."
+                    });
+                }
+                if (detalle.RowVersion == null ||
+                    !detalle.RowVersion.SequenceEqual(rowVersion))
+                {
+                    return new JsonResult(new
+                    {
+                        success = false,
+                        message = "El detalle fue modificado por otro usuario."
+                    });
+                }
+
+                var producto = productoService
+                    .ObtenerProductoCostoEInventario(request.ProductID);
+                if (producto == null)
+                {
+                    return new JsonResult(new
+                    {
+                        success = false,
+                        message = "El producto ya no existe."
+                    });
+                }
+
+                return new JsonResult(new
+                {
+                    success = true,
+                    detalle = new VentaDetalleViewModel
+                    {
+                        CategoriaID = detalle.Producto.Categoria?.CategoryID,
+                        ProductID = detalle.Producto.ProductID,
+                        ProductName = detalle.Producto.ProductName,
+                        UnitPrice = detalle.UnitPrice,
+                        UnitsInStock = producto.UnitsInStock,
+                        Quantity = detalle.Quantity,
+                        Discount = detalle.Discount,
+                        TasaIVA = detalle.TasaIVA,
+                        RowVersion = Convert.ToBase64String(detalle.RowVersion)
+                    }
+                });
             }
-            var detalle = lista[indice];
-            // Lo quitamos temporalmente
-            lista.RemoveAt(indice);
-            GuardarDetalle(lista);
-            var totales = CalcularTotalesVenta(lista);
-            return new JsonResult(new
+            catch (Exception ex)
             {
-                detalle,
-                lista,
-                totales
-            });
-        }
-        private List<VentaDetalleViewModel> ObtenerDetalle()
-        {
-            var json = HttpContext.Session.GetString(SessionDetalleVenta);
-            if (string.IsNullOrEmpty(json))
-                return new List<VentaDetalleViewModel>();
-            return JsonSerializer.Deserialize<List<VentaDetalleViewModel>>(json)!;
-        }
-        private void GuardarDetalle(List<VentaDetalleViewModel> lista)
-        {
-            var json = JsonSerializer.Serialize(lista);
-            HttpContext.Session.SetString(SessionDetalleVenta, json);
+                return new JsonResult(new
+                {
+                    success = false,
+                    message = ex.Message
+                });
+            }
         }
         public JsonResult OnPostAgregarDetalle([FromBody] AgregarDetalleRequest request)
         {
@@ -328,18 +365,7 @@ namespace NorthwindTradersV8WebRazorPages.Pages.Ventas
                 // Obtener datos actuales desde BD
                 var lista = ventaDetalleBLL
                             .ObtenerDetallesPorVentaId(request.OrderID);
-                var listaViewModel = lista.Select(x => new VentaDetalleViewModel
-                {
-                    ProductID = x.Producto.ProductID,
-                    ProductName = x.Producto.ProductName,
-                    Quantity = x.Quantity,
-                    UnitPrice = x.UnitPrice,
-                    Discount = x.Discount,
-                    TasaIVA = x.TasaIVA,
-                    RowVersion = x.RowVersion == null
-                        ? null
-                        : Convert.ToBase64String(x.RowVersion)
-                }).ToList();
+                var listaViewModel = CrearListaViewModel(lista);
                 var totales = CalcularTotalesVenta(listaViewModel);
                 return new JsonResult(new
                 {
@@ -372,6 +398,69 @@ namespace NorthwindTradersV8WebRazorPages.Pages.Ventas
         public JsonResult OnPostCalcularDetalle([FromBody] VentaDetalleViewModel detalle)
         {
             return new JsonResult(detalle);
+        }
+        public JsonResult OnPostActualizarDetalle(
+            [FromBody] ActualizarDetalleRequest request)
+        {
+            try
+            {
+                if (request == null || request.OrderID <= 0)
+                    return ErrorDetalle("El OrderID no es válido.");
+                if (request.ProductID <= 0)
+                    return ErrorDetalle("El ProductID no es válido.");
+                if (request.Quantity <= 0)
+                    return ErrorDetalle("La cantidad debe ser mayor que cero.");
+                if (request.Discount < 0 || request.Discount > 0.95m)
+                    return ErrorDetalle("El descuento debe estar entre 0 y 95.00%.");
+                if (string.IsNullOrWhiteSpace(request.VentaDetalleRowVersion))
+                    return ErrorDetalle("No se recibió la RowVersion del detalle.");
+                if (string.IsNullOrWhiteSpace(request.VentaRowVersion))
+                    return ErrorDetalle("No se recibió la RowVersion de la venta.");
+
+                var detalle = new VentaDetalle
+                {
+                    Venta = new Venta
+                    {
+                        OrderID = request.OrderID,
+                        RowVersion = Convert.FromBase64String(
+                            request.VentaRowVersion)
+                    },
+                    Producto = new Producto
+                    {
+                        ProductID = request.ProductID
+                    },
+                    Quantity = request.Quantity,
+                    Discount = request.Discount,
+                    RowVersion = Convert.FromBase64String(
+                        request.VentaDetalleRowVersion)
+                };
+
+                ventaDetalleBLL.ActualizarDetalle(detalle);
+
+                var ventaActualizada = ventaBLL.ObtenerVentaPorId2(
+                    request.OrderID);
+                if (ventaActualizada?.RowVersion == null)
+                    throw new Exception(
+                        "No se pudo obtener la RowVersion actualizada de la venta.");
+
+                var lista = ventaDetalleBLL
+                    .ObtenerDetallesPorVentaId(request.OrderID);
+                var listaViewModel = CrearListaViewModel(lista);
+                var totales = CalcularTotalesVenta(listaViewModel);
+
+                return new JsonResult(new
+                {
+                    success = true,
+                    rowVersion = Convert.ToBase64String(
+                        ventaActualizada.RowVersion),
+                    lista = listaViewModel,
+                    totales
+                });
+            }
+            catch (Exception ex)
+            {
+                return ErrorDetalle(ex.Message);
+            }
         }
         public JsonResult OnPostEliminarDetalle(
             [FromBody] EliminarDetalleRequest request)
@@ -439,20 +528,7 @@ namespace NorthwindTradersV8WebRazorPages.Pages.Ventas
                 // Obtener datos actuales desde BD
                 var lista = ventaDetalleBLL
                     .ObtenerDetallesPorVentaId(request.OrderID);
-                var listaViewModel = lista.Select(x =>
-                    new VentaDetalleViewModel
-                    {
-                        ProductID = x.Producto.ProductID,
-                        ProductName = x.Producto.ProductName,
-                        Quantity = x.Quantity,
-                        UnitPrice = x.UnitPrice,
-                        Discount = x.Discount,
-                        TasaIVA = x.TasaIVA,
-                        RowVersion = x.RowVersion == null
-                            ? null
-                            : Convert.ToBase64String(
-                                x.RowVersion)
-                    }).ToList();
+                var listaViewModel = CrearListaViewModel(lista);
                 var totales =
                     CalcularTotalesVenta(listaViewModel);
                 return new JsonResult(new
@@ -472,6 +548,31 @@ namespace NorthwindTradersV8WebRazorPages.Pages.Ventas
                     message = ex.Message
                 });
             }
+        }
+        private JsonResult ErrorDetalle(string message)
+        {
+            return new JsonResult(new
+            {
+                success = false,
+                message
+            });
+        }
+        private static List<VentaDetalleViewModel> CrearListaViewModel(
+            List<VentaDetalle> lista)
+        {
+            return lista.Select(x => new VentaDetalleViewModel
+            {
+                CategoriaID = x.Producto.Categoria?.CategoryID,
+                ProductID = x.Producto.ProductID,
+                ProductName = x.Producto.ProductName,
+                Quantity = x.Quantity,
+                UnitPrice = x.UnitPrice,
+                Discount = x.Discount,
+                TasaIVA = x.TasaIVA,
+                RowVersion = x.RowVersion == null
+                    ? null
+                    : Convert.ToBase64String(x.RowVersion)
+            }).ToList();
         }
     }
 }

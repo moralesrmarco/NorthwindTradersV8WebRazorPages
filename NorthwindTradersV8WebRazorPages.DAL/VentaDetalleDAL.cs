@@ -111,7 +111,13 @@ namespace NorthwindTradersV8WebRazorPages.DAL
                     Producto = new Producto
                     {
                         ProductID = (int)dr["ProductID"],
-                        ProductName = dr["ProductName"].ToString()
+                        ProductName = dr["ProductName"].ToString(),
+                        Categoria = dr["CategoryID"] == DBNull.Value
+                            ? null
+                            : new Categoria
+                            {
+                                CategoryID = Convert.ToInt32(dr["CategoryID"])
+                            }
                     },
                     UnitPrice = (decimal)dr["UnitPrice"],
                     Quantity = (short)dr["Quantity"],
@@ -197,6 +203,80 @@ namespace NorthwindTradersV8WebRazorPages.DAL
                     + ex.Message);
             }
         }
+        public void ActualizarDetalle(VentaDetalle detalle)
+        {
+            try
+            {
+                if (detalle.Venta == null)
+                    throw new ArgumentException(
+                        "La venta no está especificada.");
+                if (detalle.Producto == null)
+                    throw new ArgumentException(
+                        "El producto no está especificado.");
+                if (detalle.Venta.OrderID <= 0)
+                    throw new ArgumentException(
+                        "La venta no tiene un OrderID válido.");
+                if (detalle.Producto.ProductID <= 0)
+                    throw new ArgumentException(
+                        "El producto no tiene un ProductID válido.");
+                if (detalle.Quantity <= 0)
+                    throw new ArgumentException(
+                        "La cantidad debe ser mayor que cero.");
+                if (detalle.Discount < 0 || detalle.Discount > 0.95m)
+                    throw new ArgumentException(
+                        "El descuento debe estar entre 0 y 95.00%.");
+                if (detalle.RowVersion == null)
+                    throw new ArgumentException(
+                        "El detalle no tiene una RowVersion válida.");
+                if (detalle.Venta.RowVersion == null)
+                    throw new ArgumentException(
+                        "La venta no tiene una RowVersion válida.");
+
+                using SqlConnection cn = new(connectionString);
+                using SqlCommand cmd = new(
+                    "SpVentaDetalleActualizar",
+                    cn);
+                cmd.CommandType = CommandType.StoredProcedure;
+                cmd.Parameters.Add("@OrderID", SqlDbType.Int).Value =
+                    detalle.Venta.OrderID;
+                cmd.Parameters.Add("@ProductID", SqlDbType.Int).Value =
+                    detalle.Producto.ProductID;
+                cmd.Parameters.Add("@Quantity", SqlDbType.SmallInt).Value =
+                    detalle.Quantity;
+                cmd.Parameters.Add("@Discount", SqlDbType.Real).Value =
+                    Convert.ToSingle(detalle.Discount);
+                cmd.Parameters.Add(
+                    "@VentaDetalleRowVersion",
+                    SqlDbType.Binary,
+                    8).Value = detalle.RowVersion;
+                cmd.Parameters.Add(
+                    "@VentaRowVersion",
+                    SqlDbType.Binary,
+                    8).Value = detalle.Venta.RowVersion;
+                SqlParameter pReturnValue = new()
+                {
+                    ParameterName = "@RETURN_VALUE",
+                    SqlDbType = SqlDbType.Int,
+                    Direction = ParameterDirection.ReturnValue
+                };
+                cmd.Parameters.Add(pReturnValue);
+
+                cn.Open();
+                cmd.ExecuteNonQuery();
+                int resultado = (int)pReturnValue.Value;
+                if (resultado != 1)
+                {
+                    throw new Exception(
+                        ObtenerMensajeActualizarDetalle(resultado));
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(
+                    "Error al actualizar el detalle de la venta: "
+                    + ex.Message);
+            }
+        }
         private string ObtenerMensajeEliminarDetalle(int codigo)
         {
             return codigo switch
@@ -210,6 +290,22 @@ namespace NorthwindTradersV8WebRazorPages.DAL
                 -8 => "El inventario resultaría negativo.",
                 -99 => "Ocurrió un error inesperado al eliminar el detalle.",
                 _ => $"No se pudo eliminar el detalle. Código: {codigo}."
+            };
+        }
+        private string ObtenerMensajeActualizarDetalle(int codigo)
+        {
+            return codigo switch
+            {
+                -1 => "El detalle ya no existe.",
+                -2 => "El detalle fue modificado por otro usuario.",
+                -3 => "La venta ya no existe.",
+                -4 => "La venta fue modificada por otro usuario.",
+                -5 => "La cantidad del detalle no es válida.",
+                -6 => "No hay inventario suficiente para actualizar el detalle.",
+                -7 => "El inventario excedería el límite permitido.",
+                -8 => "El inventario resultaría negativo.",
+                -99 => "Ocurrió un error inesperado al actualizar el detalle.",
+                _ => $"No se pudo actualizar el detalle. Código: {codigo}."
             };
         }
     }
