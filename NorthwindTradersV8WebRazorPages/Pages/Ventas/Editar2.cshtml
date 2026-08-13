@@ -18,7 +18,8 @@
 }
 <form method="post" id="frmVenta" class="form">
     <div id="validationSummary"
-         class="text-danger">
+         class="alert alert-danger"
+         style="display:none">
     </div>
     @if (TempData["Error"] != null)
     {
@@ -386,15 +387,13 @@
             </div>
         </fieldset>
         <div class="d-flex justify-content-end gap-2 mb-3">
-            <button type="submit"
-                    id="btnNuevaVenta"
-                    asp-page-handler="NuevaVenta"
-                    formnovalidate
-                    class="btn btn-sm btn-primary"
-                    title="Nueva venta">
+            <a asp-page="./Insertar"
+               id="btnNuevaVenta"
+               class="btn btn-sm btn-primary"
+               title="Nueva venta">
                 <i class="bi bi-file-earmark-plus"></i>
                 <span class="d-none d-md-inline"> Nueva venta</span>
-            </button>
+            </a>
             <button type="button"
                     id="btnNotaRemision"
                     class="btn btn-sm btn-warning"
@@ -472,19 +471,15 @@
         function mostrarErrorValidacion(mensaje) {
             const summary = $("#validationSummary");
             summary
-                .removeClass("validation-summary-valid")
-                .addClass("validation-summary-errors");
-            summary.html(
-                "<ul><li>" + mensaje + "</li></ul>"
-            );
+                .html("<ul><li>" + mensaje + "</li></ul>")
+                .show();
         }
 
         function limpiarErrorValidacion() {
             const summary = $("#validationSummary");
             summary
-                .removeClass("alert alert-danger")
-                .addClass("d-none")
-                .empty();
+                .html("")
+                .hide();
         }
 
         function bloquearEdicionPorConcurrencia() {

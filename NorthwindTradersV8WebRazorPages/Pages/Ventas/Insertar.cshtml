@@ -376,15 +376,13 @@
                 <i class="bi bi-floppy"></i>
                 <span class="d-none d-md-inline"> Generar venta</span>
             </button>
-            <button type="submit"
-                    id="btnNuevaVenta" 
-                    asp-page-handler="NuevaVenta"
-                    formnovalidate
-                    class="btn btn-sm btn-primary"
-                    title="Nueva venta">
+            <a asp-page="./Insertar"
+               id="btnNuevaVenta"
+               class="btn btn-sm btn-primary"
+               title="Nueva venta">
                 <i class="bi bi-file-earmark-plus"></i>
                 <span class="d-none d-md-inline"> Nueva venta</span>
-            </button>
+            </a>
             <button type="button"
                     id="btnNotaRemision"                    
                     class="btn btn-sm btn-warning"
