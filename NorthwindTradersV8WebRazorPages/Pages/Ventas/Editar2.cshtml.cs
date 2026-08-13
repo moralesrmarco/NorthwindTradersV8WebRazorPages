@@ -5,6 +5,7 @@ using NorthwindTradersV8WebRazorPages.BLL;
 using NorthwindTradersV8WebRazorPages.BLL.Services;
 using NorthwindTradersV8WebRazorPages.Common;
 using NorthwindTradersV8WebRazorPages.Entities;
+using NorthwindTradersV8WebRazorPages.Entities.DTOs;
 using NorthwindTradersV8WebRazorPages.ViewModels;
 using System.Text.Json;
 
@@ -197,6 +198,133 @@ namespace NorthwindTradersV8WebRazorPages.Pages.Ventas
                     ? null
                     : Convert.ToBase64String(x.RowVersion)
             }).ToList();
+        }
+        public IActionResult OnPostActualizarEncabezado(
+            [FromBody] ActualizarEncabezadoRequest request)
+        {
+            try
+            {
+                var resultado =
+                    ventaBLL.ActualizarEncabezado2(request);
+                switch (resultado.Codigo)
+                {
+                    case 1:
+                        return new JsonResult(new
+                        {
+                            ok = true,
+                            rowVersion = resultado.RowVersion == null
+                                ? null
+                                : Convert.ToBase64String(
+                                    resultado.RowVersion)
+                        });
+
+                    case -1:
+                        return new JsonResult(new
+                        {
+                            ok = false,
+                            codigo = -1,
+                            mensaje = "La venta fue eliminada previamente por otro usuario."
+                        });
+
+                    case -2:
+                        return new JsonResult(new
+                        {
+                            ok = false,
+                            codigo = -2,
+                            mensaje = "La venta fue modificada previamente por otro usuario."
+                        });
+
+                    case -99:
+                        return new JsonResult(new
+                        {
+                            ok = false,
+                            codigo = -99,
+                            mensaje = "Ocurrió un error al actualizar la venta."
+                        });
+
+                    default:
+                        return new JsonResult(new
+                        {
+                            ok = false,
+                            codigo = resultado.Codigo,
+                            mensaje = "No se pudo actualizar la venta."
+                        });
+                }
+            }
+            catch (Exception ex)
+            {
+                Response.StatusCode = 500;
+
+                return new JsonResult(new
+                {
+                    ok = false,
+                    mensaje = ex.Message
+                });
+            }
+        }
+        [ValidateAntiForgeryToken]
+        public IActionResult OnPostActualizarEnvio(
+            [FromBody] ActualizarEnvioRequest request)
+        {
+            try
+            {
+                var resultado =
+                    ventaBLL.ActualizarEnvio2(request);
+                switch (resultado.Codigo)
+                {
+                    case 1:
+                        return new JsonResult(new
+                        {
+                            ok = true,
+                            rowVersion = resultado.RowVersion == null
+                                ? null
+                                : Convert.ToBase64String(
+                                    resultado.RowVersion)
+                        });
+
+                    case -1:
+                        return new JsonResult(new
+                        {
+                            ok = false,
+                            codigo = -1,
+                            mensaje = "La venta fue eliminada previamente por otro usuario."
+                        });
+
+                    case -2:
+                        return new JsonResult(new
+                        {
+                            ok = false,
+                            codigo = -2,
+                            mensaje = "La venta fue modificada previamente por otro usuario."
+                        });
+
+                    case -99:
+                        return new JsonResult(new
+                        {
+                            ok = false,
+                            codigo = -99,
+                            mensaje = "Ocurrió un error al actualizar la venta."
+                        });
+
+                    default:
+                        return new JsonResult(new
+                        {
+                            ok = false,
+                            codigo = resultado.Codigo,
+                            mensaje = "No se pudo actualizar la venta."
+                        });
+                }
+            }
+            catch (Exception ex)
+            {
+                Response.StatusCode = 500;
+
+                return new JsonResult(new
+                {
+                    ok = false,
+                    mensaje = ex.Message
+                });
+            }
         }
     }
 }

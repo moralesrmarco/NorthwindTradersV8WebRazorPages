@@ -4,10 +4,12 @@
     ViewData["Title"] = "Editar venta";
 }
 <h2>@ViewData["Title"]</h2>
+@*
 @if (!ViewData.ModelState.IsValid)
 {
     <div asp-validation-summary="All" class="alert alert-danger"></div>
 }
+*@
 @if (TempData["Mensaje"] != null)
 {
     <div class="alert alert-success">
@@ -15,6 +17,9 @@
     </div>
 }
 <form method="post" id="frmVenta" class="form">
+    <div id="validationSummary"
+         class="text-danger">
+    </div>
     @if (TempData["Error"] != null)
     {
         <div class="alert alert-danger">@Html.Raw(TempData["Error"])</div>
@@ -33,7 +38,8 @@
                 <label asp-for="VentaVM.CustomerID" class="form-label">Cliente</label>
                 <select id="cboCliente" asp-for="VentaVM.CustomerID"
                         asp-items="Model.Clientes"
-                        class="form-select">
+                        class="form-select" 
+                        disabled="@Model.BloquearEdicion">
                 </select>
                 <span asp-validation-for="VentaVM.CustomerID" class="text-danger"></span>
             </div>
@@ -41,7 +47,8 @@
                 <label asp-for="VentaVM.EmployeeID" class="form-label">Vendedor</label>
                 <select id="cboVendedor" asp-for="VentaVM.EmployeeID"
                         asp-items="Model.Vendedores"
-                        class="form-select">
+                        class="form-select"
+                        disabled="@Model.BloquearEdicion">
                 </select>
                 <span asp-validation-for="VentaVM.EmployeeID" class="text-danger"></span>
             </div>
@@ -49,7 +56,7 @@
         <div class="row mb-3">
             <div class="col-md-2">
                 <label>Fecha de venta</label>
-                <input asp-for="VentaVM.OrderDate" type="date" class="form-control" />
+                <input asp-for="VentaVM.OrderDate" type="date" class="form-control" disabled="@Model.BloquearEdicion" />
             </div>
             <div class="col-md-2">
                 <label>Hora</label>
@@ -58,11 +65,11 @@
                        name="VentaVM.OrderTime"
                        value="@(Model.VentaVM.OrderTime?.ToString(@"hh\:mm"))"
                        step="60"
-                       class="form-control" />
+                       class="form-control" disabled="@Model.BloquearEdicion" />
             </div>
             <div class="col-md-2">
                 <label>Fecha requerido</label>
-                <input asp-for="VentaVM.RequiredDate" type="date" class="form-control" />
+                <input asp-for="VentaVM.RequiredDate" type="date" class="form-control" disabled="@Model.BloquearEdicion" />
             </div>
             <div class="col-md-2">
                 <label>Hora</label>
@@ -71,11 +78,11 @@
                        name="VentaVM.RequiredTime"
                        value="@(Model.VentaVM.RequiredTime?.ToString(@"hh\:mm"))"
                        step="60"
-                       class="form-control" />
+                       class="form-control" disabled="@Model.BloquearEdicion" />
             </div>
             <div class="col-md-2">
                 <label>Fecha de envío</label>
-                <input asp-for="VentaVM.ShippedDate" type="date" class="form-control" />
+                <input asp-for="VentaVM.ShippedDate" type="date" class="form-control" disabled="@Model.BloquearEdicion" />
             </div>
             <div class="col-md-2">
                 <label>Hora</label>
@@ -84,7 +91,7 @@
                        name="VentaVM.ShippedTime"
                        value="@(Model.VentaVM.ShippedTime?.ToString(@"hh\:mm"))"
                        step="60"
-                       class="form-control" />
+                       class="form-control" disabled="@Model.BloquearEdicion" />
             </div>
         </div>
         <fieldset class="border rounded p-3 mb-3">
@@ -96,36 +103,36 @@
                     <label asp-for="VentaVM.ShipVia" class="form-label">Compañía transportista</label>
                     <select id="cboCompañia" asp-for="VentaVM.ShipVia"
                             asp-items="Model.Transportistas"
-                            class="form-select">
+                            class="form-select" disabled="@Model.BloquearEdicion">
                     </select>
                 </div>
                 <div class="col-md-4">
                     <label asp-for="VentaVM.ShipName" class="form-label">Enviar a</label>
-                    <input asp-for="VentaVM.ShipName" class="form-control" />
+                    <input asp-for="VentaVM.ShipName" class="form-control" disabled="@Model.BloquearEdicion" />
                 </div>
                 <div class="col-md-4">
                     <label asp-for="VentaVM.ShipAddress" class="form-label">Domicilio</label>
-                    <input asp-for="VentaVM.ShipAddress" class="form-control" />
+                    <input asp-for="VentaVM.ShipAddress" class="form-control" disabled="@Model.BloquearEdicion" />
                 </div>
             </div>
             <div class="row mb-3">
                 <div class="col-md-4">
                     <label asp-for="VentaVM.ShipCity" class="form-label">Ciudad</label>
-                    <input asp-for="VentaVM.ShipCity" class="form-control" />
+                    <input asp-for="VentaVM.ShipCity" class="form-control" disabled="@Model.BloquearEdicion" />
                 </div>
                 <div class="col-md-4">
                     <label asp-for="VentaVM.ShipRegion" class="form-label">Región</label>
-                    <input asp-for="VentaVM.ShipRegion" class="form-control" />
+                    <input asp-for="VentaVM.ShipRegion" class="form-control" disabled="@Model.BloquearEdicion" />
                 </div>
                 <div class="col-md-4">
                     <label asp-for="VentaVM.ShipPostalCode" class="form-label">Código postal</label>
-                    <input asp-for="VentaVM.ShipPostalCode" class="form-control" />
+                    <input asp-for="VentaVM.ShipPostalCode" class="form-control" disabled="@Model.BloquearEdicion" />
                 </div>
             </div>
             <div class="row mb-3">
                 <div class="col-md-4">
                     <label asp-for="VentaVM.ShipCountry" class="form-label">País</label>
-                    <input asp-for="VentaVM.ShipCountry" class="form-control" />
+                    <input asp-for="VentaVM.ShipCountry" class="form-control" disabled="@Model.BloquearEdicion" />
                 </div>
                 <div class="col-md-4">
                     <label asp-for="VentaVM.Freight" class="form-label">Cargo por envío $</label>
@@ -133,13 +140,15 @@
                            class="form-control"
                            type="number"
                            step="1"
-                           min="0" />
+                           min="0"
+                           disabled="@Model.BloquearEdicion" />
                 </div>
                 <div class="col-md-4 d-flex align-items-end">
                     <button type="button"
                             id="btnLimpiarEnvio"
                             class="btn btn-sm btn-warning"
-                            title="Limpiar forma de envío">
+                            title="Limpiar forma de envío"
+                            disabled="@Model.BloquearEdicion">
                         <i class="bi bi-eraser"></i>
                         <span class="d-none d-md-inline">Limpiar forma de envío</span>
                     </button>
@@ -147,7 +156,8 @@
                     <button type="button"
                             id="btnSeleccionarEnvio"
                             class="btn btn-sm btn-primary"
-                            title="Seleccionar forma de envío">
+                            title="Seleccionar forma de envío"
+                            disabled="@Model.BloquearEdicion">
                         <i class="bi bi-check-square"></i>
                         <span class="d-none d-md-inline">Seleccionar forma de envío</span>
                     </button>
@@ -163,14 +173,14 @@
                     <label asp-for="Detalle.CategoriaID" class="form-label">Categoría</label>
                     <select id="cboCategoria" asp-for="Detalle.CategoriaID"
                             asp-items="Model.Categorias"
-                            class="form-select">
+                            class="form-select" disabled="@Model.BloquearEdicion">
                     </select>
                 </div>
                 <div class="col-md-6">
                     <label asp-for="Detalle.ProductID" class="form-label">Producto</label>
                     <select id="cboProducto" asp-for="Detalle.ProductID"
                             asp-items="Model.Productos"
-                            class="form-select">
+                            class="form-select" disabled="@Model.BloquearEdicion">
                     </select>
                 </div>
             </div>
@@ -185,7 +195,7 @@
                 </div>
                 <div class="col-md-2 d-flex flex-column">
                     <label asp-for="Detalle.Quantity" class="form-label flex-grow-1">Cantidad</label>
-                    <input asp-for="Detalle.Quantity" class="form-control" />
+                    <input asp-for="Detalle.Quantity" class="form-control" disabled="@Model.BloquearEdicion" />
                 </div>
                 <div class="col-md-2 d-flex flex-column">
                     <label asp-for="Detalle.Discount" class="form-label flex-grow-1">Descuento (%)</label>
@@ -194,20 +204,22 @@
                            type="number"
                            step="1"
                            min="0"
-                           max="95.00" />
+                           max="95.00" disabled="@Model.BloquearEdicion" />
                 </div>
                 <div class="col-md-2 d-flex align-items-end">
                     <button type="button"
                             id="btnAgregarProducto"
                             class="btn btn-sm btn-primary"
-                            title="Agregar">
+                            title="Agregar"
+                            disabled="@Model.BloquearEdicion">
                         <i class="bi bi-plus-lg"></i>
                         <span class="d-none d-md-inline"> Agregar</span>
                     </button>
                     <button type="button"
                             id="btnCancelarEdicion"
                             class="btn btn-sm btn-secondary ms-2 d-none"
-                            title="Cancelar edición">
+                            title="Cancelar edición"
+                            disabled="@Model.BloquearEdicion">
                         <i class="bi bi-x-circle"></i>
                         <span class="d-none d-md-inline"> Cancelar</span>
                     </button>
@@ -455,3 +467,259 @@
         </div>
     </div>
 </div>
+@section Scripts {
+    <script>
+        function mostrarErrorValidacion(mensaje) {
+            const summary = $("#validationSummary");
+            summary
+                .removeClass("validation-summary-valid")
+                .addClass("validation-summary-errors");
+            summary.html(
+                "<ul><li>" + mensaje + "</li></ul>"
+            );
+        }
+
+        function limpiarErrorValidacion() {
+            const summary = $("#validationSummary");
+            summary
+                .removeClass("alert alert-danger")
+                .addClass("d-none")
+                .empty();
+        }
+
+        function bloquearEdicionPorConcurrencia() {
+
+            // Encabezado de la venta
+            $("#cboCliente").prop("disabled", true);
+            $("#cboVendedor").prop("disabled", true);
+
+            $("#VentaVM_OrderDate").prop("disabled", true);
+            $("#VentaVM_OrderTime").prop("disabled", true);
+
+            $("#VentaVM_RequiredDate").prop("disabled", true);
+            $("#VentaVM_RequiredTime").prop("disabled", true);
+
+            $("#VentaVM_ShippedDate").prop("disabled", true);
+            $("#VentaVM_ShippedTime").prop("disabled", true);
+
+            // Forma de envío
+            $("#cboCompañia").prop("disabled", true);
+
+            $("#VentaVM_ShipName").prop("disabled", true);
+            $("#VentaVM_ShipAddress").prop("disabled", true);
+            $("#VentaVM_ShipCity").prop("disabled", true);
+            $("#VentaVM_ShipRegion").prop("disabled", true);
+            $("#VentaVM_ShipPostalCode").prop("disabled", true);
+            $("#VentaVM_ShipCountry").prop("disabled", true);
+            $("#VentaVM_Freight").prop("disabled", true);
+
+            $("#btnLimpiarEnvio").prop("disabled", true);
+            $("#btnSeleccionarEnvio").prop("disabled", true);
+
+            // Captura de producto
+            $("#cboCategoria").prop("disabled", true);
+            $("#cboProducto").prop("disabled", true);
+
+            $("#Detalle_Quantity").prop("disabled", true);
+            $("#Detalle_Discount").prop("disabled", true);
+
+            $("#btnAgregarProducto").prop("disabled", true);
+            $("#btnCancelarEdicion").prop("disabled", true);
+
+            // Detalles existentes
+            $(".btnEditar").prop("disabled", true);
+            $(".btnEliminar").prop("disabled", true);
+        }
+
+        function actualizarEncabezado() {
+            const request = {
+                OrderID: parseInt($("#VentaVM_OrderID").val()),
+                CustomerID: $("#cboCliente").val(),
+                EmployeeID: parseInt($("#cboVendedor").val()),
+                OrderDate: $("#VentaVM_OrderDate").val() || null,
+                OrderTime: $("#VentaVM_OrderTime").val() || null,
+                RequiredDate: $("#VentaVM_RequiredDate").val() || null,
+                RequiredTime: $("#VentaVM_RequiredTime").val() || null,
+                ShippedDate: $("#VentaVM_ShippedDate").val() || null,
+                ShippedTime: $("#VentaVM_ShippedTime").val() || null,
+                RowVersion: $("#VentaVM_RowVersion").val()
+            };
+            $.ajax({
+                url: "?handler=ActualizarEncabezado",
+                type: "POST",
+                contentType: "application/json",
+                headers: {
+                    "RequestVerificationToken":
+                        $('input[name="__RequestVerificationToken"]').val()
+                },
+                data: JSON.stringify(request),
+                success: function(response) {
+                    if (response.ok) {
+                        limpiarErrorValidacion();
+                        //Actualizar la nueva RowVersion
+                        $("#VentaVM_RowVersion").val(response.rowVersion);
+                    } else {
+                        mostrarErrorValidacion(response.mensaje);
+                        if (
+                            response.codigo === -1 ||
+                            response.codigo === -2 ||
+                            response.codigo === -99
+                        ) {
+                            bloquearEdicionPorConcurrencia();
+                        }
+                    }
+                },
+                error: function(xhr) {
+                    mostrarErrorValidacion("Error al actualizar el encabezado.");
+                    console.error(xhr);
+                }
+            });
+        }
+
+        function llenarTabla(lista) {
+            // console.log("LISTA RECIBIDA:", lista);
+            let html = "";
+            lista.forEach(function(item, indice) {
+                html += `
+                                    <tr>
+                                        <td class="text-center">${indice + 1}</td>
+                                        <td>${item.productName}</td>
+                                        <td class="text-center">
+                                            ${Number(item.unitPrice).toLocaleString('es-MX',
+                    { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                                        </td>
+                                        <td class="text-center">
+                                            ${item.quantity}
+                                        </td>
+                                        <td class="text-end">
+                                            ${Number(item.subtotalDelImporteConIVAIncluido).toLocaleString('es-MX',
+                        { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                                        </td>
+                                        <td class="text-center">
+                                            <nobr>
+                                                ${(item.discount * 100).toFixed(2)} %
+                                            </nobr>
+                                        </td>
+                                        <td class="text-end">
+                                            ${Number(item.subtotalDelAhorroTotalDespuesDescuento).toLocaleString('es-MX',
+                            { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                                        </td>
+                                        <td class="text-end">
+                                            ${Number(item.subtotalDelImporteConIVAConDescuento).toLocaleString('es-MX',
+                                { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                                        </td>
+                                        <td class="text-center">
+                                            <nobr>
+                                                ${(item.tasaIVA * 100).toFixed(2)} %
+                                            </nobr>
+                                        </td>
+                                        <td class="text-end">
+                                            ${Number(item.subtotalDelImporteSinIVAConDescuento).toLocaleString('es-MX',
+                                    { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                                        </td>
+                                        <td class="text-end">
+                                            ${Number(item.subtotalIVADespuesDelDescuento).toLocaleString('es-MX',
+                                        { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                                        </td>
+                                        <td class="text-end fw-bold">
+                                            ${Number(item.subtotal).toLocaleString('es-MX',
+                                            { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                                        </td>
+                                        <td class="text-center">
+                                            <button type="button"
+                                                    class="btn btn-sm btn-warning btnEditar"
+                                                    data-product-id="${item.productID}"
+                                                    data-row-version="${item.rowVersion}">
+                                                <i class="bi bi-pencil"></i>
+                                            </button>
+                                            <button type="button"
+                                                    class="btn btn-sm btn-danger btnEliminar"
+                                                    data-index="${indice}"
+                                                    data-product-id="${item.productID}"
+                                                    data-row-version="${item.rowVersion}">
+                                                <i class="bi bi-trash"></i>
+                                            </button>
+                                        </td>
+                                        <td class="d-none">
+                                            ${item.productID}
+                                        </td>
+                                    </tr>`;
+            });
+            $("#tblDetalle").html(html);
+        }
+
+        function actualizarEnvio() {
+            const request = {
+                OrderID: parseInt($("#VentaVM_OrderID").val()),
+                ShipName: $("#VentaVM_ShipName").val(),
+                ShipAddress: $("#VentaVM_ShipAddress").val(),
+                ShipCity: $("#VentaVM_ShipCity").val(),
+                ShipRegion: $("#VentaVM_ShipRegion").val(),
+                ShipPostalCode: $("#VentaVM_ShipPostalCode").val(),
+                ShipCountry: $("#VentaVM_ShipCountry").val(),
+                ShipVia: $("#cboCompañia").val() || null,
+                Freight: $("#VentaVM_Freight").val() || null,
+                RowVersion: $("#VentaVM_RowVersion").val()
+            };
+            $.ajax({
+                url: "?handler=ActualizarEnvio",
+                type: "POST",
+                contentType: "application/json",
+                headers: {
+                    "RequestVerificationToken":
+                        $('input[name="__RequestVerificationToken"]').val()
+                },
+                data: JSON.stringify(request),
+                success: function(response) {
+                    if (response.ok) {
+                        limpiarErrorValidacion();
+                        $("#VentaVM_RowVersion").val(response.rowVersion);
+                    }
+                    else {
+                        mostrarErrorValidacion(response.mensaje);
+                        if (
+                            response.codigo === -1 ||
+                            response.codigo === -2 ||
+                            response.codigo === -99
+                        ) {
+                            bloquearEdicionPorConcurrencia();
+                        }
+                    }
+                },
+                error: function(xhr) {
+                    mostrarErrorValidacion("Error al actualizar el encabezado.");
+                    console.error(xhr);
+                }
+            });
+        }
+
+        $(
+            "#cboCliente," +
+            "#cboVendedor," +
+            "#VentaVM_OrderDate," +
+            "#VentaVM_OrderTime," +
+            "#VentaVM_RequiredDate," +
+            "#VentaVM_RequiredTime," +
+            "#VentaVM_ShippedDate," +
+            "#VentaVM_ShippedTime"
+        ).on("change", actualizarEncabezado);
+
+        $(
+            "#VentaVM_ShipName," +
+            "#VentaVM_ShipAddress," +
+            "#VentaVM_ShipCity," +
+            "#VentaVM_ShipRegion," +
+            "#VentaVM_ShipPostalCode," +
+            "#VentaVM_ShipCountry," +
+            "#cboCompañia," +
+            "#VentaVM_Freight"
+        ).on("change", actualizarEnvio);
+
+        var detalleVenta = @Html.Raw(Model.DetallesJson);
+        if (detalleVenta.length > 0) {
+            llenarTabla(detalleVenta);
+        }
+        mostrarTotales(@Html.Raw(Model.TotalesJson));
+
+    </script>
+}

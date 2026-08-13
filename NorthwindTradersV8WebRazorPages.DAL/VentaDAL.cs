@@ -498,7 +498,7 @@ namespace NorthwindTradersV8WebRazorPages.DAL
         {
             using SqlConnection cn = new(connectionString);
             using SqlCommand cmd =
-                new("SpVentaActualizarEncabezado", cn);
+                new("SpVentaActualizarEncabezado2", cn);
             cmd.CommandType = CommandType.StoredProcedure;
             cmd.Parameters.Add("@OrderID", SqlDbType.Int).Value = orderID;
             cmd.Parameters.Add("@CustomerID", SqlDbType.NChar, 5).Value =
@@ -518,6 +518,52 @@ namespace NorthwindTradersV8WebRazorPages.DAL
             parametroRowVersion.Direction = ParameterDirection.InputOutput;
             cn.Open();
             return (byte[])cmd.ExecuteScalar();
+        }
+        public (int Codigo, byte[]? RowVersion) ActualizarEncabezado2(
+            int orderID,
+            string customerID,
+            int employeeID,
+            DateTime? orderDate,
+            DateTime? requiredDate,
+            DateTime? shippedDate,
+            byte[] rowVersion)
+        {
+            using SqlConnection cn = new(connectionString);
+            using SqlCommand cmd =
+                new("SpVentaActualizarEncabezado", cn);
+            cmd.CommandType = CommandType.StoredProcedure;
+            cmd.Parameters.Add("@OrderID", SqlDbType.Int).Value = orderID;
+            cmd.Parameters.Add("@CustomerID", SqlDbType.NChar, 5).Value =
+                customerID ?? (object)DBNull.Value;
+            cmd.Parameters.Add("@EmployeeID", SqlDbType.Int).Value =
+                employeeID;
+            cmd.Parameters.Add("@OrderDate", SqlDbType.DateTime).Value =
+                orderDate ?? (object)DBNull.Value;
+            cmd.Parameters.Add("@RequiredDate", SqlDbType.DateTime).Value =
+                requiredDate ?? (object)DBNull.Value;
+            cmd.Parameters.Add("@ShippedDate", SqlDbType.DateTime).Value =
+                shippedDate ?? (object)DBNull.Value;
+            var parametroRowVersion = cmd.Parameters.Add(
+                "@RowVersion",
+                SqlDbType.Binary, 8);
+            parametroRowVersion.Value =
+                rowVersion ?? (object)DBNull.Value;
+            parametroRowVersion.Direction =
+                ParameterDirection.InputOutput;
+            // Parámetro para recibir el RETURN del SP
+            var parametroRetorno = cmd.Parameters.Add(
+                "@ReturnValue",
+                SqlDbType.Int);
+            parametroRetorno.Direction =
+                ParameterDirection.ReturnValue;
+            cn.Open();
+            cmd.ExecuteNonQuery();
+            int codigo = (int)parametroRetorno.Value;
+            byte[]? nuevaRowVersion =
+                parametroRowVersion.Value == DBNull.Value
+                    ? null
+                    : (byte[])parametroRowVersion.Value;
+            return (codigo, nuevaRowVersion);
         }
         public byte[] ActualizarEnvio(
             int orderID,
@@ -561,6 +607,62 @@ namespace NorthwindTradersV8WebRazorPages.DAL
                 ParameterDirection.InputOutput;
             cn.Open();
             return (byte[])cmd.ExecuteScalar();
+        }
+        public (int Codigo, byte[]? RowVersion) ActualizarEnvio2(
+            int orderID,
+            string? shipName,
+            string? shipAddress,
+            string? shipCity,
+            string? shipRegion,
+            string? shipPostalCode,
+            string? shipCountry,
+            int? shipVia,
+            decimal? freight,
+            byte[] rowVersion)
+        {
+            using SqlConnection cn = new(connectionString);
+            using SqlCommand cmd =
+                new("SpVentaActualizarEnvio2", cn);
+            cmd.CommandType = CommandType.StoredProcedure;
+            cmd.Parameters.Add("@OrderID", SqlDbType.Int)
+                .Value = orderID;
+            cmd.Parameters.Add("@ShipName", SqlDbType.NVarChar, 40)
+                .Value = shipName ?? (object)DBNull.Value;
+            cmd.Parameters.Add("@ShipAddress", SqlDbType.NVarChar, 60)
+                .Value = shipAddress ?? (object)DBNull.Value;
+            cmd.Parameters.Add("@ShipCity", SqlDbType.NVarChar, 15)
+                .Value = shipCity ?? (object)DBNull.Value;
+            cmd.Parameters.Add("@ShipRegion", SqlDbType.NVarChar, 15)
+                .Value = shipRegion ?? (object)DBNull.Value;
+            cmd.Parameters.Add("@ShipPostalCode", SqlDbType.NVarChar, 10)
+                .Value = shipPostalCode ?? (object)DBNull.Value;
+            cmd.Parameters.Add("@ShipCountry", SqlDbType.NVarChar, 15)
+                .Value = shipCountry ?? (object)DBNull.Value;
+            cmd.Parameters.Add("@ShipVia", SqlDbType.Int)
+                .Value = shipVia ?? (object)DBNull.Value;
+            cmd.Parameters.Add("@Freight", SqlDbType.Money)
+                .Value = freight ?? (object)DBNull.Value;
+            var parametroRowVersion = cmd.Parameters.Add(
+                "@RowVersion",
+                SqlDbType.Binary, 8);
+            parametroRowVersion.Value =
+                rowVersion ?? (object)DBNull.Value;
+            parametroRowVersion.Direction =
+                ParameterDirection.InputOutput;
+            // Parámetro para recibir el RETURN del SP
+            var parametroRetorno = cmd.Parameters.Add(
+                "@ReturnValue",
+                SqlDbType.Int);
+            parametroRetorno.Direction =
+                ParameterDirection.ReturnValue;
+            cn.Open();
+            cmd.ExecuteNonQuery();
+            int codigo = (int)parametroRetorno.Value;
+            byte[]? nuevaRowVersion =
+                parametroRowVersion.Value == DBNull.Value
+                    ? null
+                    : (byte[])parametroRowVersion.Value;
+            return (codigo, nuevaRowVersion);
         }
     }
 }

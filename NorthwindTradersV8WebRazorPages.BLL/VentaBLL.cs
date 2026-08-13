@@ -139,6 +139,27 @@ namespace NorthwindTradersV8WebRazorPages.BLL
                 shippedDate,
                 rowVersion);
         }
+        public (int Codigo, byte[]? RowVersion) ActualizarEncabezado2(ActualizarEncabezadoRequest request)
+        {
+            var rowVersion = Convert.FromBase64String(request.RowVersion);
+            DateTime? orderDate = CombinarFechaHora(
+                request.OrderDate,
+                request.OrderTime);
+            DateTime? requiredDate = CombinarFechaHora(
+                request.RequiredDate,
+                request.RequiredTime);
+            DateTime? shippedDate = CombinarFechaHora(
+                request.ShippedDate,
+                request.ShippedTime);
+            return ventaDAL.ActualizarEncabezado2(
+                request.OrderID,
+                request.CustomerID,
+                request.EmployeeID,
+                orderDate,
+                requiredDate,
+                shippedDate,
+                rowVersion);
+        }
         private DateTime? CombinarFechaHora(
             DateTime? fecha,
             string? hora)
@@ -157,6 +178,23 @@ namespace NorthwindTradersV8WebRazorPages.BLL
             var rowVersion =
                 Convert.FromBase64String(request.RowVersion);
             return ventaDAL.ActualizarEnvio(
+                request.OrderID,
+                request.ShipName,
+                request.ShipAddress,
+                request.ShipCity,
+                request.ShipRegion,
+                request.ShipPostalCode,
+                request.ShipCountry,
+                request.ShipVia,
+                request.Freight,
+                rowVersion);
+        }
+        public (int Codigo, byte[]? RowVersion) ActualizarEnvio2(
+            ActualizarEnvioRequest request)
+        {
+            var rowVersion =
+                Convert.FromBase64String(request.RowVersion);
+            return ventaDAL.ActualizarEnvio2(
                 request.OrderID,
                 request.ShipName,
                 request.ShipAddress,
