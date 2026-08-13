@@ -688,6 +688,674 @@
             });
         }
 
+        function openCenteredPopup(url, title, w, h) {
+            const dualScreenLeft =
+                window.screenLeft !== undefined ? window.screenLeft : window.screenX;
+            const dualScreenTop =
+                window.screenTop !== undefined ? window.screenTop : window.screenY;
+            const width =
+                window.innerWidth ||
+                document.documentElement.clientWidth ||
+                screen.width;
+            const height =
+                window.innerHeight ||
+                document.documentElement.clientHeight ||
+                screen.height;
+            const left = ((width / 2) - (w / 2)) + dualScreenLeft;
+            const top = ((height / 2) - (h / 2)) + dualScreenTop;
+            const newWindow = window.open(
+                url,
+                title,
+                'scrollbars=yes,resizable=yes,toolbar=no,location=no,status=no,menubar=no,width='
+                + w +
+                ',height='
+                + h +
+                ',top='
+                + top +
+                ',left='
+                + left
+            );
+            if (window.focus && newWindow) {
+                newWindow.focus();
+            }
+        }
+
+        $(function() {
+            // Mostrar overlay al cancelar
+            $('.btn-cancelar').on('click', function() {
+                mostrarLoadingOverlay();
+            });
+            // Ocultar overlay cuando la página se muestra nuevamente
+            window.addEventListener('pageshow', function() {
+                const overlay = document.getElementById('loadingOverlay');
+                if (overlay) {
+                    overlay.style.display = 'none';
+                }
+            });
+        });
+
+        function cargarInformacionEnvio(customerId) {
+            // Si seleccionó "Seleccione"
+            if (customerId == "") {
+                $("#VentaVM_ShipName").val("");
+                $("#VentaVM_ShipAddress").val("");
+                $("#VentaVM_ShipCity").val("");
+                $("#VentaVM_ShipRegion").val("");
+                $("#VentaVM_ShipPostalCode").val("");
+                $("#VentaVM_ShipCountry").val("");
+                $("#cboCompañia").val("");
+                return;
+            }
+            $.getJSON(
+                "?handler=UltimaInformacionEnvio",
+                { customerId: customerId },
+                function(data) {
+                    if (data == null)
+                        return;
+                    $("#VentaVM_ShipName").val(data.shipName);
+                    $("#VentaVM_ShipAddress").val(data.shipAddress);
+                    $("#VentaVM_ShipCity").val(data.shipCity);
+                    $("#VentaVM_ShipRegion").val(data.shipRegion);
+                    $("#VentaVM_ShipPostalCode").val(data.shipPostalCode);
+                    $("#VentaVM_ShipCountry").val(data.shipCountry);
+                    $("#cboCompañia").val(String(data.shipVia));
+                });
+        }
+
+        function cargarFormasEnvio() {
+            let customerId = $("#cboCliente").val();
+            if (customerId == "") {
+                alert("Debe seleccionar un cliente.");
+                return;
+            }
+            $.getJSON(
+                "?handler=FormasEnvioCliente",
+                { customerId: customerId },
+                function(lista) {
+                    llenarTablaFormasEnvio(lista);
+                    new bootstrap.Modal(
+                        document.getElementById("modalFormasEnvio")
+                    ).show();
+                }
+            );
+        }
+
+        function llenarTablaFormasEnvio(lista) {
+            let html = "";
+            lista.forEach(function(item, indice) {
+                html += `
+                                <tr>
+                                    <td>${item.companyName ?? ""}</td>
+                                    <td>${item.shipName ?? ""}</td>
+                                    <td>${item.shipAddress ?? ""}</td>
+                                    <td>${item.shipCity ?? ""}</td>
+                                    <td>${item.shipRegion ?? ""}</td>
+                                    <td>${item.shipPostalCode ?? ""}</td>
+                                    <td>${item.shipCountry ?? ""}</td>
+                                    <td class="d-none">${item.shipVia}</td>
+                                    <td class="text-center">
+                                        <button
+                                            type="button"
+                                            class="btn btn-sm btn-primary btnSeleccionar"
+                                            data-index="${indice}">
+                                            Seleccionar
+                                        </button>
+                                    </td>
+                                </tr>`;
+            });
+            $("#tbodyFormasEnvio").html(html);
+        }
+
+        function cargarProductos(categoriaId, productoSeleccionado, alTerminar) {
+            $("#cboProducto").empty();
+            // Si el usuario volvió a seleccionar "Seleccione"
+            if (categoriaId == "") {
+                $("#cboProducto").append(
+                    $("<option>")
+                        .val("")
+                        .text("»--- Seleccione una categoría ---«")
+                );
+                if (alTerminar)
+                    alTerminar();
+                return;
+            }
+            $.getJSON(
+                "?handler=ProductosPorCategoria",
+                { categoriaId: categoriaId },
+                function(data) {
+                    $.each(data, function(i, item) {
+                        $("#cboProducto").append(
+                            $("<option>")
+                                .val(item.value)
+                                .text(item.text)
+                        );
+                    });
+                    if (productoSeleccionado)
+                        $("#cboProducto").val(productoSeleccionado);
+                    if (alTerminar)
+                        alTerminar();
+                });
+        }
+
+        let detalleEnEdicion = null;
+
+        function agregarProducto() {
+            if ($("#cboCategoria").val() == "") {
+                alert("Debe seleccionar una categoría.");
+                $("#cboCategoria").focus();
+                return;
+            }
+            if ($("#cboProducto").val() == "") {
+                alert("Debe seleccionar un producto.");
+                $("#cboProducto").focus();
+                return;
+            }
+            if (Number($("#Detalle_Quantity").val()) <= 0) {
+                alert("La cantidad debe ser mayor que 0.");
+                $("#Detalle_Quantity").focus().select();
+                return;
+            }
+            if (Number($("#Detalle_Quantity").val()) >
+                Number($("#Detalle_UnitsInStock").val())) {
+                alert("La cantidad no puede ser mayor que las unidades en inventario.");
+                $("#Detalle_Quantity").focus().select();
+                return;
+            }
+            let descuento = Number($("#Detalle_Discount").val());
+            if (descuento < 0 || descuento > 95.00) {
+                alert("El descuento debe estar entre 0 y 95.00%.");
+                $("#Detalle_Discount").focus().select();
+                return;
+            }
+            // ===== VALIDAR PRODUCTO DUPLICADO =====
+            let productoId = Number($("#cboProducto").val());
+            let repetido = false;
+            $("#tblDetalle tr").each(function() {
+                let id = Number($(this).find("td:last").text().trim());
+
+                if (id === productoId) {
+                    repetido = true;
+                    return false; // break
+                }
+            });
+            if (repetido) {
+                alert("No se puede agregar un mismo producto más de una vez a la venta.");
+                $("#cboProducto").focus();
+                return;
+            }
+            // ===== FIN VALIDACIÓN =====
+            // ===== CREAR REQUEST PARA EL BACKEND =====
+            let request = {
+                OrderID: Number($("#VentaVM_OrderID").val()),
+                RowVersion: $("#VentaVM_RowVersion").val(),
+                Detalle: {
+                    CategoriaID: Number($("#cboCategoria").val()),
+                    ProductID: Number($("#cboProducto").val()),
+                    ProductName: $("#cboProducto option:selected").text(),
+                    UnitPrice: Number($("#Detalle_UnitPrice").val()),
+                    UnitsInStock: Number($("#Detalle_UnitsInStock").val()),
+                    Quantity: Number($("#Detalle_Quantity").val()),
+                    Discount: Number($("#Detalle_Discount").val()) / 100
+                }
+            };
+
+            $.ajax({
+                url: "?handler=AgregarDetalle",
+                type: "POST",
+                contentType: "application/json",
+                dataType: "json",
+                headers: {
+                    "RequestVerificationToken":
+                        $('input[name="__RequestVerificationToken"]').val()
+                },
+                data: JSON.stringify(request),
+
+                success: function(r) {
+                    console.log("Respuesta completa:", r);
+                    console.log("Lista recibida:", r.lista);
+                    if (r.success) {
+                        // Actualizar RowVersion de la venta
+                        $("#VentaVM_RowVersion").val(r.rowVersion);
+                        // Actualizar tabla con los datos reales de la BD
+                        llenarTabla(r.lista);
+                        // Actualizar totales
+                        mostrarTotales(r.totales);
+                        // Limpiar captura del producto
+                        limpiarCapturaProducto();
+                    }
+                    else {
+                        alert(r.message);
+                    }
+                },
+                error: function(xhr) {
+                    alert(xhr.responseText);
+                }
+            });
+        }
+
+        function llenarTabla(lista) {
+            let html = "";
+            lista.forEach(function(item, indice) {
+                html += `
+                                    <tr>
+                                        <td class="text-center">${indice + 1}</td>
+                                        <td>${item.productName}</td>
+                                        <td class="text-center">
+                                            ${Number(item.unitPrice).toLocaleString('es-MX',
+                    { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                                        </td>
+                                        <td class="text-center">
+                                            ${item.quantity}
+                                        </td>
+                                        <td class="text-end">
+                                            ${Number(item.subtotalDelImporteConIVAIncluido).toLocaleString('es-MX',
+                        { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                                        </td>
+                                        <td class="text-center">
+                                            <nobr>
+                                                ${(item.discount * 100).toFixed(2)} %
+                                            </nobr>
+                                        </td>
+                                        <td class="text-end">
+                                            ${Number(item.subtotalDelAhorroTotalDespuesDescuento).toLocaleString('es-MX',
+                            { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                                        </td>
+                                        <td class="text-end">
+                                            ${Number(item.subtotalDelImporteConIVAConDescuento).toLocaleString('es-MX',
+                                { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                                        </td>
+                                        <td class="text-center">
+                                            <nobr>
+                                                ${(item.tasaIVA * 100).toFixed(2)} %
+                                            </nobr>
+                                        </td>
+                                        <td class="text-end">
+                                            ${Number(item.subtotalDelImporteSinIVAConDescuento).toLocaleString('es-MX',
+                                    { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                                        </td>
+                                        <td class="text-end">
+                                            ${Number(item.subtotalIVADespuesDelDescuento).toLocaleString('es-MX',
+                                        { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                                        </td>
+                                        <td class="text-end fw-bold">
+                                            ${Number(item.subtotal).toLocaleString('es-MX',
+                                            { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                                        </td>
+                                        <td class="text-center">
+                                            <button type="button"
+                                                    class="btn btn-sm btn-warning btnEditar"
+                                                    data-product-id="${item.productID}"
+                                                    data-row-version="${item.rowVersion}">
+                                                <i class="bi bi-pencil"></i>
+                                            </button>
+                                            <button type="button"
+                                                    class="btn btn-sm btn-danger btnEliminar"
+                                                    data-index="${indice}"
+                                                    data-product-id="${item.productID}"
+                                                    data-row-version="${item.rowVersion}">
+                                                <i class="bi bi-trash"></i>
+                                            </button>
+                                        </td>
+                                        <td class="d-none">
+                                            ${item.productID}
+                                        </td>
+                                    </tr>`;
+            });
+            $("#tblDetalle").html(html);
+        }
+
+        function mostrarTotales(t) {
+            $("#Totales_NumeroProductos")
+                .val(t.numeroProductos);
+            $("#Totales_TotalUnidades")
+                .val(t.totalUnidades);
+            $("#Totales_TotalImporteConIVA")
+                .val(t.totalImporteConIVA);
+            $("#Totales_TotalDescuento")
+                .val(t.totalDescuento);
+            $("#Totales_TotalImporteConDescuento")
+                .val(t.totalImporteConDescuento);
+            $("#Totales_TotalImporteSinIVA")
+                .val(t.totalImporteSinIVA);
+            $("#Totales_TotalIVA")
+                .val(t.totalIVA);
+            $("#Totales_Total")
+                .val(t.total);
+        }
+
+        function limpiarCapturaProducto() {
+
+            // Regresar el producto a "Seleccione"
+            $("#cboProducto").val("");
+
+            // Limpiar datos del producto
+            $("#Detalle_UnitPrice").val(0);
+            $("#Detalle_UnitsInStock").val(0);
+
+            // Valores por defecto
+            $("#Detalle_Quantity").val(0);
+            $("#Detalle_Discount").val(0);
+
+            // Limpiar cálculos
+            $("#Detalle_PrecioPorUnidadSinIVASinDescuento").val(0);
+            $("#Detalle_IVADelPrecioPorUnidadSinDescuento").val(0);
+            $("#Detalle_PrecioPorUnidadSinIVADespuesDescuento").val(0);
+            $("#Detalle_IVADelPrecioporUnidadDespuesDescuento").val(0);
+
+            $("#Detalle_AhorroPorUnidadSinIVA").val(0);
+            $("#Detalle_AhorroEnIVAPorUnidadDespuesDescuento").val(0);
+            $("#Detalle_AhorroTotalPorUnidadConIVA").val(0);
+            $("#Detalle_PrecioPorUnidadConIVADespuesDescuento").val(0);
+
+            $("#Detalle_SubtotalDelImporteConIVAIncluido").val(0);
+            $("#Detalle_SubtotalDelImporteSinIVASinDescuento").val(0);
+            $("#Detalle_SubtotalDelImporteDelIVASinDescuento").val(0);
+            $("#Detalle_SubtotalDelImporteSinIVAConDescuento").val(0);
+            $("#Detalle_SubtotalIVADespuesDelDescuento").val(0);
+
+            $("#Detalle_SubtotalDelAhorroSinIvaDespuesDescuento").val(0);
+            $("#Detalle_SubtotalDelAhorroEnIVADespuesDescuento").val(0);
+            $("#Detalle_SubtotalDelAhorroTotalDespuesDescuento").val(0);
+
+            $("#Detalle_Subtotal").val(0);
+
+            // Dejar el foco en Producto
+            $("#cboProducto").focus();
+        }
+
+        function cargarInformacionProducto(productId) {
+            if (productId == "") {
+                $("#Detalle_UnitPrice").val("");
+                $("#Detalle_UnitsInStock").val("");
+                return;
+            }
+            $.getJSON(
+                "?handler=ProductoCostoEInventario",
+                { productId: productId },
+                function(data) {
+                    if (data == null)
+                        return;
+
+                    $("#Detalle_UnitPrice").val(data.unitPrice);
+                    $("#Detalle_UnitsInStock").val(data.unitsInStock);
+                });
+        }
+
+        function calcularDetalle() {
+            let detalle = {
+                unitPrice: Number($("#Detalle_UnitPrice").val()),
+                unitsInStock: Number($("#Detalle_UnitsInStock").val()),
+                quantity: Number($("#Detalle_Quantity").val()),
+                discount: Number($("#Detalle_Discount").val()) / 100
+            };
+            $.ajax({
+                url: "?handler=CalcularDetalle",
+                type: "POST",
+                contentType: "application/json",
+                headers: {
+                    "RequestVerificationToken":
+                        $('input[name="__RequestVerificationToken"]').val()
+                },
+                data: JSON.stringify(detalle),
+                success: function(r) {
+                    // Datos básicos
+                    $("#Detalle_PrecioPorUnidadSinIVASinDescuento")
+                        .val(r.precioPorUnidadSinIVASinDescuento);
+                    $("#Detalle_IVADelPrecioPorUnidadSinDescuento")
+                        .val(r.ivaDelPrecioPorUnidadSinDescuento);
+                    $("#Detalle_PrecioPorUnidadSinIVADespuesDescuento")
+                        .val(r.precioPorUnidadSinIVADespuesDescuento);
+                    $("#Detalle_IVADelPrecioporUnidadDespuesDescuento")
+                        .val(r.ivaDelPrecioporUnidadDespuesDescuento);
+                    // Ahorros por unidad
+                    $("#Detalle_AhorroPorUnidadSinIVA")
+                        .val(r.ahorroPorUnidadSinIVA);
+                    $("#Detalle_AhorroEnIVAPorUnidadDespuesDescuento")
+                        .val(r.ahorroEnIVAPorUnidadDespuesDescuento);
+                    $("#Detalle_AhorroTotalPorUnidadConIVA")
+                        .val(r.ahorroTotalPorUnidadConIVA);
+                    $("#Detalle_PrecioPorUnidadConIVADespuesDescuento")
+                        .val(r.precioPorUnidadConIVADespuesDescuento);
+                    // Subtotales del producto
+                    $("#Detalle_SubtotalDelImporteConIVAIncluido")
+                        .val(r.subtotalDelImporteConIVAIncluido);
+                    $("#Detalle_SubtotalDelImporteSinIVASinDescuento")
+                        .val(r.subtotalDelImporteSinIVASinDescuento);
+                    $("#Detalle_SubtotalDelImporteDelIVASinDescuento")
+                        .val(r.subtotalDelImporteDelIVASinDescuento);
+                    $("#Detalle_SubtotalDelImporteSinIVAConDescuento")
+                        .val(r.subtotalDelImporteSinIVAConDescuento);
+                    $("#Detalle_SubtotalIVADespuesDelDescuento")
+                        .val(r.subtotalIVADespuesDelDescuento);
+                    // Ahorros subtotal
+                    $("#Detalle_SubtotalDelAhorroSinIvaDespuesDescuento")
+                        .val(r.subtotalDelAhorroSinIvaDespuesDescuento);
+                    $("#Detalle_SubtotalDelAhorroEnIVADespuesDescuento")
+                        .val(r.subtotalDelAhorroEnIVADespuesDescuento);
+                    $("#Detalle_SubtotalDelAhorroTotalDespuesDescuento")
+                        .val(r.subtotalDelAhorroTotalDespuesDescuento);
+                    // Total del producto
+                    $("#Detalle_Subtotal")
+                        .val(r.subtotal);
+                },
+                error: function(xhr) {
+                    console.log(xhr.responseText);
+                }
+            });
+        }
+
+        function actualizarDetalle() {
+            const quantity = Number($("#Detalle_Quantity").val());
+            const discount = Number($("#Detalle_Discount").val()) / 100;
+            if (quantity <= 0) {
+                alert("La cantidad debe ser mayor que 0.");
+                $("#Detalle_Quantity").focus().select();
+                return;
+            }
+            if (discount < 0 || discount > 0.95) {
+                alert("El descuento debe estar entre 0 y 95.00%.");
+                $("#Detalle_Discount").focus().select();
+                return;
+            }
+
+            const request = {
+                OrderID: Number($("#VentaVM_OrderID").val()),
+                ProductID: detalleEnEdicion.productID,
+                Quantity: quantity,
+                Discount: discount,
+                VentaDetalleRowVersion: detalleEnEdicion.rowVersion,
+                VentaRowVersion: $("#VentaVM_RowVersion").val()
+            };
+            $.ajax({
+                url: "?handler=ActualizarDetalle",
+                type: "POST",
+                contentType: "application/json",
+                headers: {
+                    "RequestVerificationToken":
+                        $('input[name="__RequestVerificationToken"]').val()
+                },
+                data: JSON.stringify(request),
+                success: function(r) {
+                    if (r.success) {
+                        $("#VentaVM_RowVersion").val(r.rowVersion);
+                        llenarTabla(r.lista);
+                        mostrarTotales(r.totales);
+                        salirModoEdicion();
+                    }
+                    else {
+                        alert(r.message);
+                    }
+                },
+                error: function(xhr) {
+                    console.error(xhr);
+                    alert("Ocurrió un error al actualizar el detalle.");
+                }
+            });
+        }
+
+        function salirModoEdicion() {
+            detalleEnEdicion = null;
+            $("#cboCategoria, #cboProducto").prop("disabled", false);
+            $("#btnAgregarProducto")
+                .attr("title", "Agregar")
+                .find("span")
+                .text(" Agregar");
+            $("#btnAgregarProducto i").attr("class", "bi bi-plus-lg");
+            $("#btnCancelarEdicion").addClass("d-none");
+            $("#cboCategoria").val("");
+            cargarProductos("");
+            limpiarCapturaProducto();
+        }
+
+        function eliminarProducto(productID, rowVersion) {
+            if (!confirm("¿Está seguro de eliminar este producto?")) {
+                return;
+            }
+            let request = {
+                OrderID: Number($("#VentaVM_OrderID").val()),
+                ProductID: productID,
+                RowVersion: rowVersion,
+                VentaRowVersion: $("#VentaVM_RowVersion").val()
+            };
+            console.log("Request eliminar detalle:");
+            console.log(request);
+            $.ajax({
+                type: "POST",
+                url: "?handler=EliminarDetalle",
+                contentType: "application/json; charset=utf-8",
+                headers: {
+                    "RequestVerificationToken":
+                        $('input[name="__RequestVerificationToken"]').val()
+                },
+                data: JSON.stringify(request),
+                success: function(r) {
+                    console.log("Respuesta eliminar:");
+                    console.log(r);
+                    if (r.success) {
+                        // Actualizar RowVersion de Orders
+                        $("#VentaVM_RowVersion")
+                            .val(r.rowVersion);
+                        // Actualizar tabla
+                        llenarTabla(r.lista);
+                        // Actualizar totales
+                        mostrarTotales(r.totales);
+                    }
+                    else {
+
+                        alert(r.message);
+                    }
+                },
+                error: function(xhr) {
+                    console.error(xhr);
+                    alert(
+                        "Ocurrió un error al eliminar el detalle."
+                    );
+                }
+            });
+        }
+
+        function editarProducto(productID, rowVersion) {
+            const request = {
+                OrderID: Number($("#VentaVM_OrderID").val()),
+                ProductID: productID,
+                RowVersion: rowVersion
+            };
+            $.ajax({
+                url: "?handler=ObtenerDetalleEditar",
+                type: "POST",
+                contentType: "application/json; charset=utf-8",
+                contentType: "application/json",
+                headers: {
+                    "RequestVerificationToken":
+                        $('input[name="__RequestVerificationToken"]').val()
+                },
+                data: JSON.stringify(request),
+                success: function(r) {
+                    if (r.success) {
+                        detalleEnEdicion = {
+                            productID: r.detalle.productID,
+                            rowVersion: r.detalle.rowVersion
+                        };
+                        $("#cboCategoria").val(r.detalle.categoriaID);
+                        cargarProductos(
+                            r.detalle.categoriaID,
+                            r.detalle.productID,
+                            function() {
+                                $("#Detalle_UnitPrice")
+                                    .val(r.detalle.unitPrice);
+                                $("#Detalle_UnitsInStock")
+                                    .val(r.detalle.unitsInStock);
+                                $("#Detalle_Quantity")
+                                    .val(r.detalle.quantity);
+                                $("#Detalle_Discount")
+                                    .val(r.detalle.discount * 100);
+                                $("#cboCategoria, #cboProducto")
+                                    .prop("disabled", true);
+                                $("#btnAgregarProducto")
+                                    .attr("title", "Guardar cambios")
+                                    .find("span")
+                                    .text(" Guardar cambios");
+                                $("#btnAgregarProducto i")
+                                    .attr("class", "bi bi-floppy");
+                                $("#btnCancelarEdicion")
+                                    .removeClass("d-none");
+                                calcularDetalle();
+                                $("#Detalle_Quantity").focus().select();
+                            }
+                        );
+                    }
+                    else {
+                        alert(r.message);
+                    }
+                },
+                error: function(xhr) {
+                    console.error(xhr);
+                    alert(xhr.responseText);
+                }
+            });
+        }
+
+        // ===== EVENTOS =====
+        $(document).on("click", ".btnSeleccionar", function() {
+            let indice = $(this).data("index");
+            let fila = $("#tbodyFormasEnvio tr")
+                .eq(indice);
+            $("#VentaVM_ShipName")
+                .val(fila.find("td:eq(1)").text());
+            $("#VentaVM_ShipAddress")
+                .val(fila.find("td:eq(2)").text());
+            $("#VentaVM_ShipCity")
+                .val(fila.find("td:eq(3)").text());
+            $("#VentaVM_ShipRegion")
+                .val(fila.find("td:eq(4)").text());
+            $("#VentaVM_ShipPostalCode")
+                .val(fila.find("td:eq(5)").text());
+            $("#VentaVM_ShipCountry")
+                .val(fila.find("td:eq(6)").text());
+            // Seleccionar compañía transportista
+            let shipVia = fila.find("td:eq(7)").text();
+            $("#cboCompañia")
+                .val(shipVia)
+                .trigger("change");
+            let modal = bootstrap.Modal.getInstance(
+                document.getElementById("modalFormasEnvio")
+            );
+            modal.hide();
+        });
+
+        $("#btnLimpiarEnvio").click(function() {
+            $("#cboCompañia").val("");
+            $("#VentaVM_ShipName").val("");
+            $("#VentaVM_ShipAddress").val("");
+            $("#VentaVM_ShipCity").val("");
+            $("#VentaVM_ShipRegion").val("");
+            $("#VentaVM_ShipPostalCode").val("");
+            $("#VentaVM_ShipCountry").val("");
+            $("#VentaVM_Freight").val(0);
+            // Guardar inmediatamente los cambios en la BD
+            actualizarEnvio();
+        });
+
         $(
             "#cboCliente," +
             "#cboVendedor," +
@@ -709,6 +1377,122 @@
             "#cboCompañia," +
             "#VentaVM_Freight"
         ).on("change", actualizarEnvio);
+
+        $("#btnSeleccionarEnvio").click(function() {
+            cargarFormasEnvio();
+        });
+
+        $("#cboCategoria").change(function() {
+            cargarProductos($(this).val());
+        });
+
+        $("#cboProducto").change(function() {
+            cargarInformacionProducto($(this).val());
+        });
+
+        $("#Detalle_Quantity").on("input", calcularDetalle);
+
+        $("#Detalle_Discount").on("input", calcularDetalle);
+
+        $("#Detalle_Quantity").focus(function() {
+            $(this).select();
+        });
+
+        $("#Detalle_Discount").focus(function() {
+            $(this).select();
+        });
+
+        $("#btnAgregarProducto").click(function() {
+            if (detalleEnEdicion) {
+                actualizarDetalle();
+            }
+            else {
+                agregarProducto();
+            }
+        });
+
+        $("#cboCliente").change(function() {
+            cargarInformacionEnvio($(this).val());
+        });
+
+        $(document).on("click", ".btnEliminar", function() {
+            const productID = Number($(this).data("product-id"));
+            const rowVersion = $(this).data("row-version");
+            eliminarProducto(productID, rowVersion);
+        });
+
+        $(document).on("click", ".btnEditar", function() {
+            const productID =
+                Number($(this).data("product-id"));
+            const rowVersion =
+                $(this).data("row-version");
+            editarProducto(
+                productID,
+                rowVersion
+            );
+        });
+
+        $("#btnCancelarEdicion").click(function() {
+            salirModoEdicion();
+        });
+
+        $("#frmVenta").on("submit", function(e) {
+            // Existe un producto seleccionado que no se ha agregado
+            if ($("#cboProducto").val() != "") {
+                e.preventDefault();
+                e.stopImmediatePropagation();
+                alert("Se ha seleccionado un producto y no lo ha agregado a la venta.");
+                $("#Detalle_Quantity").focus();
+                return false;
+            }
+            // Validaciones de jQuery Validate
+            if (!$(this).valid()) {
+                e.preventDefault();
+                e.stopImmediatePropagation();
+                return false;
+            }
+            // Debe existir al menos un producto
+            if ($("#tblDetalle tr").length === 0) {
+                e.preventDefault();
+                e.stopImmediatePropagation();
+                alert("Debe agregar al menos un producto.");
+                return false;
+            }
+            // Mostrar overlay solamente para Generar venta y Nota remisión
+            if (botonSubmit === "btnGenerarVenta" ||
+                botonSubmit === "btnNotaRemision") {
+                mostrarLoadingOverlay();
+            }            // Todas las validaciones pasaron
+            return true;
+        });
+
+        document.addEventListener("DOMContentLoaded", function() {
+            const btn = document.getElementById("btnNotaRemision");
+            if (btn) {
+                btn.addEventListener("click", function() {
+                    const url = this.dataset.url;
+                    openCenteredPopup(
+                        url,
+                        "NotaRemision",
+                        900,
+                        700
+                    );
+                });
+            }
+        });
+
+        $("#VentaVM_Freight").focus(function() {
+            $(this).select();
+        });
+
+
+        // Registrar qué botón envió el formulario
+        let botonSubmit = null;
+
+        $("#btnGenerarVenta, #btnNotaRemision, #btnNuevaVenta").on("click", function() {
+            botonSubmit = this.id;
+        });
+
 
         var detalleVenta = @Html.Raw(Model.DetallesJson);
         if (detalleVenta.length > 0) {

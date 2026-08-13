@@ -326,5 +326,321 @@ namespace NorthwindTradersV8WebRazorPages.Pages.Ventas
                 });
             }
         }
+        public JsonResult OnGetFormasEnvioCliente(string customerId)
+        {
+            var lista = ventaService.ObtenerFormasEnvio(customerId);
+            return new JsonResult(lista);
+        }
+
+        public JsonResult OnGetProductosPorCategoria(int categoriaId)
+        {
+            var productos = productoService.ObtenerProductosPorCategoriaCbo(categoriaId);
+            return new JsonResult(productos);
+        }
+        public JsonResult OnGetProductoCostoEInventario(int productId)
+        {
+            var producto = productoService.ObtenerProductoCostoEInventario(productId);
+            return new JsonResult(producto);
+        }
+        public JsonResult OnPostCalcularDetalle([FromBody] VentaDetalleViewModel detalle)
+        {
+            return new JsonResult(detalle);
+        }
+        public JsonResult OnPostActualizarDetalle(
+            [FromBody] ActualizarDetalleRequest request)
+        {
+            try
+            {
+                if (request == null || request.OrderID <= 0)
+                    return ErrorDetalle("El OrderID no es válido.");
+                if (request.ProductID <= 0)
+                    return ErrorDetalle("El ProductID no es válido.");
+                if (request.Quantity <= 0)
+                    return ErrorDetalle("La cantidad debe ser mayor que cero.");
+                if (request.Discount < 0 || request.Discount > 0.95m)
+                    return ErrorDetalle("El descuento debe estar entre 0 y 95.00%.");
+                if (string.IsNullOrWhiteSpace(request.VentaDetalleRowVersion))
+                    return ErrorDetalle("No se recibió la RowVersion del detalle.");
+                if (string.IsNullOrWhiteSpace(request.VentaRowVersion))
+                    return ErrorDetalle("No se recibió la RowVersion de la venta.");
+
+                var detalle = new VentaDetalle
+                {
+                    Venta = new Venta
+                    {
+                        OrderID = request.OrderID,
+                        RowVersion = Convert.FromBase64String(
+                            request.VentaRowVersion)
+                    },
+                    Producto = new Producto
+                    {
+                        ProductID = request.ProductID
+                    },
+                    Quantity = request.Quantity,
+                    Discount = request.Discount,
+                    RowVersion = Convert.FromBase64String(
+                        request.VentaDetalleRowVersion)
+                };
+
+                ventaDetalleBLL.ActualizarDetalle(detalle);
+
+                var ventaActualizada = ventaBLL.ObtenerVentaPorId2(
+                    request.OrderID);
+                if (ventaActualizada?.RowVersion == null)
+                    throw new Exception(
+                        "No se pudo obtener la RowVersion actualizada de la venta.");
+
+                var lista = ventaDetalleBLL
+                    .ObtenerDetallesPorVentaId(request.OrderID);
+                var listaViewModel = CrearListaViewModel(lista);
+                var totales = CalcularTotalesVenta(listaViewModel);
+
+                return new JsonResult(new
+                {
+                    success = true,
+                    rowVersion = Convert.ToBase64String(
+                        ventaActualizada.RowVersion),
+                    lista = listaViewModel,
+                    totales
+                });
+            }
+            catch (Exception ex)
+            {
+                return ErrorDetalle(ex.Message);
+            }
+        }
+        public JsonResult OnPostAgregarDetalle([FromBody] AgregarDetalleRequest request)
+        {
+            try
+            {
+                if (!request.Detalle.ProductID.HasValue)
+                {
+                    return new JsonResult(new
+                    {
+                        success = false,
+                        message = "Debe seleccionar un producto x."
+                    });
+                }
+                var detalle = new VentaDetalle
+                {
+                    Venta = new Venta
+                    {
+                        OrderID = request.OrderID,
+                        RowVersion = string.IsNullOrEmpty(request.RowVersion)
+                            ? null
+                            : Convert.FromBase64String(request.RowVersion)
+                    },
+                    Producto = new Producto
+                    {
+                        ProductID = request.Detalle.ProductID.Value
+                    },
+                    UnitPrice = request.Detalle.UnitPrice,
+                    Quantity = request.Detalle.Quantity,
+                    Discount = request.Detalle.Discount,
+                    TasaIVA = request.Detalle.TasaIVA
+                };
+                ventaDetalleBLL.InsertarDetalle(detalle);
+                // El DAL ya actualizó este valor después del SP
+                VentaVM.RowVersion = detalle.Venta.RowVersion;
+                // Obtener datos actuales desde BD
+                var lista = ventaDetalleBLL
+                            .ObtenerDetallesPorVentaId(request.OrderID);
+                var listaViewModel = CrearListaViewModel(lista);
+                var totales = CalcularTotalesVenta(listaViewModel);
+                return new JsonResult(new
+                {
+                    success = true,
+                    rowVersion = Convert.ToBase64String(
+                        detalle.Venta.RowVersion),
+                    lista = listaViewModel,
+                    totales
+                });
+            }
+            catch (Exception ex)
+            {
+                return new JsonResult(new
+                {
+                    success = false,
+                    message = ex.Message
+                });
+            }
+        }
+        public JsonResult OnPostObtenerDetalleEditar(
+    [FromBody] ObtenerDetalleEditarRequest request)
+        {
+            try
+            {
+                if (request == null || request.OrderID <= 0 || request.ProductID <= 0)
+                {
+                    return new JsonResult(new
+                    {
+                        success = false,
+                        message = "Los datos del detalle no son válidos."
+                    });
+                }
+                if (string.IsNullOrWhiteSpace(request.RowVersion))
+                {
+                    return new JsonResult(new
+                    {
+                        success = false,
+                        message = "No se recibió la RowVersion del detalle."
+                    });
+                }
+
+                var rowVersion = Convert.FromBase64String(request.RowVersion);
+                var detalle = ventaDetalleBLL
+                    .ObtenerDetallesPorVentaId(request.OrderID)
+                    .FirstOrDefault(d => d.Producto.ProductID == request.ProductID);
+                if (detalle == null)
+                {
+                    return new JsonResult(new
+                    {
+                        success = false,
+                        message = "El detalle ya no existe."
+                    });
+                }
+                if (detalle.RowVersion == null ||
+                    !detalle.RowVersion.SequenceEqual(rowVersion))
+                {
+                    return new JsonResult(new
+                    {
+                        success = false,
+                        message = "El detalle fue modificado por otro usuario."
+                    });
+                }
+
+                var producto = productoService
+                    .ObtenerProductoCostoEInventario(request.ProductID);
+                if (producto == null)
+                {
+                    return new JsonResult(new
+                    {
+                        success = false,
+                        message = "El producto ya no existe."
+                    });
+                }
+
+                return new JsonResult(new
+                {
+                    success = true,
+                    detalle = new VentaDetalleViewModel
+                    {
+                        CategoriaID = detalle.Producto.Categoria?.CategoryID,
+                        ProductID = detalle.Producto.ProductID,
+                        ProductName = detalle.Producto.ProductName,
+                        UnitPrice = detalle.UnitPrice,
+                        UnitsInStock = producto.UnitsInStock,
+                        Quantity = detalle.Quantity,
+                        Discount = detalle.Discount,
+                        TasaIVA = detalle.TasaIVA,
+                        RowVersion = Convert.ToBase64String(detalle.RowVersion)
+                    }
+                });
+            }
+            catch (Exception ex)
+            {
+                return new JsonResult(new
+                {
+                    success = false,
+                    message = ex.Message
+                });
+            }
+        }
+        public JsonResult OnPostEliminarDetalle(
+    [FromBody] EliminarDetalleRequest request)
+        {
+            try
+            {
+                if (request == null)
+                {
+                    return new JsonResult(new
+                    {
+                        success = false,
+                        message = "Datos inválidos."
+                    });
+                }
+                if (request.OrderID <= 0)
+                {
+                    return new JsonResult(new
+                    {
+                        success = false,
+                        message = "El OrderID no es válido."
+                    });
+                }
+                if (request.ProductID <= 0)
+                {
+                    return new JsonResult(new
+                    {
+                        success = false,
+                        message = "El ProductID no es válido."
+                    });
+                }
+                if (string.IsNullOrWhiteSpace(request.RowVersion))
+                {
+                    return new JsonResult(new
+                    {
+                        success = false,
+                        message = "No se recibió la RowVersion del detalle."
+                    });
+                }
+                if (string.IsNullOrWhiteSpace(request.VentaRowVersion))
+                {
+                    return new JsonResult(new
+                    {
+                        success = false,
+                        message = "No se recibió la RowVersion de la venta."
+                    });
+                }
+                var detalle = new VentaDetalle
+                {
+                    Venta = new Venta
+                    {
+                        OrderID = request.OrderID,
+
+                        RowVersion = Convert.FromBase64String(request.VentaRowVersion)
+                    },
+                    Producto = new Producto
+                    {
+                        ProductID = request.ProductID
+                    },
+                    RowVersion = Convert.FromBase64String(request.RowVersion)
+                };
+                ventaDetalleBLL.EliminarDetalle(detalle);
+                // Actualizar RowVersion de la venta
+                VentaVM.RowVersion =
+                    detalle.Venta.RowVersion;
+                // Obtener datos actuales desde BD
+                var lista = ventaDetalleBLL
+                    .ObtenerDetallesPorVentaId(request.OrderID);
+                var listaViewModel = CrearListaViewModel(lista);
+                var totales =
+                    CalcularTotalesVenta(listaViewModel);
+                return new JsonResult(new
+                {
+                    success = true,
+                    rowVersion = Convert.ToBase64String(
+                        detalle.Venta.RowVersion),
+                    lista = listaViewModel,
+                    totales
+                });
+            }
+            catch (Exception ex)
+            {
+                return new JsonResult(new
+                {
+                    success = false,
+                    message = ex.Message
+                });
+            }
+        }
+        private JsonResult ErrorDetalle(string message)
+        {
+            return new JsonResult(new
+            {
+                success = false,
+                message
+            });
+        }
+
     }
 }
