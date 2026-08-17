@@ -332,6 +332,16 @@ namespace NorthwindTradersV8WebRazorPages.Pages.Ventas
             return new JsonResult(lista);
         }
 
+        public JsonResult OnGetUltimaInformacionEnvio(string customerId)
+        {
+            if (string.IsNullOrWhiteSpace(customerId))
+                return new JsonResult(null);
+
+            var informacion =
+                ventaService.ObtenerUltimaInformacionDeEnvio(customerId);
+            return new JsonResult(informacion);
+        }
+
         public JsonResult OnGetProductosPorCategoria(int categoriaId)
         {
             var productos = productoService.ObtenerProductosPorCategoriaCbo(categoriaId);
@@ -413,12 +423,14 @@ namespace NorthwindTradersV8WebRazorPages.Pages.Ventas
         {
             try
             {
-                if (!request.Detalle.ProductID.HasValue)
+                if (request == null || request.Detalle == null ||
+                    !request.Detalle.ProductID.HasValue)
                 {
                     return new JsonResult(new
                     {
-                        success = false,
-                        message = "Debe seleccionar un producto x."
+                        ok = false,
+                        codigo = 0,
+                        mensaje = "Debe seleccionar un producto."
                     });
                 }
                 var detalle = new VentaDetalle
@@ -439,9 +451,11 @@ namespace NorthwindTradersV8WebRazorPages.Pages.Ventas
                     Discount = request.Detalle.Discount,
                     TasaIVA = request.Detalle.TasaIVA
                 };
-                ventaDetalleBLL.InsertarDetalle(detalle);
-                // El DAL ya actualizó este valor después del SP
-                VentaVM.RowVersion = detalle.Venta.RowVersion;
+                var resultado = ventaDetalleBLL.InsertarDetalle(detalle);
+                if (resultado.Codigo != 1)
+                    return ResultadoAgregarDetalleError(resultado.Codigo);
+
+                VentaVM.RowVersion = resultado.RowVersion;
                 // Obtener datos actuales desde BD
                 var lista = ventaDetalleBLL
                             .ObtenerDetallesPorVentaId(request.OrderID);
@@ -449,24 +463,49 @@ namespace NorthwindTradersV8WebRazorPages.Pages.Ventas
                 var totales = CalcularTotalesVenta(listaViewModel);
                 return new JsonResult(new
                 {
-                    success = true,
+                    ok = true,
                     rowVersion = Convert.ToBase64String(
-                        detalle.Venta.RowVersion),
+                        resultado.RowVersion!),
                     lista = listaViewModel,
                     totales
                 });
             }
-            catch (Exception ex)
+            catch
             {
                 return new JsonResult(new
                 {
-                    success = false,
-                    message = ex.Message
+                    ok = false,
+                    codigo = -99,
+                    mensaje = "Ocurrió un error inesperado al insertar el detalle."
                 });
             }
         }
+
+        private JsonResult ResultadoAgregarDetalleError(int codigo)
+        {
+            string mensaje = codigo switch
+            {
+                -1 => "El producto ya existe en el detalle de la venta.",
+                -3 => "La venta ya no existe o fue eliminada por otro usuario.",
+                -4 => "La venta fue modificada previamente por otro usuario.",
+                -5 => "No se pudo insertar el detalle de la venta.",
+                -6 => "No hay existencias suficientes para agregar la cantidad solicitada.",
+                -7 => "El inventario resultante excede el límite permitido.",
+                -8 => "El inventario resultante no puede ser negativo.",
+                -99 => "Ocurrió un error inesperado al insertar el detalle.",
+                _ => "No se pudo insertar el detalle de la venta."
+            };
+
+            return new JsonResult(new
+            {
+                ok = false,
+                codigo,
+                mensaje
+            });
+        }
+
         public JsonResult OnPostObtenerDetalleEditar(
-    [FromBody] ObtenerDetalleEditarRequest request)
+            [FromBody] ObtenerDetalleEditarRequest request)
         {
             try
             {
@@ -547,7 +586,7 @@ namespace NorthwindTradersV8WebRazorPages.Pages.Ventas
             }
         }
         public JsonResult OnPostEliminarDetalle(
-    [FromBody] EliminarDetalleRequest request)
+            [FromBody] EliminarDetalleRequest request)
         {
             try
             {

@@ -4,12 +4,6 @@
     ViewData["Title"] = "Editar venta";
 }
 <h2>@ViewData["Title"]</h2>
-@*
-@if (!ViewData.ModelState.IsValid)
-{
-    <div asp-validation-summary="All" class="alert alert-danger"></div>
-}
-*@
 @if (TempData["Mensaje"] != null)
 {
     <div class="alert alert-success">
@@ -464,7 +458,7 @@
                 </button>
             </div>
         </div>
-    </div>
+    </div>      
 </div>
 @section Scripts {
     <script>
@@ -473,6 +467,15 @@
             summary
                 .html("<ul><li>" + mensaje + "</li></ul>")
                 .show();
+            // Desplazar la página hacia el elemento de resumen de validación
+            try {
+                var top = summary.offset() ? summary.offset().top : 0;
+                // Dejar un pequeño espacio por encima
+                $("html, body").animate({ scrollTop: Math.max(top - 10, 0) }, 400);
+            } catch (e) {
+                // En caso de error (ej. summary no existe), hacer scroll al inicio
+                $("html, body").animate({ scrollTop: 0 }, 400);
+            }
         }
 
         function limpiarErrorValidacion() {
@@ -526,7 +529,7 @@
             $(".btnEliminar").prop("disabled", true);
         }
 
-        function actualizarEncabezado() {
+        function actualizarEncabezado(alTerminar) {
             const request = {
                 OrderID: parseInt($("#VentaVM_OrderID").val()),
                 CustomerID: $("#cboCliente").val(),
@@ -553,6 +556,9 @@
                         limpiarErrorValidacion();
                         //Actualizar la nueva RowVersion
                         $("#VentaVM_RowVersion").val(response.rowVersion);
+                        if (alTerminar) {
+                            alTerminar();
+                        }
                     } else {
                         mostrarErrorValidacion(response.mensaje);
                         if (
@@ -572,7 +578,6 @@
         }
 
         function llenarTabla(lista) {
-            // console.log("LISTA RECIBIDA:", lista);
             let html = "";
             lista.forEach(function(item, indice) {
                 html += `
@@ -734,32 +739,47 @@
             });
         });
 
-        function cargarInformacionEnvio(customerId) {
-            // Si seleccionó "Seleccione"
+        function obtenerUltimaInformacionEnvio(customerId, alTerminar) {
             if (customerId == "") {
-                $("#VentaVM_ShipName").val("");
-                $("#VentaVM_ShipAddress").val("");
-                $("#VentaVM_ShipCity").val("");
-                $("#VentaVM_ShipRegion").val("");
-                $("#VentaVM_ShipPostalCode").val("");
-                $("#VentaVM_ShipCountry").val("");
-                $("#cboCompañia").val("");
+                alTerminar(null);
                 return;
             }
+
             $.getJSON(
                 "?handler=UltimaInformacionEnvio",
                 { customerId: customerId },
                 function(data) {
-                    if (data == null)
-                        return;
-                    $("#VentaVM_ShipName").val(data.shipName);
-                    $("#VentaVM_ShipAddress").val(data.shipAddress);
-                    $("#VentaVM_ShipCity").val(data.shipCity);
-                    $("#VentaVM_ShipRegion").val(data.shipRegion);
-                    $("#VentaVM_ShipPostalCode").val(data.shipPostalCode);
-                    $("#VentaVM_ShipCountry").val(data.shipCountry);
-                    $("#cboCompañia").val(String(data.shipVia));
-                });
+                    alTerminar(data);
+                }
+            ).fail(function(xhr) {
+                mostrarErrorValidacion(
+                    "No se pudo obtener la última información de envío."
+                );
+                console.error(xhr);
+            });
+        }
+
+        function aplicarInformacionEnvio(data) {
+            $("#VentaVM_ShipName").val("");
+            $("#VentaVM_ShipAddress").val("");
+            $("#VentaVM_ShipCity").val("");
+            $("#VentaVM_ShipRegion").val("");
+            $("#VentaVM_ShipPostalCode").val("");
+            $("#VentaVM_ShipCountry").val("");
+            $("#cboCompañia").val("");
+            $("#VentaVM_Freight").val(0);
+
+            if (data != null) {
+                $("#VentaVM_ShipName").val(data.shipName);
+                $("#VentaVM_ShipAddress").val(data.shipAddress);
+                $("#VentaVM_ShipCity").val(data.shipCity);
+                $("#VentaVM_ShipRegion").val(data.shipRegion);
+                $("#VentaVM_ShipPostalCode").val(data.shipPostalCode);
+                $("#VentaVM_ShipCountry").val(data.shipCountry);
+                $("#cboCompañia").val(String(data.shipVia));
+            }
+
+            actualizarEnvio();
         }
 
         function cargarFormasEnvio() {
@@ -911,9 +931,8 @@
                 data: JSON.stringify(request),
 
                 success: function(r) {
-                    console.log("Respuesta completa:", r);
-                    console.log("Lista recibida:", r.lista);
-                    if (r.success) {
+                    if (r.ok) {
+                        limpiarErrorValidacion();
                         // Actualizar RowVersion de la venta
                         $("#VentaVM_RowVersion").val(r.rowVersion);
                         // Actualizar tabla con los datos reales de la BD
@@ -924,84 +943,24 @@
                         limpiarCapturaProducto();
                     }
                     else {
-                        alert(r.message);
+                        mostrarErrorValidacion(r.mensaje);
+                        if (
+                            r.codigo === -3 ||
+                            r.codigo === -4 ||
+                            r.codigo === -99
+                        ) {
+                            bloquearEdicionPorConcurrencia();
+                        }
                     }
                 },
                 error: function(xhr) {
-                    alert(xhr.responseText);
+                    mostrarErrorValidacion(
+                        xhr.responseJSON?.mensaje ||
+                        "Ocurrió un error al insertar el detalle."
+                    );
+                    console.error(xhr);
                 }
             });
-        }
-
-        function llenarTabla(lista) {
-            let html = "";
-            lista.forEach(function(item, indice) {
-                html += `
-                                    <tr>
-                                        <td class="text-center">${indice + 1}</td>
-                                        <td>${item.productName}</td>
-                                        <td class="text-center">
-                                            ${Number(item.unitPrice).toLocaleString('es-MX',
-                    { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                                        </td>
-                                        <td class="text-center">
-                                            ${item.quantity}
-                                        </td>
-                                        <td class="text-end">
-                                            ${Number(item.subtotalDelImporteConIVAIncluido).toLocaleString('es-MX',
-                        { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                                        </td>
-                                        <td class="text-center">
-                                            <nobr>
-                                                ${(item.discount * 100).toFixed(2)} %
-                                            </nobr>
-                                        </td>
-                                        <td class="text-end">
-                                            ${Number(item.subtotalDelAhorroTotalDespuesDescuento).toLocaleString('es-MX',
-                            { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                                        </td>
-                                        <td class="text-end">
-                                            ${Number(item.subtotalDelImporteConIVAConDescuento).toLocaleString('es-MX',
-                                { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                                        </td>
-                                        <td class="text-center">
-                                            <nobr>
-                                                ${(item.tasaIVA * 100).toFixed(2)} %
-                                            </nobr>
-                                        </td>
-                                        <td class="text-end">
-                                            ${Number(item.subtotalDelImporteSinIVAConDescuento).toLocaleString('es-MX',
-                                    { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                                        </td>
-                                        <td class="text-end">
-                                            ${Number(item.subtotalIVADespuesDelDescuento).toLocaleString('es-MX',
-                                        { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                                        </td>
-                                        <td class="text-end fw-bold">
-                                            ${Number(item.subtotal).toLocaleString('es-MX',
-                                            { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
-                                        </td>
-                                        <td class="text-center">
-                                            <button type="button"
-                                                    class="btn btn-sm btn-warning btnEditar"
-                                                    data-product-id="${item.productID}"
-                                                    data-row-version="${item.rowVersion}">
-                                                <i class="bi bi-pencil"></i>
-                                            </button>
-                                            <button type="button"
-                                                    class="btn btn-sm btn-danger btnEliminar"
-                                                    data-index="${indice}"
-                                                    data-product-id="${item.productID}"
-                                                    data-row-version="${item.rowVersion}">
-                                                <i class="bi bi-trash"></i>
-                                            </button>
-                                        </td>
-                                        <td class="d-none">
-                                            ${item.productID}
-                                        </td>
-                                    </tr>`;
-            });
-            $("#tblDetalle").html(html);
         }
 
         function mostrarTotales(t) {
@@ -1166,6 +1125,9 @@
                 VentaDetalleRowVersion: detalleEnEdicion.rowVersion,
                 VentaRowVersion: $("#VentaVM_RowVersion").val()
             };
+
+            $("#btnAgregarProducto").prop("disabled", true);
+
             $.ajax({
                 url: "?handler=ActualizarDetalle",
                 type: "POST",
@@ -1184,11 +1146,13 @@
                     }
                     else {
                         alert(r.message);
+                        $("#btnAgregarProducto").prop("disabled", false);
                     }
                 },
                 error: function(xhr) {
                     console.error(xhr);
                     alert("Ocurrió un error al actualizar el detalle.");
+                    $("#btnAgregarProducto").prop("disabled", false);
                 }
             });
         }
@@ -1197,6 +1161,7 @@
             detalleEnEdicion = null;
             $("#cboCategoria, #cboProducto").prop("disabled", false);
             $("#btnAgregarProducto")
+                .prop("disabled", false)
                 .attr("title", "Agregar")
                 .find("span")
                 .text(" Agregar");
@@ -1217,8 +1182,6 @@
                 RowVersion: rowVersion,
                 VentaRowVersion: $("#VentaVM_RowVersion").val()
             };
-            console.log("Request eliminar detalle:");
-            console.log(request);
             $.ajax({
                 type: "POST",
                 url: "?handler=EliminarDetalle",
@@ -1229,8 +1192,6 @@
                 },
                 data: JSON.stringify(request),
                 success: function(r) {
-                    console.log("Respuesta eliminar:");
-                    console.log(r);
                     if (r.success) {
                         // Actualizar RowVersion de Orders
                         $("#VentaVM_RowVersion")
@@ -1357,7 +1318,6 @@
         });
 
         $(
-            "#cboCliente," +
             "#cboVendedor," +
             "#VentaVM_OrderDate," +
             "#VentaVM_OrderTime," +
@@ -1412,7 +1372,12 @@
         });
 
         $("#cboCliente").change(function() {
-            cargarInformacionEnvio($(this).val());
+            const customerId = $(this).val();
+            obtenerUltimaInformacionEnvio(customerId, function(data) {
+                actualizarEncabezado(function() {
+                    aplicarInformacionEnvio(data);
+                });
+            });
         });
 
         $(document).on("click", ".btnEliminar", function() {

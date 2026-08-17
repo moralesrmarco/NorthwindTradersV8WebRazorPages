@@ -59,7 +59,8 @@ namespace NorthwindTradersV8WebRazorPages.DAL
             }
             return ventaDetalles;
         }
-        public void InsertarDetalle(VentaDetalle detalle)
+        public (int Codigo, byte[]? RowVersion) InsertarDetalle(
+            VentaDetalle detalle)
         {
             try
             {
@@ -72,25 +73,36 @@ namespace NorthwindTradersV8WebRazorPages.DAL
                 cmd.Parameters.AddWithValue("@Quantity", detalle.Quantity);
                 cmd.Parameters.AddWithValue("@Discount", detalle.Discount);
                 cmd.Parameters.AddWithValue("@TasaIVA", detalle.TasaIVA);
+
                 SqlParameter pRowVersion = new("@VentaRowVersion", SqlDbType.Binary, 8)
                 {
                     Direction = ParameterDirection.InputOutput,
                     Value = detalle.Venta.RowVersion ?? (object)DBNull.Value
                 };
                 cmd.Parameters.Add(pRowVersion);
-                if (detalle.Venta.OrderID <= 0)
-                    throw new ArgumentException("La venta no tiene un OrderID válido.");
-                if (detalle.Producto.ProductID <= 0)
-                    throw new ArgumentException("El producto no tiene un ProductID válido.");
+
+                SqlParameter pCodigo = new("@Codigo", SqlDbType.Int)
+                {
+                    Direction = ParameterDirection.ReturnValue
+                };
+                cmd.Parameters.Add(pCodigo);
+
                 cn.Open();
                 cmd.ExecuteNonQuery();
+
+                int codigo = Convert.ToInt32(pCodigo.Value);
+                if (codigo != 1)
+                    return (codigo, null);
+
                 detalle.Venta.RowVersion = (byte[])pRowVersion.Value;
+                return (codigo, detalle.Venta.RowVersion);
             }
             catch (Exception ex)
             {
                 throw new Exception("Error al insertar el detalle de la venta: " + ex.Message);
             }
         }
+
         public List<VentaDetalle> ObtenerDetallesPorVentaId(int orderID)
         {
             List<VentaDetalle> lista = new();

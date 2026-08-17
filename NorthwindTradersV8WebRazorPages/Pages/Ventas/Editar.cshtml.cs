@@ -359,7 +359,13 @@ namespace NorthwindTradersV8WebRazorPages.Pages.Ventas
                     Discount = request.Detalle.Discount,
                     TasaIVA = request.Detalle.TasaIVA
                 };
-                ventaDetalleBLL.InsertarDetalle(detalle);
+                var resultado = ventaDetalleBLL.InsertarDetalle(detalle);
+                if (resultado.Codigo != 1)
+                    throw new Exception(
+                        "No se pudo insertar el detalle de la venta. " +
+                        "Código: " + resultado.Codigo);
+
+                detalle.Venta.RowVersion = resultado.RowVersion;
                 // El DAL ya actualizó este valor después del SP
                 VentaVM.RowVersion = detalle.Venta.RowVersion;
                 // Obtener datos actuales desde BD

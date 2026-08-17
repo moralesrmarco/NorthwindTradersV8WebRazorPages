@@ -26,9 +26,10 @@ namespace NorthwindTradersV8WebRazorPages.BLL
                 Thread.Sleep(_tiempoDemora);
             return ventaDetalleDAL.ObtenerVentaDetallePorVentaId(orderId);
         }
-        public void InsertarDetalle(VentaDetalle detalle)
+        public (int Codigo, byte[]? RowVersion) InsertarDetalle(
+            VentaDetalle detalle)
         {
-            ventaDetalleDAL.InsertarDetalle(detalle);
+            return ventaDetalleDAL.InsertarDetalle(detalle);
         }
         public List<VentaDetalle> ObtenerDetallesPorVentaId(int orderID)
         {
