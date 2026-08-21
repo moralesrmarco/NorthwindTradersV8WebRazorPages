@@ -25,11 +25,11 @@ namespace NorthwindTradersV8WebRazorPages.Pages.Ventas
         public VentaInsertarViewModel VentaVM { get; set; } = new();
         [BindProperty(SupportsGet = true)]
         public string? ReturnUrl { get; set; }
-        public List<SelectListItem> Clientes { get; set; }
-        public List<SelectListItem> Vendedores { get; set; }
-        public List<SelectListItem> Transportistas { get; set; }
-        public List<SelectListItem> Categorias { get; set; }
-        public List<SelectListItem> Productos { get; set; }
+        public List<SelectListItem> Clientes { get; set; } = new();
+        public List<SelectListItem> Vendedores { get; set; } = new();
+        public List<SelectListItem> Transportistas { get; set; } = new();
+        public List<SelectListItem> Categorias { get; set; } = new();
+        public List<SelectListItem> Productos { get; set; } = new();
         [BindProperty]
         public VentaDetalleViewModel Detalle { get; set; } = new();
         public List<VentaDetalleViewModel> Detalles { get; set; } = new();
@@ -392,24 +392,22 @@ namespace NorthwindTradersV8WebRazorPages.Pages.Ventas
                         request.VentaDetalleRowVersion)
                 };
 
-                ventaDetalleBLL.ActualizarDetalle(detalle);
+                var resultado = ventaDetalleBLL.ActualizarDetalle(detalle);
 
-                var ventaActualizada = ventaBLL.ObtenerVentaPorId2(
-                    request.OrderID);
-                if (ventaActualizada?.RowVersion == null)
-                    throw new Exception(
-                        "No se pudo obtener la RowVersion actualizada de la venta.");
-
+                if (resultado.Codigo != 1)
+                    return ResultadoActualizarDetalleError(
+                        resultado.Codigo);
+                VentaVM.RowVersion = resultado.RowVersion;
                 var lista = ventaDetalleBLL
                     .ObtenerDetallesPorVentaId(request.OrderID);
                 var listaViewModel = CrearListaViewModel(lista);
-                var totales = CalcularTotalesVenta(listaViewModel);
-
+                var totales =
+                    CalcularTotalesVenta(listaViewModel); 
                 return new JsonResult(new
                 {
-                    success = true,
+                    ok = true,
                     rowVersion = Convert.ToBase64String(
-                        ventaActualizada.RowVersion),
+                        resultado.RowVersion!),
                     lista = listaViewModel,
                     totales
                 });
@@ -480,14 +478,35 @@ namespace NorthwindTradersV8WebRazorPages.Pages.Ventas
                 });
             }
         }
-
+        private JsonResult ResultadoActualizarDetalleError(int codigo)
+        {
+            string mensaje = codigo switch
+            {
+                -1 => "El detalle fue eliminado por otro usuario. Recargue la venta para actualizar los datos.",
+                -2 => "El detalle fue modificado por otro usuario. Recargue la venta para actualizar los datos.",
+                -3 => "La venta fue eliminada por otro usuario.",
+                -4 => "La venta fue modificada previamente por otro usuario. Recargue la venta para actualizar los datos.",
+                -5 => "La cantidad del detalle no es válida.",
+                -6 => "No hay inventario suficiente para actualizar el detalle.",
+                -7 => "El inventario resultante excede el límite permitido.",
+                -8 => "El inventario resultaría negativo.",
+                -99 => "Ocurrió un error inesperado al actualizar el detalle.",
+                _ => "No se pudo actualizar el detalle de la venta."
+            };
+            return new JsonResult(new
+            {
+                ok = false,
+                codigo,
+                mensaje
+            });
+        }
         private JsonResult ResultadoAgregarDetalleError(int codigo)
         {
             string mensaje = codigo switch
             {
                 -1 => "El producto ya existe en el detalle de la venta.",
-                -3 => "La venta ya no existe o fue eliminada por otro usuario.",
-                -4 => "La venta fue modificada previamente por otro usuario.",
+                -3 => "La venta fue eliminada por otro usuario.",
+                -4 => "La venta fue modificada previamente por otro usuario. Recargue la venta para actualizar los datos.",
                 -5 => "No se pudo insertar el detalle de la venta.",
                 -6 => "No hay existencias suficientes para agregar la cantidad solicitada.",
                 -7 => "El inventario resultante excede el límite permitido.",
@@ -535,7 +554,8 @@ namespace NorthwindTradersV8WebRazorPages.Pages.Ventas
                     return new JsonResult(new
                     {
                         success = false,
-                        message = "El detalle ya no existe."
+                        bloquearEdicionPorConcurrencia = true,
+                        message = "El detalle fue eliminado por otro usuario. Recargue la venta para actualizar los datos."
                     });
                 }
                 if (detalle.RowVersion == null ||
@@ -544,7 +564,8 @@ namespace NorthwindTradersV8WebRazorPages.Pages.Ventas
                     return new JsonResult(new
                     {
                         success = false,
-                        message = "El detalle fue modificado por otro usuario."
+                        bloquearEdicionPorConcurrencia = true,
+                        message = "El detalle fue modificado por otro usuario. Recargue la venta para actualizar los datos."
                     });
                 }
 
@@ -555,6 +576,7 @@ namespace NorthwindTradersV8WebRazorPages.Pages.Ventas
                     return new JsonResult(new
                     {
                         success = false,
+                        bloquearEdicionPorConcurrencia = true,
                         message = "El producto ya no existe."
                     });
                 }
@@ -591,95 +613,98 @@ namespace NorthwindTradersV8WebRazorPages.Pages.Ventas
             try
             {
                 if (request == null)
-                {
-                    return new JsonResult(new
-                    {
-                        success = false,
-                        message = "Datos inválidos."
-                    });
-                }
+                    return ErrorDetalle(
+                        "Datos inválidos.");
                 if (request.OrderID <= 0)
-                {
-                    return new JsonResult(new
-                    {
-                        success = false,
-                        message = "El OrderID no es válido."
-                    });
-                }
+                    return ErrorDetalle(
+                        "El OrderID no es válido.");
                 if (request.ProductID <= 0)
-                {
-                    return new JsonResult(new
-                    {
-                        success = false,
-                        message = "El ProductID no es válido."
-                    });
-                }
+                    return ErrorDetalle(
+                        "El ProductID no es válido.");
                 if (string.IsNullOrWhiteSpace(request.RowVersion))
-                {
-                    return new JsonResult(new
-                    {
-                        success = false,
-                        message = "No se recibió la RowVersion del detalle."
-                    });
-                }
+                    return ErrorDetalle(
+                        "No se recibió la RowVersion del detalle.");
                 if (string.IsNullOrWhiteSpace(request.VentaRowVersion))
-                {
-                    return new JsonResult(new
-                    {
-                        success = false,
-                        message = "No se recibió la RowVersion de la venta."
-                    });
-                }
+                    return ErrorDetalle(
+                        "No se recibió la RowVersion de la venta.");
                 var detalle = new VentaDetalle
                 {
                     Venta = new Venta
                     {
                         OrderID = request.OrderID,
-
-                        RowVersion = Convert.FromBase64String(request.VentaRowVersion)
+                        RowVersion = Convert.FromBase64String(
+                            request.VentaRowVersion)
                     },
                     Producto = new Producto
                     {
                         ProductID = request.ProductID
                     },
-                    RowVersion = Convert.FromBase64String(request.RowVersion)
+                    RowVersion = Convert.FromBase64String(
+                        request.RowVersion)
                 };
-                ventaDetalleBLL.EliminarDetalle(detalle);
-                // Actualizar RowVersion de la venta
+                var resultado =
+                    ventaDetalleBLL.EliminarDetalle(detalle);
+                if (resultado.Codigo != 1)
+                    return ResultadoEliminarDetalleError(
+                        resultado.Codigo);
                 VentaVM.RowVersion =
-                    detalle.Venta.RowVersion;
-                // Obtener datos actuales desde BD
+                    resultado.RowVersion;
                 var lista = ventaDetalleBLL
-                    .ObtenerDetallesPorVentaId(request.OrderID);
-                var listaViewModel = CrearListaViewModel(lista);
+                    .ObtenerDetallesPorVentaId(
+                        request.OrderID);
+                var listaViewModel =
+                    CrearListaViewModel(lista);
                 var totales =
-                    CalcularTotalesVenta(listaViewModel);
+                    CalcularTotalesVenta(
+                        listaViewModel);
                 return new JsonResult(new
                 {
-                    success = true,
+                    ok = true,
                     rowVersion = Convert.ToBase64String(
-                        detalle.Venta.RowVersion),
+                        resultado.RowVersion!),
                     lista = listaViewModel,
                     totales
                 });
             }
             catch (Exception ex)
             {
-                return new JsonResult(new
-                {
-                    success = false,
-                    message = ex.Message
-                });
+                return ErrorDetalle(
+                    ex.Message);
             }
         }
-        private JsonResult ErrorDetalle(string message)
+        private JsonResult ResultadoEliminarDetalleError(
+            int codigo)
+        {
+            string mensaje = codigo switch
+            {
+                -1 => "El detalle fue eliminado por otro usuario. Recargue la venta para actualizar los datos.",
+                -2 => "El detalle fue modificado por otro usuario. Recargue la venta para actualizar los datos.",
+                -3 => "La venta fue eliminada por otro usuario.",
+                -4 => "La venta fue modificada previamente por otro usuario. Recargue la venta para actualizar los datos.",
+                -5 => "La cantidad del detalle no es válida.",
+                -7 => "El inventario resultante excede el límite permitido.",
+                -8 => "El inventario resultaría negativo.",
+                -99 => "Ocurrió un error inesperado al eliminar el detalle.",
+                _ => "No se pudo eliminar el detalle de la venta."
+            };
+
+            return new JsonResult(new
+            {
+                ok = false,
+                codigo,
+                mensaje
+            });
+        }
+        private JsonResult ErrorDetalle(
+            string mensaje,
+            int codigo = -99)
         {
             return new JsonResult(new
             {
-                success = false,
-                message
+                ok = false,
+                codigo,
+                mensaje
             });
         }
-
     }
 }

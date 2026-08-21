@@ -35,13 +35,13 @@ namespace NorthwindTradersV8WebRazorPages.BLL
         {
             return ventaDetalleDAL.ObtenerDetallesPorVentaId(orderID);
         }
-        public void EliminarDetalle(VentaDetalle detalle)
+        public (int Codigo, byte[]? RowVersion) EliminarDetalle(VentaDetalle detalle)
         {
-            ventaDetalleDAL.EliminarDetalle(detalle);
+            return ventaDetalleDAL.EliminarDetalle(detalle);
         }
-        public void ActualizarDetalle(VentaDetalle detalle)
+        public (int Codigo, byte[]? RowVersion) ActualizarDetalle(VentaDetalle detalle)
         {
-            ventaDetalleDAL.ActualizarDetalle(detalle);
+            return ventaDetalleDAL.ActualizarDetalle(detalle);
         }
     }
 }

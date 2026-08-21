@@ -142,7 +142,7 @@ namespace NorthwindTradersV8WebRazorPages.DAL
             }
             return lista;
         }
-        public void EliminarDetalle(VentaDetalle detalle)
+        public (int Codigo, byte[]? RowVersion) EliminarDetalle(VentaDetalle detalle)
         {
             try
             {
@@ -166,7 +166,7 @@ namespace NorthwindTradersV8WebRazorPages.DAL
                         "La venta no tiene una RowVersion válida.");
                 using SqlConnection cn = new(connectionString);
                 using SqlCommand cmd = new(
-                    "SpVentaDetalleEliminar",
+                    "SpVentaDetalleEliminar2",
                     cn);
                 cmd.CommandType = CommandType.StoredProcedure;
                 cmd.Parameters.AddWithValue(
@@ -179,34 +179,34 @@ namespace NorthwindTradersV8WebRazorPages.DAL
                     "@VentaDetalleRowVersion",
                     SqlDbType.Binary,
                     8).Value = detalle.RowVersion;
-                cmd.Parameters.Add(
+                SqlParameter pRowVersion = new(
                     "@VentaRowVersion",
                     SqlDbType.Binary,
-                    8).Value = detalle.Venta.RowVersion;
-                SqlParameter pReturnValue = new()
-                {
-                    ParameterName = "@RETURN_VALUE",
-                    SqlDbType = SqlDbType.Int,
-                    Direction = ParameterDirection.ReturnValue
-                };
-                cmd.Parameters.Add(pReturnValue);
+                    8)
+                        {
+                            Direction = ParameterDirection.InputOutput,
+                            Value = detalle.Venta.RowVersion
+                        };
+                cmd.Parameters.Add(pRowVersion);
+                SqlParameter pCodigo = new(
+                    "@Codigo",
+                    SqlDbType.Int)
+                        {
+                            Direction =
+                        ParameterDirection.ReturnValue
+                        };
+                cmd.Parameters.Add(pCodigo);
                 cn.Open();
-                byte[]? nuevaRowVersion = null;
-                using (SqlDataReader reader = cmd.ExecuteReader())
-                {
-                    if (reader.Read())
-                    {
-                        nuevaRowVersion =
-                            (byte[])reader["RowVersion"];
-                    }
-                }
-                int resultado = (int)pReturnValue.Value;
-                if (resultado != 1)
-                {
-                    throw new Exception(
-                        ObtenerMensajeEliminarDetalle(resultado));
-                }
-                detalle.Venta.RowVersion = nuevaRowVersion;
+                cmd.ExecuteNonQuery();
+                int codigo =
+                    Convert.ToInt32(pCodigo.Value);
+                if (codigo != 1)
+                    return (codigo, null);
+                detalle.Venta.RowVersion =
+                    (byte[])pRowVersion.Value;
+                return (
+                    codigo,
+                    detalle.Venta.RowVersion);
             }
             catch (Exception ex)
             {
@@ -215,7 +215,7 @@ namespace NorthwindTradersV8WebRazorPages.DAL
                     + ex.Message);
             }
         }
-        public void ActualizarDetalle(VentaDetalle detalle)
+        public (int Codigo, byte[]? RowVersion) ActualizarDetalle(VentaDetalle detalle)
         {
             try
             {
@@ -246,7 +246,7 @@ namespace NorthwindTradersV8WebRazorPages.DAL
 
                 using SqlConnection cn = new(connectionString);
                 using SqlCommand cmd = new(
-                    "SpVentaDetalleActualizar",
+                    "SpVentaDetalleActualizar2",
                     cn);
                 cmd.CommandType = CommandType.StoredProcedure;
                 cmd.Parameters.Add("@OrderID", SqlDbType.Int).Value =
@@ -261,26 +261,31 @@ namespace NorthwindTradersV8WebRazorPages.DAL
                     "@VentaDetalleRowVersion",
                     SqlDbType.Binary,
                     8).Value = detalle.RowVersion;
-                cmd.Parameters.Add(
-                    "@VentaRowVersion",
-                    SqlDbType.Binary,
-                    8).Value = detalle.Venta.RowVersion;
-                SqlParameter pReturnValue = new()
+                SqlParameter pRowVersion = new(
+                            "@VentaRowVersion",
+                            SqlDbType.Binary,
+                            8)
                 {
-                    ParameterName = "@RETURN_VALUE",
-                    SqlDbType = SqlDbType.Int,
+                    Direction = ParameterDirection.InputOutput,
+                    Value = detalle.Venta.RowVersion
+                };
+                cmd.Parameters.Add(pRowVersion);
+                SqlParameter pCodigo = new("@Codigo", SqlDbType.Int)
+                {
                     Direction = ParameterDirection.ReturnValue
                 };
-                cmd.Parameters.Add(pReturnValue);
 
+                cmd.Parameters.Add(pCodigo);
                 cn.Open();
                 cmd.ExecuteNonQuery();
-                int resultado = (int)pReturnValue.Value;
-                if (resultado != 1)
-                {
-                    throw new Exception(
-                        ObtenerMensajeActualizarDetalle(resultado));
-                }
+                int codigo = Convert.ToInt32(pCodigo.Value);
+                if (codigo != 1)
+                    return (codigo, null);
+                detalle.Venta.RowVersion =
+                    (byte[])pRowVersion.Value;
+                return (
+                    codigo,
+                    detalle.Venta.RowVersion);
             }
             catch (Exception ex)
             {
@@ -304,21 +309,6 @@ namespace NorthwindTradersV8WebRazorPages.DAL
                 _ => $"No se pudo eliminar el detalle. Código: {codigo}."
             };
         }
-        private string ObtenerMensajeActualizarDetalle(int codigo)
-        {
-            return codigo switch
-            {
-                -1 => "El detalle ya no existe.",
-                -2 => "El detalle fue modificado por otro usuario.",
-                -3 => "La venta ya no existe.",
-                -4 => "La venta fue modificada por otro usuario.",
-                -5 => "La cantidad del detalle no es válida.",
-                -6 => "No hay inventario suficiente para actualizar el detalle.",
-                -7 => "El inventario excedería el límite permitido.",
-                -8 => "El inventario resultaría negativo.",
-                -99 => "Ocurrió un error inesperado al actualizar el detalle.",
-                _ => $"No se pudo actualizar el detalle. Código: {codigo}."
-            };
-        }
+
     }
 }

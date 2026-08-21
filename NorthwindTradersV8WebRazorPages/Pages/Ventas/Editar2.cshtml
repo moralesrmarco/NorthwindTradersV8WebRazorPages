@@ -486,6 +486,8 @@
         }
 
         function bloquearEdicionPorConcurrencia() {
+            ventaBloqueada = true;
+            detalleEnEdicion = null;
 
             // Encabezado de la venta
             $("#cboCliente").prop("disabled", true);
@@ -858,6 +860,7 @@
         }
 
         let detalleEnEdicion = null;
+        let ventaBloqueada = false;
 
         function agregarProducto() {
             if ($("#cboCategoria").val() == "") {
@@ -1019,7 +1022,9 @@
             $("#Detalle_Subtotal").val(0);
 
             // Dejar el foco en Producto
-            $("#cboProducto").focus();
+            if (!ventaBloqueada) {
+                $("#cboProducto").focus();
+            }
         }
 
         function cargarInformacionProducto(productId) {
@@ -1116,7 +1121,6 @@
                 $("#Detalle_Discount").focus().select();
                 return;
             }
-
             const request = {
                 OrderID: Number($("#VentaVM_OrderID").val()),
                 ProductID: detalleEnEdicion.productID,
@@ -1125,50 +1129,98 @@
                 VentaDetalleRowVersion: detalleEnEdicion.rowVersion,
                 VentaRowVersion: $("#VentaVM_RowVersion").val()
             };
-
             $("#btnAgregarProducto").prop("disabled", true);
-
             $.ajax({
                 url: "?handler=ActualizarDetalle",
                 type: "POST",
                 contentType: "application/json",
+                dataType: "json",
                 headers: {
                     "RequestVerificationToken":
                         $('input[name="__RequestVerificationToken"]').val()
                 },
                 data: JSON.stringify(request),
                 success: function(r) {
-                    if (r.success) {
+                    if (r.ok) {
+                        limpiarErrorValidacion();
+                        // Actualizar RowVersion de la venta
                         $("#VentaVM_RowVersion").val(r.rowVersion);
+                        // Actualizar tabla
                         llenarTabla(r.lista);
+                        // Actualizar totales
                         mostrarTotales(r.totales);
+                        // Salir del modo edición
                         salirModoEdicion();
                     }
                     else {
-                        alert(r.message);
-                        $("#btnAgregarProducto").prop("disabled", false);
+                        mostrarErrorValidacion(r.mensaje);
+                        /*
+                         * Estos códigos corresponden a problemas
+                         * de la venta que impiden seguir editando.
+                         */
+                        if (
+                            r.codigo === -1 ||
+                            r.codigo === -2 ||
+                            r.codigo === -3 ||
+                            r.codigo === -4 ||
+                            r.codigo === -99
+                        ) {
+                            salirModoEdicion();
+                            bloquearEdicionPorConcurrencia();
+                        }
+                        else {
+                            $("#btnAgregarProducto")
+                                .prop("disabled", false);
+                        }
                     }
                 },
                 error: function(xhr) {
+                    mostrarErrorValidacion(
+                        xhr.responseJSON?.mensaje ||
+                        "Ocurrió un error al actualizar el detalle."
+                    );
                     console.error(xhr);
-                    alert("Ocurrió un error al actualizar el detalle.");
-                    $("#btnAgregarProducto").prop("disabled", false);
+                    $("#btnAgregarProducto")
+                        .prop("disabled", false);
                 }
             });
         }
 
         function salirModoEdicion() {
+
             detalleEnEdicion = null;
-            $("#cboCategoria, #cboProducto").prop("disabled", false);
+
+            if (!ventaBloqueada) {
+
+                $("#cboCategoria, #cboProducto")
+                    .prop("disabled", false);
+
+                $("#Detalle_Quantity")
+                    .prop("disabled", false);
+
+                $("#Detalle_Discount")
+                    .prop("disabled", false);
+
+                $(".btnEditar, .btnEliminar")
+                    .prop("disabled", false);
+            }
+
             $("#btnAgregarProducto")
-                .prop("disabled", false)
+                .prop("disabled", ventaBloqueada)
                 .attr("title", "Agregar")
                 .find("span")
                 .text(" Agregar");
-            $("#btnAgregarProducto i").attr("class", "bi bi-plus-lg");
-            $("#btnCancelarEdicion").addClass("d-none");
+
+            $("#btnAgregarProducto i")
+                .attr("class", "bi bi-plus-lg");
+
+            $("#btnCancelarEdicion")
+                .addClass("d-none");
+
             $("#cboCategoria").val("");
+
             cargarProductos("");
+
             limpiarCapturaProducto();
         }
 
@@ -1192,7 +1244,8 @@
                 },
                 data: JSON.stringify(request),
                 success: function(r) {
-                    if (r.success) {
+                    if (r.ok) {
+                        limpiarErrorValidacion();
                         // Actualizar RowVersion de Orders
                         $("#VentaVM_RowVersion")
                             .val(r.rowVersion);
@@ -1202,8 +1255,20 @@
                         mostrarTotales(r.totales);
                     }
                     else {
+                        mostrarErrorValidacion(
+                            r.mensaje ||
+                            "No se pudo eliminar el detalle."
+                        );
 
-                        alert(r.message);
+                        if (
+                            r.codigo === -1 ||
+                            r.codigo === -2 ||
+                            r.codigo === -3 ||
+                            r.codigo === -4 ||
+                            r.codigo === -99
+                        ) {
+                            bloquearEdicionPorConcurrencia();
+                        }
                     }
                 },
                 error: function(xhr) {
@@ -1216,62 +1281,111 @@
         }
 
         function editarProducto(productID, rowVersion) {
+
+            if (ventaBloqueada) {
+                return;
+            }
+
             const request = {
                 OrderID: Number($("#VentaVM_OrderID").val()),
                 ProductID: productID,
                 RowVersion: rowVersion
             };
+
             $.ajax({
                 url: "?handler=ObtenerDetalleEditar",
                 type: "POST",
-                contentType: "application/json; charset=utf-8",
                 contentType: "application/json",
+
                 headers: {
                     "RequestVerificationToken":
                         $('input[name="__RequestVerificationToken"]').val()
                 },
+
                 data: JSON.stringify(request),
+
                 success: function(r) {
+
                     if (r.success) {
+
                         detalleEnEdicion = {
                             productID: r.detalle.productID,
                             rowVersion: r.detalle.rowVersion
                         };
-                        $("#cboCategoria").val(r.detalle.categoriaID);
+
+                        $("#cboCategoria")
+                            .val(r.detalle.categoriaID);
+
                         cargarProductos(
                             r.detalle.categoriaID,
                             r.detalle.productID,
                             function() {
+
                                 $("#Detalle_UnitPrice")
                                     .val(r.detalle.unitPrice);
+
                                 $("#Detalle_UnitsInStock")
                                     .val(r.detalle.unitsInStock);
+
                                 $("#Detalle_Quantity")
                                     .val(r.detalle.quantity);
+
                                 $("#Detalle_Discount")
                                     .val(r.detalle.discount * 100);
+
+                                // No permitir cambiar el producto
                                 $("#cboCategoria, #cboProducto")
                                     .prop("disabled", true);
+
+                                // Evitar editar/eliminar otro detalle
+                                $(".btnEditar, .btnEliminar")
+                                    .prop("disabled", true);
+
+                                // Cambiar botón Agregar por Guardar
                                 $("#btnAgregarProducto")
+                                    .prop("disabled", false)
                                     .attr("title", "Guardar cambios")
                                     .find("span")
                                     .text(" Guardar cambios");
+
                                 $("#btnAgregarProducto i")
                                     .attr("class", "bi bi-floppy");
+
                                 $("#btnCancelarEdicion")
-                                    .removeClass("d-none");
+                                    .removeClass("d-none")
+                                    .prop("disabled", false);
+
                                 calcularDetalle();
-                                $("#Detalle_Quantity").focus().select();
+
+                                $("#Detalle_Quantity")
+                                    .focus()
+                                    .select();
                             }
                         );
                     }
                     else {
-                        alert(r.message);
+
+                        mostrarErrorValidacion(
+                            r.message ||
+                            "No se pudo obtener el detalle para editar."
+                        );
+
+                        if (
+                            r.bloquearEdicionPorConcurrencia === true
+                        ) {
+                            bloquearEdicionPorConcurrencia();
+                        }
                     }
                 },
+
                 error: function(xhr) {
+
                     console.error(xhr);
-                    alert(xhr.responseText);
+
+                    mostrarErrorValidacion(
+                        xhr.responseJSON?.message ||
+                        "Ocurrió un error al obtener el detalle."
+                    );
                 }
             });
         }
