@@ -26,6 +26,7 @@ namespace NorthwindTradersV8WebRazorPages.ViewModels
         public string? ShipCountry { get; set; }
         public decimal Freight { get; set; }
         public byte[]? RowVersion { get; set; }
+        public decimal TasaIVA { get; set; }
         public List<VentaDetalleViewModel> Detalles { get; set; } = new();
     }
 }

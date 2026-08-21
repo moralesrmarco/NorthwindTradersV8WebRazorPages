@@ -40,4 +40,12 @@
 
   </ItemGroup>
 
+  <ItemGroup>
+    <Compile Remove="Pages\Ventas\Insertar.cshtml.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Remove="Pages\Ventas\Insertar.cshtml" />
+  </ItemGroup>
+
 </Project>

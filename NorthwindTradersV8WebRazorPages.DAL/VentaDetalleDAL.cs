@@ -294,21 +294,5 @@ namespace NorthwindTradersV8WebRazorPages.DAL
                     + ex.Message);
             }
         }
-        private string ObtenerMensajeEliminarDetalle(int codigo)
-        {
-            return codigo switch
-            {
-                -1 => "El detalle ya no existe.",
-                -2 => "El detalle fue modificado por otro usuario.",
-                -3 => "La venta ya no existe.",
-                -4 => "La venta fue modificada por otro usuario.",
-                -5 => "La cantidad del detalle no es válida.",
-                -7 => "El inventario excedería el límite permitido.",
-                -8 => "El inventario resultaría negativo.",
-                -99 => "Ocurrió un error inesperado al eliminar el detalle.",
-                _ => $"No se pudo eliminar el detalle. Código: {codigo}."
-            };
-        }
-
     }
 }

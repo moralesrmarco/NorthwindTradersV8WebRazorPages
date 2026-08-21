@@ -21,6 +21,7 @@ namespace NorthwindTradersV8WebRazorPages.Pages.Ventas
         private readonly CategoriaService categoriasService;
         private readonly ProductoService productoService;
         private readonly VentaService ventaService;
+        private readonly TasaImpuestoBLL tasaImpuestoBLL;
         [BindProperty]
         public VentaInsertarViewModel VentaVM { get; set; } = new();
         [BindProperty(SupportsGet = true)]
@@ -60,7 +61,7 @@ namespace NorthwindTradersV8WebRazorPages.Pages.Ventas
         public Editar2Model(IConfiguration configuration)
         {
             var connectionString = configuration.GetConnectionString("NorthwindConnection")
-    ?? throw new InvalidOperationException("Connection string not found");
+                ?? throw new InvalidOperationException("Connection string not found");
             bool ejecutarTiempoDemora = configuration.GetValue<bool>("AppSettings:ejecutarTiempoDemora");
             int tiempoDemora = configuration.GetValue<int>("AppSettings:tiempoDemora");
             ventaBLL = new VentaBLL(connectionString, ejecutarTiempoDemora, tiempoDemora);
@@ -71,6 +72,7 @@ namespace NorthwindTradersV8WebRazorPages.Pages.Ventas
             categoriasService = new CategoriaService(connectionString);
             productoService = new ProductoService(connectionString);
             ventaService = new VentaService(connectionString);
+            tasaImpuestoBLL = new TasaImpuestoBLL(connectionString);
             Productos = new List<SelectListItem>
             {
                 new SelectListItem
@@ -162,24 +164,37 @@ namespace NorthwindTradersV8WebRazorPages.Pages.Ventas
                 };
             }
         }
-        private VentaTotalesViewModel CalcularTotalesVenta(List<VentaDetalleViewModel> lista)
+        private VentaTotalesViewModel CalcularTotalesVenta(
+            List<VentaDetalleViewModel> lista)
         {
+            var detalles = lista
+                .Select(x => x.ToVentaDetalle())
+                .ToList();
+
             return new VentaTotalesViewModel
             {
-                NumeroProductos = lista.Count,
-                TotalUnidades = lista.Sum(x => x.Quantity),
+                NumeroProductos = detalles.Count,
+
+                TotalUnidades =
+                    detalles.Sum(x => x.Quantity),
+
                 TotalImporteConIVA =
-                    lista.Sum(x => x.SubtotalDelImporteConIVAIncluido),
+                    detalles.Sum(x => x.SubtotalDelImporteConIVAIncluido),
+
                 TotalDescuento =
-                    lista.Sum(x => x.SubtotalDelAhorroTotalDespuesDescuento),
+                    detalles.Sum(x => x.SubtotalDelAhorroTotalDespuesDescuento),
+
                 TotalImporteConDescuento =
-                    lista.Sum(x => x.SubtotalDelImporteConIVAConDescuento),
+                    detalles.Sum(x => x.SubtotalDelImporteConIVAConDescuento),
+
                 TotalImporteSinIVA =
-                    lista.Sum(x => x.SubtotalDelImporteSinIVAConDescuento),
+                    detalles.Sum(x => x.SubtotalDelImporteSinIVAConDescuento),
+
                 TotalIVA =
-                    lista.Sum(x => x.SubtotalIVADespuesDelDescuento),
+                    detalles.Sum(x => x.SubtotalIVADespuesDelDescuento),
+
                 Total =
-                    lista.Sum(x => x.Subtotal)
+                    detalles.Sum(x => x.Subtotal)
             };
         }
         private static List<VentaDetalleViewModel> CrearListaViewModel(
@@ -431,6 +446,38 @@ namespace NorthwindTradersV8WebRazorPages.Pages.Ventas
                         mensaje = "Debe seleccionar un producto."
                     });
                 }
+                // Obtener la venta desde la BD
+                var venta = ventaBLL.ObtenerVentaPorId2(request.OrderID);
+                if (venta == null)
+                {
+                    return new JsonResult(new
+                    {
+                        ok = false,
+                        codigo = 0,
+                        mensaje = "La venta no existe."
+                    });
+                }
+                if (!venta.OrderDate.HasValue)
+                {
+                    return new JsonResult(new
+                    {
+                        ok = false,
+                        codigo = 0,
+                        mensaje = "La venta no tiene fecha."
+                    });
+                }
+                // Obtener la tasa vigente según la fecha de la venta
+                var tasaIVA = tasaImpuestoBLL.ObtenerTasaVigente(
+                    venta.OrderDate.Value);
+                if (!tasaIVA.HasValue)
+                {
+                    return new JsonResult(new
+                    {
+                        ok = false,
+                        codigo = 0,
+                        mensaje = "No existe una tasa de IVA vigente para la fecha de la venta."
+                    });
+                }
                 var detalle = new VentaDetalle
                 {
                     Venta = new Venta
@@ -447,12 +494,12 @@ namespace NorthwindTradersV8WebRazorPages.Pages.Ventas
                     UnitPrice = request.Detalle.UnitPrice,
                     Quantity = request.Detalle.Quantity,
                     Discount = request.Detalle.Discount,
-                    TasaIVA = request.Detalle.TasaIVA
+                    // Ya no viene del navegador
+                    TasaIVA = tasaIVA.Value
                 };
                 var resultado = ventaDetalleBLL.InsertarDetalle(detalle);
                 if (resultado.Codigo != 1)
                     return ResultadoAgregarDetalleError(resultado.Codigo);
-
                 VentaVM.RowVersion = resultado.RowVersion;
                 // Obtener datos actuales desde BD
                 var lista = ventaDetalleBLL
