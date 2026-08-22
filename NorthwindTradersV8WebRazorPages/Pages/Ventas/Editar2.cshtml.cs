@@ -58,6 +58,7 @@ namespace NorthwindTradersV8WebRazorPages.Pages.Ventas
         [BindProperty]
         public int OrderID { get; set; }
         public bool BloquearEdicion { get; set; }
+        public bool VentaTieneDetalles { get; set; }
         public Editar2Model(IConfiguration configuration)
         {
             var connectionString = configuration.GetConnectionString("NorthwindConnection")
@@ -92,6 +93,15 @@ namespace NorthwindTradersV8WebRazorPages.Pages.Ventas
                 return Page();
             }
             CargarCombos();
+            decimal tasaIVA = 0m;
+            if (venta.OrderDate.HasValue)
+            {
+                var tasa = venta.OrderDate.HasValue
+                    ? tasaImpuestoBLL.ObtenerTasaVigente(venta.OrderDate.Value)
+                    : null;
+                if (tasa.HasValue)
+                    tasaIVA = tasa.Value;
+            }
             VentaVM = new VentaInsertarViewModel
             {
                 OrderID = venta.OrderID,
@@ -111,9 +121,11 @@ namespace NorthwindTradersV8WebRazorPages.Pages.Ventas
                 ShipPostalCode = venta.ShipPostalCode,
                 ShipCountry = venta.ShipCountry,
                 Freight = venta.Freight ?? 0m,
-                RowVersion = venta.RowVersion
+                RowVersion = venta.RowVersion,
+                TasaIVA = tasaIVA
             };
             var detalles = ventaDetalleBLL.ObtenerDetallesPorVentaId(id);
+            VentaTieneDetalles = detalles.Any();
             Detalles = CrearListaViewModel(detalles);
             Totales = CalcularTotalesVenta(Detalles);
             return Page();
@@ -198,20 +210,105 @@ namespace NorthwindTradersV8WebRazorPages.Pages.Ventas
             };
         }
         private static List<VentaDetalleViewModel> CrearListaViewModel(
-        List<VentaDetalle> lista)
+            List<VentaDetalle> lista)
         {
             return lista.Select(x => new VentaDetalleViewModel
             {
+                // =============================================
+                // DATOS BASE
+                // =============================================
+
                 CategoriaID = x.Producto.Categoria?.CategoryID,
+
                 ProductID = x.Producto.ProductID,
+
                 ProductName = x.Producto.ProductName,
+
                 Quantity = x.Quantity,
+
                 UnitPrice = x.UnitPrice,
+
                 Discount = x.Discount,
+
                 TasaIVA = x.TasaIVA,
+
                 RowVersion = x.RowVersion == null
                     ? null
-                    : Convert.ToBase64String(x.RowVersion)
+                    : Convert.ToBase64String(x.RowVersion),
+
+
+                // =============================================
+                // RESULTADOS CALCULADOS EN VentaDetalle
+                // =============================================
+
+                PrecioBaseSinIva =
+                    x.PrecioBaseSinIva,
+
+                PrecioPorUnidadSinIVASinDescuento =
+                    x.PrecioPorUnidadSinIVASinDescuento,
+
+                IVADelPrecioPorUnidadSinDescuento =
+                    x.IVADelPrecioPorUnidadSinDescuento,
+
+                PrecioPorUnidadConIVADespuesDescuento =
+                    x.PrecioPorUnidadConIVADespuesDescuento,
+
+                IVADelPrecioporUnidadDespuesDescuento =
+                    x.IVADelPrecioporUnidadDespuesDescuento,
+
+                PrecioPorUnidadSinIVADespuesDescuento =
+                    x.PrecioPorUnidadSinIVADepuesDescuento,
+
+                AhorroPorUnidadSinIVA =
+                    x.AhorroPorUnidadSinIVA,
+
+                AhorroEnIVAPorUnidadDespuesDescuento =
+                    x.AhorroEnIVAPorUnidadDespuesDescuento,
+
+                AhorroTotalPorUnidadConIVA =
+                    x.AhorroTotalPorUnidadConIVA,
+
+                TasaDescuentoPorcentaje =
+                    x.TasaDescuentoPorcentaje,
+
+                TasaIVAPorcentaje =
+                    x.TasaIVAPorcentaje,
+
+
+                // =============================================
+                // SUBTOTALES
+                // =============================================
+
+                SubtotalDelImporteConIVAIncluido =
+                    x.SubtotalDelImporteConIVAIncluido,
+
+                SubtotalDelImporteSinIVASinDescuento =
+                    x.SubtotalDelImporteSinIVASinDescuento,
+
+                SubtotalDelImporteDelIVASinDescuento =
+                    x.SubtotalDelImporteDelIVASinDescuento,
+
+                SubtotalDelImporteConIVAConDescuento =
+                    x.SubtotalDelImporteConIVAConDescuento,
+
+                SubtotalDelImporteSinIVAConDescuento =
+                    x.SubtotalDelImporteSinIVAConDescuento,
+
+                SubtotalIVADespuesDelDescuento =
+                    x.SubtotalIVADespuesDelDescuento,
+
+                SubtotalDelAhorroSinIvaDespuesDescuento =
+                    x.SubtotalDelAhorroSinIvaDespuesDescuento,
+
+                SubtotalDelAhorroEnIVADespuesDescuento =
+                    x.SubtotalDelAhorroEnIVADespuesDescuento,
+
+                SubtotalDelAhorroTotalDespuesDescuento =
+                    x.SubtotalDelAhorroTotalDespuesDescuento,
+
+                Subtotal =
+                    x.Subtotal
+
             }).ToList();
         }
         public IActionResult OnPostActualizarEncabezado(
@@ -247,6 +344,22 @@ namespace NorthwindTradersV8WebRazorPages.Pages.Ventas
                             ok = false,
                             codigo = -2,
                             mensaje = "La venta fue modificada previamente por otro usuario."
+                        });
+
+                    case -10:
+                        return new JsonResult(new
+                        {
+                            ok = false,
+                            codigo = -10,
+                            mensaje = "No se puede modificar la fecha de la venta porque ya existen detalles asociados. La fecha determina la tasa de IVA aplicada a la venta."
+                        });
+
+                    case -11:
+                        return new JsonResult(new
+                        {
+                            ok = false,
+                            codigo = -11,
+                            mensaje = "No existe una tasa de IVA vigente para la fecha de la venta indicada."
                         });
 
                     case -99:
@@ -367,9 +480,97 @@ namespace NorthwindTradersV8WebRazorPages.Pages.Ventas
             var producto = productoService.ObtenerProductoCostoEInventario(productId);
             return new JsonResult(producto);
         }
-        public JsonResult OnPostCalcularDetalle([FromBody] VentaDetalleViewModel detalle)
+        public JsonResult OnPostCalcularDetalle(
+            [FromBody] VentaDetalleViewModel detalleVM)
         {
-            return new JsonResult(detalle);
+            var detalle = detalleVM.ToVentaDetalle();
+
+            var resultado = new VentaDetalleViewModel
+            {
+                CategoriaID = detalleVM.CategoriaID,
+                ProductID = detalleVM.ProductID,
+                ProductName = detalleVM.ProductName,
+
+                UnitPrice = detalle.UnitPrice,
+                UnitsInStock = detalleVM.UnitsInStock,
+                Quantity = detalle.Quantity,
+                Discount = detalle.Discount,
+                TasaIVA = detalle.TasaIVA,
+
+                // =============================================
+                // RESULTADOS CENTRALIZADOS EN VentaDetalle
+                // =============================================
+
+                PrecioBaseSinIva =
+                    detalle.PrecioBaseSinIva,
+
+                PrecioPorUnidadSinIVASinDescuento =
+                    detalle.PrecioPorUnidadSinIVASinDescuento,
+
+                IVADelPrecioPorUnidadSinDescuento =
+                    detalle.IVADelPrecioPorUnidadSinDescuento,
+
+                PrecioPorUnidadConIVADespuesDescuento =
+                    detalle.PrecioPorUnidadConIVADespuesDescuento,
+
+                PrecioPorUnidadSinIVADespuesDescuento =
+                    detalle.PrecioPorUnidadSinIVADepuesDescuento,
+
+                IVADelPrecioporUnidadDespuesDescuento =
+                    detalle.IVADelPrecioporUnidadDespuesDescuento,
+
+                AhorroPorUnidadSinIVA =
+                    detalle.AhorroPorUnidadSinIVA,
+
+                AhorroEnIVAPorUnidadDespuesDescuento =
+                    detalle.AhorroEnIVAPorUnidadDespuesDescuento,
+
+                AhorroTotalPorUnidadConIVA =
+                    detalle.AhorroTotalPorUnidadConIVA,
+
+                TasaDescuentoPorcentaje =
+                    detalle.TasaDescuentoPorcentaje,
+
+                TasaIVAPorcentaje =
+                    detalle.TasaIVAPorcentaje,
+
+
+                // =============================================
+                // SUBTOTALES
+                // =============================================
+
+                SubtotalDelImporteConIVAIncluido =
+                    detalle.SubtotalDelImporteConIVAIncluido,
+
+                SubtotalDelImporteSinIVASinDescuento =
+                    detalle.SubtotalDelImporteSinIVASinDescuento,
+
+                SubtotalDelImporteDelIVASinDescuento =
+                    detalle.SubtotalDelImporteDelIVASinDescuento,
+
+                SubtotalDelImporteConIVAConDescuento =
+                    detalle.SubtotalDelImporteConIVAConDescuento,
+
+                SubtotalDelImporteSinIVAConDescuento =
+                    detalle.SubtotalDelImporteSinIVAConDescuento,
+
+                SubtotalIVADespuesDelDescuento =
+                    detalle.SubtotalIVADespuesDelDescuento,
+
+                SubtotalDelAhorroSinIvaDespuesDescuento =
+                    detalle.SubtotalDelAhorroSinIvaDespuesDescuento,
+
+                SubtotalDelAhorroEnIVADespuesDescuento =
+                    detalle.SubtotalDelAhorroEnIVADespuesDescuento,
+
+                SubtotalDelAhorroTotalDespuesDescuento =
+                    detalle.SubtotalDelAhorroTotalDespuesDescuento,
+
+                Subtotal =
+                    detalle.Subtotal
+            };
+
+            return new JsonResult(resultado);
         }
         public JsonResult OnPostActualizarDetalle(
             [FromBody] ActualizarDetalleRequest request)
@@ -446,38 +647,6 @@ namespace NorthwindTradersV8WebRazorPages.Pages.Ventas
                         mensaje = "Debe seleccionar un producto."
                     });
                 }
-                // Obtener la venta desde la BD
-                var venta = ventaBLL.ObtenerVentaPorId2(request.OrderID);
-                if (venta == null)
-                {
-                    return new JsonResult(new
-                    {
-                        ok = false,
-                        codigo = 0,
-                        mensaje = "La venta no existe."
-                    });
-                }
-                if (!venta.OrderDate.HasValue)
-                {
-                    return new JsonResult(new
-                    {
-                        ok = false,
-                        codigo = 0,
-                        mensaje = "La venta no tiene fecha."
-                    });
-                }
-                // Obtener la tasa vigente según la fecha de la venta
-                var tasaIVA = tasaImpuestoBLL.ObtenerTasaVigente(
-                    venta.OrderDate.Value);
-                if (!tasaIVA.HasValue)
-                {
-                    return new JsonResult(new
-                    {
-                        ok = false,
-                        codigo = 0,
-                        mensaje = "No existe una tasa de IVA vigente para la fecha de la venta."
-                    });
-                }
                 var detalle = new VentaDetalle
                 {
                     Venta = new Venta
@@ -494,8 +663,8 @@ namespace NorthwindTradersV8WebRazorPages.Pages.Ventas
                     UnitPrice = request.Detalle.UnitPrice,
                     Quantity = request.Detalle.Quantity,
                     Discount = request.Detalle.Discount,
-                    // Ya no viene del navegador
-                    TasaIVA = tasaIVA.Value
+                    // LA TASA YA VIENE DE LA VENTA
+                    TasaIVA = request.Detalle.TasaIVA
                 };
                 var resultado = ventaDetalleBLL.InsertarDetalle(detalle);
                 if (resultado.Codigo != 1)
@@ -558,6 +727,7 @@ namespace NorthwindTradersV8WebRazorPages.Pages.Ventas
                 -6 => "No hay existencias suficientes para agregar la cantidad solicitada.",
                 -7 => "El inventario resultante excede el límite permitido.",
                 -8 => "El inventario resultante no puede ser negativo.",
+                -10 => "No existe tasa de IVA para la fecha de la venta.",
                 -99 => "Ocurrió un error inesperado al insertar el detalle.",
                 _ => "No se pudo insertar el detalle de la venta."
             };

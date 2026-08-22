@@ -65,7 +65,7 @@ namespace NorthwindTradersV8WebRazorPages.DAL
             try
             {
                 using SqlConnection cn = new(connectionString);
-                using SqlCommand cmd = new("SpVentaDetalleInsertar", cn);
+                using SqlCommand cmd = new("SpVentaDetalleInsertar2", cn);
                 cmd.CommandType = CommandType.StoredProcedure;
                 cmd.Parameters.AddWithValue("@OrderID", detalle.Venta.OrderID);
                 cmd.Parameters.AddWithValue("@ProductID", detalle.Producto.ProductID);

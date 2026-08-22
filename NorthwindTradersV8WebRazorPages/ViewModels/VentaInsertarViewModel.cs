@@ -26,6 +26,7 @@ namespace NorthwindTradersV8WebRazorPages.ViewModels
         public string? ShipCountry { get; set; }
         public decimal Freight { get; set; }
         public byte[]? RowVersion { get; set; }
+        // quede en que la tasa debe ser una propiededad de la venta y no de cada detalle, ya que todos los productos tienen la misma tasa de iva
         public decimal TasaIVA { get; set; }
         public List<VentaDetalleViewModel> Detalles { get; set; } = new();
     }
