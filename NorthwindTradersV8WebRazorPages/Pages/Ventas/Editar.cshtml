@@ -406,7 +406,7 @@
                     data-url="@Url.Page(
                                                     "/Ventas/Reportes/NotaRemisionRpt",
                                                     pageHandler: "Pdf",
-                                                    values: new { orderId = Model.OrderID })">
+                                                    values: new { orderId = Model.VentaVM.OrderID })">
                 <i class="bi bi-printer"></i>
                 <span class="d-none d-md-inline">Nota de remisión</span>
             </button>
@@ -475,6 +475,10 @@
 </div>
 @section Scripts {
     <script>
+        function activarNotaRemision() {
+            $("#btnNotaRemision").prop("disabled", false);
+        }
+
         function mostrarErrorValidacion(mensaje) {
             const summary = $("#validationSummary");
             summary
@@ -571,6 +575,7 @@
                         limpiarErrorValidacion();
                         //Actualizar la nueva RowVersion
                         $("#VentaVM_RowVersion").val(response.rowVersion);
+                        activarNotaRemision();
                         if (alTerminar) {
                             alTerminar();
                         }
@@ -689,6 +694,7 @@
                     if (response.ok) {
                         limpiarErrorValidacion();
                         $("#VentaVM_RowVersion").val(response.rowVersion);
+                        activarNotaRemision();
                     }
                     else {
                         mostrarErrorValidacion(response.mensaje);
@@ -958,6 +964,7 @@
                         mostrarTotales(r.totales);
                         // Limpiar captura del producto
                         limpiarCapturaProducto();
+                        activarNotaRemision();
                     }
                     else {
                         mostrarErrorValidacion(r.mensaje);
@@ -1169,6 +1176,7 @@
                         llenarTabla(r.lista);
                         // Actualizar totales
                         mostrarTotales(r.totales);
+                        activarNotaRemision();
                         // Salir del modo edición
                         salirModoEdicion();
                     }
@@ -1273,6 +1281,7 @@
                         llenarTabla(r.lista);
                         // Actualizar totales
                         mostrarTotales(r.totales);
+                        activarNotaRemision();
                     }
                     else {
                         mostrarErrorValidacion(
@@ -1565,19 +1574,23 @@
             return true;
         });
 
-        document.addEventListener("DOMContentLoaded", function() {
-            const btn = document.getElementById("btnNotaRemision");
-            if (btn) {
-                btn.addEventListener("click", function() {
-                    const url = this.dataset.url;
-                    openCenteredPopup(
-                        url,
-                        "NotaRemision",
-                        900,
-                        700
-                    );
-                });
+        $("#btnNotaRemision").on("click", function () {
+
+            const url = $(this).data("url");
+
+            if (!url) {
+                mostrarErrorValidacion(
+                    "No se pudo obtener la ruta de la nota de remisión."
+                );
+                return;
             }
+
+            openCenteredPopup(
+                url,
+                "NotaRemision",
+                900,
+                700
+            );
         });
 
         $("#VentaVM_Freight").focus(function() {

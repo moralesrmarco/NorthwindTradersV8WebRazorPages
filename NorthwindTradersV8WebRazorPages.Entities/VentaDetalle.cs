@@ -1,5 +1,4 @@
-﻿//using Entities.Config;
-namespace NorthwindTradersV8WebRazorPages.Entities
+﻿namespace NorthwindTradersV8WebRazorPages.Entities
 {
     /*
     En los calculos se considero que el precio unitario ya incluye el iva.

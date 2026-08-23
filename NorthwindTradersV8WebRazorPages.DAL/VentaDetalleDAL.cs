@@ -46,6 +46,9 @@ namespace NorthwindTradersV8WebRazorPages.DAL
                                 UnitPrice = rdr.GetDecimal(rdr.GetOrdinal("UnitPrice")),
                                 Quantity = rdr.GetInt16(rdr.GetOrdinal("Quantity")),
                                 Discount = (decimal)rdr.GetFloat(rdr.GetOrdinal("Discount")),
+                                TasaIVA = Convert.ToDecimal(
+                                    rdr.GetFloat(
+                                        rdr.GetOrdinal("TasaIVA"))),
                                 RowVersion = rdr.IsDBNull(rdr.GetOrdinal("RowVersion")) ? null : (byte[])rdr["RowVersion"]
                             };
                             ventaDetalles.Add(ventaDetalle);

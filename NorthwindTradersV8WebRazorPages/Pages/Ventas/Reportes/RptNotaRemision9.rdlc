@@ -1303,13 +1303,13 @@ Format(Fields!FechaDeEnvio.Value,
                       <Width>1.66392cm</Width>
                     </TablixColumn>
                     <TablixColumn>
-                      <Width>0.86852cm</Width>
+                      <Width>1.36969cm</Width>
                     </TablixColumn>
                     <TablixColumn>
                       <Width>1.8015cm</Width>
                     </TablixColumn>
                     <TablixColumn>
-                      <Width>1.96303cm</Width>
+                      <Width>1.5243cm</Width>
                     </TablixColumn>
                     <TablixColumn>
                       <Width>2.41979cm</Width>
@@ -1371,7 +1371,7 @@ Format(Fields!FechaDeEnvio.Value,
                       </TablixCells>
                     </TablixRow>
                     <TablixRow>
-                      <Height>0.70583cm</Height>
+                      <Height>0.95983cm</Height>
                       <TablixCells>
                         <TablixCell>
                           <CellContents>
@@ -1457,7 +1457,7 @@ Format(Fields!FechaDeEnvio.Value,
                                 <Paragraph>
                                   <TextRuns>
                                     <TextRun>
-                                      <Value>Precio con IVA incluido</Value>
+                                      <Value>Precio con impuesto incluido</Value>
                                       <Style>
                                         <FontSize>6pt</FontSize>
                                         <FontWeight>Bold</FontWeight>
@@ -1678,7 +1678,7 @@ Format(Fields!FechaDeEnvio.Value,
                                 <Paragraph>
                                   <TextRuns>
                                     <TextRun>
-                                      <Value>Tasa IVA</Value>
+                                      <Value>Tasa impuesto</Value>
                                       <Style>
                                         <FontSize>6pt</FontSize>
                                         <FontWeight>Bold</FontWeight>
@@ -1729,7 +1729,7 @@ Format(Fields!FechaDeEnvio.Value,
                                 <Paragraph>
                                   <TextRuns>
                                     <TextRun>
-                                      <Value>sin IVA</Value>
+                                      <Value>sin impuesto</Value>
                                       <Style>
                                         <FontSize>6pt</FontSize>
                                         <FontWeight>Bold</FontWeight>
@@ -1766,7 +1766,7 @@ Format(Fields!FechaDeEnvio.Value,
                                 <Paragraph>
                                   <TextRuns>
                                     <TextRun>
-                                      <Value>Importe del IVA (Incluido)</Value>
+                                      <Value>Importe del impuesto (Incluido)</Value>
                                       <Style>
                                         <FontSize>6pt</FontSize>
                                         <FontWeight>Bold</FontWeight>
@@ -1908,7 +1908,6 @@ Format(Fields!FechaDeEnvio.Value,
                                 <PaddingBottom>2pt</PaddingBottom>
                               </Style>
                             </Textbox>
-                            <rd:Selected>true</rd:Selected>
                           </CellContents>
                         </TablixCell>
                         <TablixCell>
@@ -2762,8 +2761,8 @@ Format(Fields!FechaDeEnvio.Value,
                 <RepeatRowHeaders>true</RepeatRowHeaders>
                 <DataSetName>DataSet1</DataSetName>
                 <Top>8.64205cm</Top>
-                <Height>2.18833cm</Height>
-                <Width>19.96078cm</Width>
+                <Height>2.44233cm</Height>
+                <Width>20.02322cm</Width>
                 <ZIndex>2</ZIndex>
                 <Style>
                   <Border>
@@ -3387,7 +3386,7 @@ Format(Fields!FechaDeEnvio.Value,
             </ReportItems>
             <KeepTogether>true</KeepTogether>
             <Height>17.65093cm</Height>
-            <Width>20cm</Width>
+            <Width>20.02322cm</Width>
             <Style>
               <Border>
                 <Style>None</Style>
@@ -3398,7 +3397,7 @@ Format(Fields!FechaDeEnvio.Value,
         <Height>6.94919in</Height>
         <Style />
       </Body>
-      <Width>7.87402in</Width>
+      <Width>7.88316in</Width>
       <Page>
         <PageHeader>
           <Height>1.93146cm</Height>
