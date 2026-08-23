@@ -85,15 +85,6 @@
                             <i class="bi bi-pencil"></i>
                             <span class="d-none d-md-inline"> Editar</span>
                         </a>
-                        <a asp-page="Editar2"
-                           asp-route-id="@row["OrderID"]"
-                           data-show-overlay
-                           asp-route-returnUrl="@Url.Page("Index", new { pageIndex = Model.PageIndex })"
-                           class="btn btn-sm btn-warning me-1 action-btn"
-                           title="Editar">
-                            <i class="bi bi-pencil"></i>
-                            <span class="d-none d-md-inline"> Editar 2</span>
-                        </a>
                         <a asp-page="Eliminar"
                            asp-route-id="@row["OrderID"]"
                            data-show-overlay
