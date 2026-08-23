@@ -119,15 +119,15 @@
                     <tr>
                         <th class="text-center">N°</th>
                         <th>Producto</th>
-                        <th class="text-center">Precio con IVA incluido</th>
+                        <th class="text-center">Precio con impuesto incluido</th>
                         <th class="text-center">Cantidad</th>
                         <th class="text-center">Importe</th>
                         <th class="text-center">Descuento</th>
                         <th class="text-center">Importe del descuento</th>
                         <th class="text-center">Importe con descuento</th>
-                        <th class="text-center">Tasa IVA</th>
-                        <th class="text-center">Importe sin IVA</th>
-                        <th class="text-center">Importe del IVA (Incluido)</th>
+                        <th class="text-center">Tasa impuesto</th>
+                        <th class="text-center">Importe sin impuesto</th>
+                        <th class="text-center">Importe del impuesto (Incluido)</th>
                         <th class="text-center"><strong>Subtotal</strong></th>
                     </tr>
                 </thead>
@@ -175,7 +175,7 @@
                        readonly />
             </div>
             <div class="col-md-4">
-                <label class="form-label">Subtotal del importe (Precios con IVA incluido)</label>
+                <label class="form-label">Subtotal del importe (Precios con impuesto incluido)</label>
                 <input class="form-control text-end"
                        value="@($"{Model.Venta?.SubtotalImporte:C2}")"
                        readonly />
@@ -195,7 +195,7 @@
                        readonly />
             </div>
             <div class="col-md-4">
-                <label class="form-label">Subtotal del importe sin IVA</label>
+                <label class="form-label">Subtotal del importe sin impuesto</label>
                 <input class="form-control text-end"
                        value="@($"{Model.Venta?.SubtotalImporteSinIVA:C2}")"
                        readonly />
@@ -203,7 +203,7 @@
         </div>
         <div class="row mb-3">
             <div class="col-md-4">
-                <label class="form-label">Subtotal del importe del IVA (Incluido)</label>
+                <label class="form-label">Subtotal del importe del impuesto (Incluido)</label>
                 <input class="form-control text-end"
                        value="@($"{Model.Venta?.SubtotalImporteConIVA:C2}")"
                        readonly />
