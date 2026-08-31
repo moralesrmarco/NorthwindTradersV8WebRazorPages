@@ -31,7 +31,7 @@
                 <label asp-for="VentaVM.CustomerID" class="form-label">Cliente</label>
                 <select id="cboCliente" asp-for="VentaVM.CustomerID"
                         asp-items="Model.Clientes"
-                        class="form-select">
+                        class="form-select" disabled="@(Model.VentaGuardada)">
                 </select>
                 <span asp-validation-for="VentaVM.CustomerID" class="text-danger"></span>
             </div>
@@ -39,7 +39,7 @@
                 <label asp-for="VentaVM.EmployeeID" class="form-label">Vendedor</label>
                 <select id="cboVendedor" asp-for="VentaVM.EmployeeID"
                         asp-items="Model.Vendedores"
-                        class="form-select">
+                        class="form-select" disabled="@(Model.VentaGuardada)">
                 </select>
                 <span asp-validation-for="VentaVM.EmployeeID" class="text-danger"></span>
             </div>
@@ -47,7 +47,7 @@
         <div class="row mb-3">
             <div class="col-md-2">
                 <label>Fecha de venta</label>
-                <input asp-for="VentaVM.OrderDate" type="date" class="form-control" />
+                <input asp-for="VentaVM.OrderDate" type="date" class="form-control" disabled="@(Model.VentaTieneDetalles || Model.VentaGuardada)"/>
             </div>
             <div class="col-md-2">
                 <label>Hora</label>
@@ -56,11 +56,12 @@
                        name="VentaVM.OrderTime"
                        value="@(Model.VentaVM.OrderTime?.ToString(@"hh\:mm"))"
                        step="60"
-                       class="form-control" />
+                       class="form-control" 
+                       disabled="@(Model.VentaTieneDetalles || Model.VentaGuardada)" />
             </div>
             <div class="col-md-2">
                 <label>Fecha requerido</label>
-                <input asp-for="VentaVM.RequiredDate" type="date" class="form-control" />
+                <input asp-for="VentaVM.RequiredDate" type="date" class="form-control" disabled="@(Model.VentaGuardada)" />
             </div>
             <div class="col-md-2">
                 <label>Hora</label>
@@ -69,11 +70,11 @@
                        name="VentaVM.RequiredTime"
                        value="@(Model.VentaVM.RequiredTime?.ToString(@"hh\:mm"))"
                        step="60"
-                       class="form-control" />
+                       class="form-control" disabled="@(Model.VentaGuardada)" />
             </div>            
             <div class="col-md-2">
                 <label>Fecha de envío</label>
-                <input asp-for="VentaVM.ShippedDate" type="date" class="form-control" />
+                <input asp-for="VentaVM.ShippedDate" type="date" class="form-control" disabled="@(Model.VentaGuardada)" />
             </div>
             <div class="col-md-2">
                 <label>Hora</label>
@@ -82,7 +83,7 @@
                        name="VentaVM.ShippedTime"
                        value="@(Model.VentaVM.ShippedTime?.ToString(@"hh\:mm"))"
                        step="60"
-                       class="form-control" />
+                       class="form-control" disabled="@(Model.VentaGuardada)" />
             </div>
         </div>
         <fieldset class="border rounded p-3 mb-3">
@@ -94,36 +95,36 @@
                     <label asp-for="VentaVM.ShipVia" class="form-label">Compañía transportista</label>
                     <select id="cboCompañia" asp-for="VentaVM.ShipVia"
                             asp-items="Model.Transportistas"
-                            class="form-select">
+                            class="form-select" disabled="@(Model.VentaGuardada)">
                     </select>
                 </div>
                 <div class="col-md-4">
                     <label asp-for="VentaVM.ShipName" class="form-label">Enviar a</label>
-                    <input asp-for="VentaVM.ShipName" class="form-control" />
+                    <input asp-for="VentaVM.ShipName" class="form-control" disabled="@(Model.VentaGuardada)" />
                 </div>
                 <div class="col-md-4">
                     <label asp-for="VentaVM.ShipAddress" class="form-label">Domicilio</label>
-                    <input asp-for="VentaVM.ShipAddress" class="form-control" />
+                    <input asp-for="VentaVM.ShipAddress" class="form-control" disabled="@(Model.VentaGuardada)" />
                 </div>
             </div>
             <div class="row mb-3">
                 <div class="col-md-4">
                     <label asp-for="VentaVM.ShipCity" class="form-label">Ciudad</label>
-                    <input asp-for="VentaVM.ShipCity" class="form-control" />
+                    <input asp-for="VentaVM.ShipCity" class="form-control" disabled="@(Model.VentaGuardada)" />
                 </div>
                 <div class="col-md-4">
                     <label asp-for="VentaVM.ShipRegion" class="form-label">Región</label>
-                    <input asp-for="VentaVM.ShipRegion" class="form-control" />
+                    <input asp-for="VentaVM.ShipRegion" class="form-control" disabled="@(Model.VentaGuardada)" />
                 </div>
                 <div class="col-md-4">
                     <label asp-for="VentaVM.ShipPostalCode" class="form-label">Código postal</label>
-                    <input asp-for="VentaVM.ShipPostalCode" class="form-control" />
+                    <input asp-for="VentaVM.ShipPostalCode" class="form-control" disabled="@(Model.VentaGuardada)" />
                 </div>
             </div>
             <div class="row mb-3">
                 <div class="col-md-4">
                     <label asp-for="VentaVM.ShipCountry" class="form-label">País</label>
-                    <input asp-for="VentaVM.ShipCountry" class="form-control" />
+                    <input asp-for="VentaVM.ShipCountry" class="form-control" disabled="@(Model.VentaGuardada)" />
                 </div>
                 <div class="col-md-4">
                     <label asp-for="VentaVM.Freight" class="form-label">Cargo por envío $</label>
@@ -131,13 +132,13 @@
                            class="form-control"
                            type="number"
                            step="1"
-                           min="0" />
+                           min="0" disabled="@(Model.VentaGuardada)" />
                 </div>
                 <div class="col-md-4 d-flex align-items-end">
                     <button type="button"
                             id="btnLimpiarEnvio"
                             class="btn btn-sm btn-warning"
-                            title="Limpiar forma de envío">
+                            title="Limpiar forma de envío" disabled="@(Model.VentaGuardada)">
                         <i class="bi bi-eraser"></i>
                         <span class="d-none d-md-inline">Limpiar forma de envío</span>
                     </button>
@@ -145,7 +146,7 @@
                     <button type="button"
                             id="btnSeleccionarEnvio"
                             class="btn btn-sm btn-primary"
-                            title="Seleccionar forma de envío">
+                            title="Seleccionar forma de envío" disabled="@(Model.VentaGuardada)">
                         <i class="bi bi-check-square"></i>
                         <span class="d-none d-md-inline">Seleccionar forma de envío</span>
                     </button>
@@ -161,14 +162,14 @@
                     <label asp-for="Detalle.CategoriaID" class="form-label">Categoría</label>
                     <select id="cboCategoria" asp-for="Detalle.CategoriaID"
                             asp-items="Model.Categorias"
-                            class="form-select">
+                            class="form-select" disabled="@(Model.VentaGuardada)">
                     </select>
                 </div>
                 <div class="col-md-6">
                     <label asp-for="Detalle.ProductID" class="form-label">Producto</label>
                     <select id="cboProducto" asp-for="Detalle.ProductID"
                             asp-items="Model.Productos"
-                            class="form-select">
+                            class="form-select" disabled="@(Model.VentaGuardada)">
                     </select>
                 </div>
             </div>
@@ -183,7 +184,7 @@
                 </div>
                 <div class="col-md-2 d-flex flex-column">
                     <label asp-for="Detalle.Quantity" class="form-label flex-grow-1">Cantidad</label>
-                    <input asp-for="Detalle.Quantity" class="form-control" />
+                    <input asp-for="Detalle.Quantity" class="form-control" disabled="@(Model.VentaGuardada)" />
                 </div>
                 <div class="col-md-2 d-flex flex-column">
                     <label asp-for="Detalle.Discount" class="form-label flex-grow-1">Descuento (%)</label>
@@ -192,13 +193,13 @@
                            type="number"
                            step="1"
                            min="0" 
-                           max="95.00" />
+                           max="95.00" disabled="@(Model.VentaGuardada)" />
                 </div>
                 <div class="col-md-2 d-flex align-items-end">
                     <button type="button"
                             id="btnAgregarProducto"
                             class="btn btn-sm btn-primary"
-                            title="Agregar">
+                            title="Agregar" disabled="@(Model.VentaGuardada)">
                         <i class="bi bi-plus-lg"></i>
                         <span class="d-none d-md-inline"> Agregar</span>
                     </button>
@@ -403,6 +404,7 @@
             </a>
         </div>
     </fieldset>
+    <input asp-for="VentaVM.TasaIVA" type="hidden" id="VentaVM_TasaIVA" />
     <input asp-for="OrderID" type="hidden" />
 </form>
 <div class="modal fade"
@@ -456,6 +458,59 @@
 </div>
 @section Scripts {
     <script>
+
+        function actualizarTasaIVA() {
+
+            let orderDate = $("#VentaVM_OrderDate").val();
+            let orderTime = $("#VentaVM_OrderTime").val();
+
+            if (!orderDate) {
+                $("#VentaVM_TasaIVA").val(0);
+                return;
+            }
+
+            let request = {
+                orderDate: orderDate,
+                orderTime: orderTime
+            };
+
+            $.ajax({
+                url: "?handler=ObtenerTasaIVA",
+                type: "POST",
+                contentType: "application/json",
+                headers: {
+                    "RequestVerificationToken":
+                        $('input[name="__RequestVerificationToken"]').val()
+                },
+                data: JSON.stringify(request),
+                success: function(r) {
+
+                    if (r.ok) {
+
+                        $("#VentaVM_TasaIVA").val(r.tasaIVA);
+
+                        // Si hay un producto seleccionado,
+                        // recalcular con la nueva tasa
+                        if ($("#cboProducto").val() != "") {
+                            calcularDetalle();
+                        }
+
+                    } else {
+
+                        $("#VentaVM_TasaIVA").val(0);
+
+                        alert(r.mensaje);
+                    }
+                },
+                error: function(xhr) {
+
+                    $("#VentaVM_TasaIVA").val(0);
+
+                    console.log(xhr.responseText);
+                }
+            });
+        }
+
         function openCenteredPopup(url, title, w, h) {
             const dualScreenLeft =
                 window.screenLeft !== undefined ? window.screenLeft : window.screenX;
@@ -578,11 +633,17 @@
         }
 
         function calcularDetalle() {
+            let tasaIVA = Number($("#VentaVM_TasaIVA").val());
+
+            if (tasaIVA <= 0) {
+                return;
+            }
             let detalle = {
                 unitPrice: Number($("#Detalle_UnitPrice").val()),
                 unitsInStock: Number($("#Detalle_UnitsInStock").val()),
                 quantity: Number($("#Detalle_Quantity").val()),
-                discount: Number($("#Detalle_Discount").val()) / 100
+                discount: Number($("#Detalle_Discount").val()) / 100,
+                tasaIVA: Number($("#VentaVM_TasaIVA").val())
             };
             $.ajax({
                 url: "?handler=CalcularDetalle",
@@ -692,7 +753,8 @@
                 unitPrice: Number($("#Detalle_UnitPrice").val()),
                 unitsInStock: Number($("#Detalle_UnitsInStock").val()),
                 quantity: Number($("#Detalle_Quantity").val()),
-                discount: Number($("#Detalle_Discount").val()) / 100
+                discount: Number($("#Detalle_Discount").val()) / 100,
+                tasaIVA: Number($("#VentaVM_TasaIVA").val())
             };
             $.ajax({
                 url: "?handler=AgregarDetalle",
@@ -769,12 +831,12 @@
                         <td class="text-center">
                             <button type="button"
                                     class="btn btn-sm btn-warning btnEditar"
-                                    data-index="${indice}">
+                                            data-index="${indice}">
                                 <i class="bi bi-pencil"></i>
                             </button>
                             <button type="button"
                                     class="btn btn-sm btn-danger btnEliminar"
-                                    data-index="${indice}">
+                                            data-index="${indice}">
                                 <i class="bi bi-trash"></i>
                             </button>
                         </td>
@@ -1061,6 +1123,7 @@
             }            // Todas las validaciones pasaron
             return true;
         });
+
         $("#btnSeleccionarEnvio").click(function() {
             cargarFormasEnvio();
         });
@@ -1078,6 +1141,14 @@
                     );
                 });
             }
+        });
+
+        $("#VentaVM_OrderDate").change(function() {
+            actualizarTasaIVA();
+        });
+
+        $("#VentaVM_OrderTime").change(function() {
+            actualizarTasaIVA();
         });
 
         var detalleVenta = @Html.Raw(Model.DetallesJson);

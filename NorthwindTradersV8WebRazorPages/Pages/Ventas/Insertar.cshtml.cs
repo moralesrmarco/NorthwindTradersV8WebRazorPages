@@ -4,7 +4,9 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using NorthwindTradersV8WebRazorPages.BLL;
 using NorthwindTradersV8WebRazorPages.BLL.Services;
 using NorthwindTradersV8WebRazorPages.Common;
+using NorthwindTradersV8WebRazorPages.DAL;
 using NorthwindTradersV8WebRazorPages.Entities;
+using NorthwindTradersV8WebRazorPages.Entities.DTOs;
 using NorthwindTradersV8WebRazorPages.ViewModels;
 using System.Text.Json;
 
@@ -19,6 +21,7 @@ namespace NorthwindTradersV8WebRazorPages.Pages.Ventas
         private readonly CategoriaService categoriasService;
         private readonly ProductoService productoService;
         private readonly VentaService ventaService;
+        private readonly TasaImpuestoBLL tasaImpuestoBLL;
         [BindProperty]
         public VentaInsertarViewModel VentaVM { get; set; } = new();
         [BindProperty(SupportsGet = true)]
@@ -55,6 +58,7 @@ namespace NorthwindTradersV8WebRazorPages.Pages.Ventas
         }
         [BindProperty]
         public int OrderID { get; set; }
+        public bool VentaTieneDetalles { get; set; }
         public InsertarModel(IConfiguration configuration)
         {
             var connectionString = configuration.GetConnectionString("NorthwindConnection")
@@ -68,6 +72,7 @@ namespace NorthwindTradersV8WebRazorPages.Pages.Ventas
             categoriasService = new CategoriaService(connectionString);
             productoService = new ProductoService(connectionString);
             ventaService = new VentaService(connectionString);
+            tasaImpuestoBLL = new TasaImpuestoBLL(connectionString);
             Productos = new List<SelectListItem>
             {
                 new SelectListItem
@@ -83,10 +88,13 @@ namespace NorthwindTradersV8WebRazorPages.Pages.Ventas
             {
                 HttpContext.Session.Remove(SessionDetalleVenta);
             }
-            VentaVM.OrderDate = DateTime.Today;
-            VentaVM.OrderTime = DateTime.Now.TimeOfDay; 
+            var ahora = DateTime.Now;
+            VentaVM.OrderDate = ahora.Date;
+            VentaVM.OrderTime = ahora.TimeOfDay;
+            VentaVM.TasaIVA = ObtenerTasaIVA(VentaVM.OrderDate, VentaVM.OrderTime);
             CargarCombos();
             Detalles = ObtenerDetalle();
+            VentaTieneDetalles = Detalles.Count > 0;
             Totales = CalcularTotalesVenta(Detalles);
         }
         public IActionResult OnGetNueva(string? returnUrl)
@@ -115,24 +123,63 @@ namespace NorthwindTradersV8WebRazorPages.Pages.Ventas
             {
                 return BadRequest("La cantidad debe ser mayor que cero.");
             }
+
             if (detalle.Quantity > detalle.UnitsInStock)
             {
-                return BadRequest("La cantidad no puede ser mayor que las unidades en inventario.");
+                return BadRequest(
+                    "La cantidad no puede ser mayor que las unidades en inventario.");
             }
+
             var lista = ObtenerDetalle();
+
             // Validar producto duplicado
             if (lista.Any(x => x.ProductID == detalle.ProductID))
             {
-                return BadRequest("No se puede agregar un mismo producto más de una vez a la venta.");
+                return BadRequest(
+                    "No se puede agregar un mismo producto más de una vez a la venta.");
             }
-            lista.Add(detalle);
+
+            // =============================================
+            // CALCULAR EL DETALLE
+            // =============================================
+
+            var ventaDetalle = detalle.ToVentaDetalle();
+
+            var detalleCalculado =
+                VentaDetalleViewModel.FromVentaDetalle(ventaDetalle);
+
+            // =============================================
+            // OBTENER LA TASA DE IVA VIGENTE
+            // =============================================
+
+            var fechaHoraVenta = CombinarFechaHora(
+                VentaVM.OrderDate,
+                VentaVM.OrderTime);
+
+            // =============================================
+            // CONSERVAR DATOS DE LA UI QUE NO PERTENECEN
+            // AL CÁLCULO DE VentaDetalle
+            // =============================================
+
+            detalleCalculado.CategoriaID = detalle.CategoriaID;
+            detalleCalculado.UnitsInStock = detalle.UnitsInStock;
+
+            // =============================================
+            // GUARDAR EN SESIÓN
+            // =============================================
+
+            lista.Add(detalleCalculado);
+
             GuardarDetalle(lista);
+
             var totales = CalcularTotalesVenta(lista);
+
             return new JsonResult(new
             {
                 count = lista.Count,
                 lista = lista,
-                totales = totales
+                totales = totales,
+                ventaTieneDetalles = lista.Count > 0
             });
         }
         private void CargarCombos()
@@ -197,9 +244,16 @@ namespace NorthwindTradersV8WebRazorPages.Pages.Ventas
             return new JsonResult(producto);
         }
         [IgnoreAntiforgeryToken]
-        public JsonResult OnPostCalcularDetalle([FromBody] VentaDetalleViewModel detalle)
+        public JsonResult OnPostCalcularDetalle(
+            [FromBody] VentaDetalleViewModel detalle)
         {
-            return new JsonResult(detalle);
+            var ventaDetalle = detalle.ToVentaDetalle();
+
+            // Aquí se ejecuta el cálculo de VentaDetalle
+
+            var resultado = VentaDetalleViewModel.FromVentaDetalle(ventaDetalle);
+
+            return new JsonResult(resultado);
         }
         private VentaTotalesViewModel CalcularTotalesVenta(List<VentaDetalleViewModel> lista)
         {
@@ -239,6 +293,18 @@ namespace NorthwindTradersV8WebRazorPages.Pages.Ventas
             var fechaHoraVenta = CombinarFechaHora(
                 VentaVM.OrderDate,
                 VentaVM.OrderTime);
+            var tasaIVA = tasaImpuestoBLL.ObtenerTasaVigente(
+                fechaHoraVenta!.Value);
+            if (!tasaIVA.HasValue)
+            {
+                ModelState.AddModelError(
+                    "",
+                    "No existe una tasa de IVA vigente para la fecha de la venta.");
+                Detalles = lista;
+                Totales = CalcularTotalesVenta(lista);
+                return Page();
+            }
+            VentaVM.TasaIVA = tasaIVA.Value;
             // Construir Fecha/Hora requerida
             var fechaHoraRequerido = CombinarFechaHora(
                 VentaVM.RequiredDate,
@@ -337,7 +403,8 @@ namespace NorthwindTradersV8WebRazorPages.Pages.Ventas
             return new JsonResult(new
             {
                 lista,
-                totales
+                totales,
+                ventaTieneDetalles = lista.Count > 0
             });
         }
         [IgnoreAntiforgeryToken]
@@ -408,6 +475,7 @@ namespace NorthwindTradersV8WebRazorPages.Pages.Ventas
                     Quantity = item.Quantity,
                     UnitPrice = item.UnitPrice,
                     Discount = item.Discount,
+                    TasaIVA = VentaVM.TasaIVA
                 });
             }
             return venta;
@@ -422,6 +490,51 @@ namespace NorthwindTradersV8WebRazorPages.Pages.Ventas
         {
             var lista = ventaService.ObtenerFormasEnvio(customerId);
             return new JsonResult(lista);
+        }
+        private decimal ObtenerTasaIVA(
+            DateTime? fecha,
+            TimeSpan? hora)
+        {
+            var fechaHora = CombinarFechaHora(fecha, hora);
+            if (!fechaHora.HasValue)
+                return 0m;
+            var tasa = tasaImpuestoBLL.ObtenerTasaVigente(fechaHora.Value);
+            return tasa ?? 0m;
+        }
+        [IgnoreAntiforgeryToken]
+        public JsonResult OnPostObtenerTasaIVA(
+            [FromBody] ObtenerTasaIVARequest request)
+        {
+            var fechaHora = CombinarFechaHora(
+                request.OrderDate,
+                request.OrderTime);
+
+            if (!fechaHora.HasValue)
+            {
+                return new JsonResult(new
+                {
+                    ok = false,
+                    mensaje = "Debe indicar la fecha y hora de la venta."
+                });
+            }
+
+            var tasa = tasaImpuestoBLL.ObtenerTasaVigente(
+                fechaHora.Value);
+
+            if (!tasa.HasValue)
+            {
+                return new JsonResult(new
+                {
+                    ok = false,
+                    mensaje = "No existe una tasa de IVA vigente para la fecha indicada."
+                });
+            }
+
+            return new JsonResult(new
+            {
+                ok = true,
+                tasaIVA = tasa.Value
+            });
         }
     }
 }

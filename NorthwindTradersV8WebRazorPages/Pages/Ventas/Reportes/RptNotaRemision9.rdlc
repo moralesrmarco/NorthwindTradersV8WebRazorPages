@@ -2883,7 +2883,7 @@ Format(Fields!FechaDeEnvio.Value,
                       <Paragraph>
                         <TextRuns>
                           <TextRun>
-                            <Value>Importe del IVA (Incluido):</Value>
+                            <Value>Importe del impuesto (Incluido):</Value>
                             <Style>
                               <FontWeight>Bold</FontWeight>
                             </Style>

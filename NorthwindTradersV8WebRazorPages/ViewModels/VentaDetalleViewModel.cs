@@ -96,6 +96,84 @@ namespace NorthwindTradersV8WebRazorPages.ViewModels
                 TasaIVA = TasaIVA
             };
         }
+
+        public static VentaDetalleViewModel FromVentaDetalle(
+            VentaDetalle detalle)
+        {
+            return new VentaDetalleViewModel
+            {
+                // Datos
+                ProductID = detalle.ProductID,
+                ProductName = detalle.ProductName,
+                UnitPrice = detalle.UnitPrice,
+                Quantity = detalle.Quantity,
+                Discount = detalle.Discount,
+                TasaIVA = detalle.TasaIVA,
+
+                // Resultados calculados
+                PrecioBaseSinIva = detalle.PrecioBaseSinIva,
+
+                PrecioPorUnidadSinIVASinDescuento =
+                    detalle.PrecioPorUnidadSinIVASinDescuento,
+
+                IVADelPrecioPorUnidadSinDescuento =
+                    detalle.IVADelPrecioPorUnidadSinDescuento,
+
+                PrecioPorUnidadConIVADespuesDescuento =
+                    detalle.PrecioPorUnidadConIVADespuesDescuento,
+
+                IVADelPrecioporUnidadDespuesDescuento =
+                    detalle.IVADelPrecioporUnidadDespuesDescuento,
+
+                PrecioPorUnidadSinIVADespuesDescuento =
+                    detalle.PrecioPorUnidadSinIVADepuesDescuento,
+
+                AhorroPorUnidadSinIVA =
+                    detalle.AhorroPorUnidadSinIVA,
+
+                AhorroEnIVAPorUnidadDespuesDescuento =
+                    detalle.AhorroEnIVAPorUnidadDespuesDescuento,
+
+                AhorroTotalPorUnidadConIVA =
+                    detalle.AhorroTotalPorUnidadConIVA,
+
+                TasaDescuentoPorcentaje =
+                    detalle.TasaDescuentoPorcentaje,
+
+                TasaIVAPorcentaje =
+                    detalle.TasaIVAPorcentaje,
+
+                // Subtotales
+                SubtotalDelImporteConIVAIncluido =
+                    detalle.SubtotalDelImporteConIVAIncluido,
+
+                SubtotalDelImporteSinIVASinDescuento =
+                    detalle.SubtotalDelImporteSinIVASinDescuento,
+
+                SubtotalDelImporteDelIVASinDescuento =
+                    detalle.SubtotalDelImporteDelIVASinDescuento,
+
+                SubtotalDelImporteConIVAConDescuento =
+                    detalle.SubtotalDelImporteConIVAConDescuento,
+
+                SubtotalDelImporteSinIVAConDescuento =
+                    detalle.SubtotalDelImporteSinIVAConDescuento,
+
+                SubtotalIVADespuesDelDescuento =
+                    detalle.SubtotalIVADespuesDelDescuento,
+
+                SubtotalDelAhorroSinIvaDespuesDescuento =
+                    detalle.SubtotalDelAhorroSinIvaDespuesDescuento,
+
+                SubtotalDelAhorroEnIVADespuesDescuento =
+                    detalle.SubtotalDelAhorroEnIVADespuesDescuento,
+
+                SubtotalDelAhorroTotalDespuesDescuento =
+                    detalle.SubtotalDelAhorroTotalDespuesDescuento,
+
+                Subtotal = detalle.Subtotal
+            };
+        }
     }
 }
 

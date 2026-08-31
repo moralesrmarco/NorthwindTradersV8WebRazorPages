@@ -87,7 +87,7 @@ namespace NorthwindTradersV8WebRazorPages.DAL
                                     cmdUpdateStock.Parameters.Add(new SqlParameter("@ProductID", SqlDbType.Int));
 
                                     // 2.3) Preparar inserción de detalle (SP)
-                                    using (var cmdInsertDetail = new SqlCommand("SpVentaDetalleInsertarSinActualizarInventario", cn, tx))
+                                    using (var cmdInsertDetail = new SqlCommand("SpVentaDetalleInsertarSinActualizarInventario2", cn, tx))
                                     {
                                         cmdInsertDetail.CommandType = CommandType.StoredProcedure;
                                         cmdInsertDetail.Parameters.Add(new SqlParameter("@OrderID", SqlDbType.Int));
