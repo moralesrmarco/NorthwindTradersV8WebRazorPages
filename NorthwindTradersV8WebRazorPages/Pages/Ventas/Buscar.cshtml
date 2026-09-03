@@ -13,7 +13,7 @@
     </li>
 </ul>
 <div class="border border-top-0 p-3">
-    <form method="post">
+    <form method="get" onsubmit="return disableSearchButton();">
         <div class="row g-3">
             <div class="col-md-2">
                 <label>ID inicial</label>
@@ -49,7 +49,6 @@
                 <input asp-for="Filtro.DirigidoA"
                        class="form-control" />
             </div>
-
         </div>
         <div class="row mt-3">
             <div class="col-md-4">
@@ -122,19 +121,27 @@
         </div>
         <div class="mt-4">
             <button type="submit"
-                    class="btn btn-primary">
+                    class="btn btn-sm btn-buscar"
+                    title="Buscar">
                 <i class="bi bi-search"></i>
-                Buscar
+                <span class="d-none d-md-inline"> Buscar</span>
             </button>
-            <a asp-page="./ListadoProductos"
-               class="btn btn-secondary"
+            <a asp-page="./Buscar"
+               class="btn btn-sm btn-primary"
+               title="Limpiar"
                data-show-overlay>
-                Limpiar
+                <i class="bi bi-eraser"></i>
+                <span class="d-none d-md-inline"> Limpiar</span>
+            </a>
+            <a asp-page="/Ventas/Index"
+               class="btn btn-sm btn-cancelar navigation-btn"
+               title="Cancelar">
+                <i class="bi bi-x-circle"></i>
+                <span class="d-none d-md-inline"> Cancelar</span>
             </a>
         </div>
     </form>
 </div>
-
 <div class="table-responsive">
     <table class="table table-striped">
         <thead>
@@ -155,12 +162,54 @@
                     <td class="text-center">@venta.OrderID</td>
                     <td>@venta.CustomerCompanyName</td>
                     <td>@venta.CustomerContactName</td>
-                    <td>@venta.OrderDate?.ToString("yyyy-MM-dd")</td>
-                    <td>@venta.RequiredDate?.ToString("yyyy-MM-dd")</td>
-                    <td>@venta.ShippedDate?.ToString("yyyy-MM-dd")</td>
-                    <td>
-                        <a asp-page="./Detalles" asp-route-id="@venta.OrderID" class="btn btn-sm btn-outline-primary">
+                    <td class="text-end">
+                        @if (venta.OrderDate.HasValue)
+                        {
+                            @Html.Raw(venta.OrderDate.Value
+                                .ToString("ddd dd' de 'MMM' de 'yyyy<br/>hh:mm:ss tt"))
+                        }
+                    </td>
+                    <td class="text-end">
+                        @if (venta.RequiredDate.HasValue)
+                        {
+                            @Html.Raw(venta.RequiredDate.Value
+                                .ToString("ddd dd' de 'MMM' de 'yyyy<br/>hh:mm:ss tt"))
+                        }
+                    </td>
+                    <td class="text-end">
+                        @if (venta.ShippedDate.HasValue)
+                        {
+                            @Html.Raw(venta.ShippedDate.Value
+                                .ToString("ddd dd' de 'MMM' de 'yyyy<br/>hh:mm:ss tt"))
+                        }
+                    </td>
+                    <td class="text-center text-nowrap">
+                        <a asp-page="Consultar" 
+                            asp-route-id="@venta.OrderID" 
+                            class="btn btn-sm btn-success me-1 action-btn"
+                            data-show-overlay
+                            asp-route-returnUrl="@(Request.Path + Request.QueryString)"
+                            title="Consultar">
                             <i class="bi bi-eye"></i>
+                            <span class="d-none d-md-inline"> Consultar</span>
+                        </a>
+                        <a asp-page="Editar"
+                            asp-route-id="@venta.OrderID"
+                            data-show-overlay
+                            asp-route-returnUrl="@(Request.Path + Request.QueryString)"
+                            class="btn btn-sm btn-warning me-1 action-btn"
+                            title="Editar">
+                            <i class="bi bi-pencil"></i>
+                            <span class="d-none d-md-inline"> Editar</span>
+                        </a>
+                        <a asp-page="Eliminar"
+                            asp-route-id="@venta.OrderID"
+                            data-show-overlay
+                            asp-route-returnUrl="@(Request.Path + Request.QueryString)"
+                            class="btn btn-sm btn-danger me-1 action-btn"
+                            title="Eliminar">
+                            <i class="bi bi-trash"></i>
+                            <span class="d-none d-md-inline"> Eliminar</span>
                         </a>
                     </td>
                 </tr>
@@ -168,3 +217,141 @@
         </tbody>
     </table>
 </div>
+@section Scripts {
+    <script src="~/js/navigation-actions.js"></script>
+    <script src="~/js/form-buscar.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+
+            // =====================================================
+            // CONFIGURAR UN GRUPO DE FECHAS
+            // =====================================================
+            function configurarFechas(idFechaIni, idFechaFin, idFechaNull) {
+
+                const fechaIni = document.getElementById(idFechaIni);
+                const fechaFin = document.getElementById(idFechaFin);
+                const fechaNull = document.getElementById(idFechaNull);
+
+                if (!fechaIni || !fechaFin || !fechaNull) {
+                    return;
+                }
+
+                // =================================================
+                // ACTUALIZAR ESTADO CUANDO SE SELECCIONA
+                // "FECHA NULA"
+                // =================================================
+                function actualizarEstadoFecha() {
+
+                    if (fechaNull.checked) {
+
+                        // Borrar ambas fechas
+                        fechaIni.value = "";
+                        fechaFin.value = "";
+
+                        // Deshabilitar ambas fechas
+                        fechaIni.disabled = true;
+                        fechaFin.disabled = true;
+
+                    } else {
+
+                        // Habilitar ambas fechas
+                        fechaIni.disabled = false;
+                        fechaFin.disabled = false;
+                    }
+                }
+
+
+                // =================================================
+                // CAMBIO DE FECHA INICIAL
+                // =================================================
+                fechaIni.addEventListener("change", function() {
+
+                    if (!fechaIni.value) {
+                        return;
+                    }
+
+                    // Si la fecha final está vacía,
+                    // copiar la fecha inicial.
+                    if (!fechaFin.value) {
+                        fechaFin.value = fechaIni.value;
+                        return;
+                    }
+
+                    // Si la fecha inicial es mayor que la final,
+                    // igualar la final a la inicial.
+                    if (fechaIni.value > fechaFin.value) {
+                        fechaFin.value = fechaIni.value;
+                    }
+                });
+
+
+                // =================================================
+                // CAMBIO DE FECHA FINAL
+                // =================================================
+                fechaFin.addEventListener("change", function() {
+
+                    if (!fechaFin.value) {
+                        return;
+                    }
+
+                    // Si la fecha inicial está vacía,
+                    // copiar la fecha final.
+                    if (!fechaIni.value) {
+                        fechaIni.value = fechaFin.value;
+                        return;
+                    }
+
+                    // Si la fecha final es menor que la inicial,
+                    // igualar la inicial a la final.
+                    if (fechaFin.value < fechaIni.value) {
+                        fechaIni.value = fechaFin.value;
+                    }
+                });
+
+
+                // =================================================
+                // CAMBIO DEL CHECKBOX "FECHA NULA"
+                // =================================================
+                fechaNull.addEventListener("change", actualizarEstadoFecha);
+
+
+                // =================================================
+                // ESTADO INICIAL AL CARGAR LA PÁGINA
+                // =================================================
+                actualizarEstadoFecha();
+            }
+
+
+            // =====================================================
+            // FECHA DE VENTA
+            // =====================================================
+            configurarFechas(
+                "Filtro_FVentaIni",
+                "Filtro_FVentaFin",
+                "Filtro_FVentaNull"
+            );
+
+
+            // =====================================================
+            // FECHA DE ENTREGA
+            // =====================================================
+            configurarFechas(
+                "Filtro_FRequeridoIni",
+                "Filtro_FRequeridoFin",
+                "Filtro_FRequeridoNull"
+            );
+
+
+            // =====================================================
+            // FECHA DE ENVÍO
+            // =====================================================
+            configurarFechas(
+                "Filtro_FEnvioIni",
+                "Filtro_FEnvioFin",
+                "Filtro_FEnvioNull"
+            );
+
+        });
+
+    </script>
+}

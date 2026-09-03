@@ -664,5 +664,87 @@ namespace NorthwindTradersV8WebRazorPages.DAL
                     : (byte[])parametroRowVersion.Value;
             return (codigo, nuevaRowVersion);
         }
+        public List<VentaDto> BuscarVentas(VentasBuscarDto filtro)
+        {
+            var ventas = new List<VentaDto>();
+            using (var connection = new SqlConnection(connectionString))
+            {
+                using (var command = new SqlCommand("SpVentaBuscar", connection))
+                {
+                    command.CommandType = CommandType.StoredProcedure;
+                    command.Parameters.AddWithValue("@IdIni", filtro.IdIni ?? 0);
+                    command.Parameters.AddWithValue("@IdFin", filtro.IdFin ?? 0);
+                    command.Parameters.AddWithValue("@Cliente", (object?)filtro.Cliente ?? "");
+                    command.Parameters.AddWithValue("@FVenta", filtro.FVenta);
+                    command.Parameters.AddWithValue("@FVentaIni", (object?)filtro.FVentaIni ?? DBNull.Value);
+
+                    command.Parameters.AddWithValue(
+                        "@FVentaFin",
+                        filtro.FVentaFin.HasValue
+                            ? filtro.FVentaFin.Value.Date.AddDays(1)
+                            : DBNull.Value);
+
+                    command.Parameters.AddWithValue("@FVentaNull", filtro.FVentaNull);
+                    command.Parameters.AddWithValue("@FRequerido", filtro.FRequerido);
+                    command.Parameters.AddWithValue("@FRequeridoIni", (object?)filtro.FRequeridoIni ?? DBNull.Value);
+
+                    command.Parameters.AddWithValue(
+                        "@FRequeridoFin",
+                        filtro.FRequeridoFin.HasValue
+                            ? filtro.FRequeridoFin.Value.Date.AddDays(1)
+                            : DBNull.Value);
+
+                    command.Parameters.AddWithValue("@FRequeridoNull", filtro.FRequeridoNull);
+                    command.Parameters.AddWithValue("@FEnvio", filtro.FEnvio);
+                    command.Parameters.AddWithValue("@FEnvioIni", (object?)filtro.FEnvioIni ?? DBNull.Value);
+
+                    command.Parameters.AddWithValue(
+                        "@FEnvioFin",
+                        filtro.FEnvioFin.HasValue
+                            ? filtro.FEnvioFin.Value.Date.AddDays(1)
+                            : DBNull.Value);
+
+                    command.Parameters.AddWithValue("@FEnvioNull", filtro.FEnvioNull);
+                    command.Parameters.AddWithValue("@Empleado", (object?)filtro.Empleado ?? "");
+                    command.Parameters.AddWithValue("@CompañiaT", (object?)filtro.CompañiaT ?? "");
+                    command.Parameters.AddWithValue("@DirigidoA", (object?)filtro.DirigidoA ?? "");
+                    connection.Open();
+                    using (var reader = command.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            int ordOrderDate = reader.GetOrdinal("OrderDate");
+                            int ordRequiredDate = reader.GetOrdinal("RequiredDate");
+                            int ordShippedDate = reader.GetOrdinal("ShippedDate");
+                            ventas.Add(new VentaDto
+                            {
+                                OrderID = reader.GetInt32(reader.GetOrdinal("OrderID")),
+                                CustomerCompanyName =
+                                    reader.IsDBNull(reader.GetOrdinal("CustomerCompanyName"))
+                                        ? null
+                                        : reader.GetString(reader.GetOrdinal("CustomerCompanyName")),
+                                CustomerContactName =
+                                    reader.IsDBNull(reader.GetOrdinal("ContactName"))
+                                        ? null
+                                        : reader.GetString(reader.GetOrdinal("ContactName")),
+                                OrderDate =
+                                    reader.IsDBNull(ordOrderDate)
+                                        ? null
+                                        : reader.GetDateTime(ordOrderDate),
+                                RequiredDate =
+                                    reader.IsDBNull(ordRequiredDate)
+                                        ? null
+                                        : reader.GetDateTime(ordRequiredDate),
+                                ShippedDate =
+                                    reader.IsDBNull(ordShippedDate)
+                                        ? null
+                                        : reader.GetDateTime(ordShippedDate)
+                            });
+                        }
+                    }
+                }
+            }
+            return ventas;
+        }
     }
 }

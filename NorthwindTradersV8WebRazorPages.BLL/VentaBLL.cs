@@ -206,5 +206,11 @@ namespace NorthwindTradersV8WebRazorPages.BLL
                 request.Freight,
                 rowVersion);
         }
+        public List<VentaDto> BuscarVentas(VentasBuscarDto filtro)
+        {
+            if (_ejecutarTiempoDemora)
+                Thread.Sleep(_tiempoDemora);
+            return ventaDAL.BuscarVentas(filtro);
+        }
     }
 }
