@@ -1,0 +1,291 @@
+﻿@page
+@model NorthwindTradersV8WebRazorPages.Pages.Ventas.Reportes.VentasRptModel
+@{
+    ViewData["Title"] = "Reporte de ventas";
+}
+<h2>@ViewData["Title"]</h2>
+<ul class="nav nav-tabs mb-0">
+    <li class="nav-item">
+        <span class="nav-link active">
+            <i class="bi bi-search"></i>
+            Buscar una venta
+        </span>
+    </li>
+</ul>
+<div class="border border-top-0 p-3">
+    <form method="get" onsubmit="return disableSearchButton();">
+        <div class="row g-3">
+            <div class="col-md-2">
+                <label>ID inicial</label>
+                <input asp-for="Filtro.IdIni"
+                       class="form-control"
+                       id="txtIdIni" />
+            </div>
+            <div class="col-md-2">
+                <label>ID final</label>
+                <input asp-for="Filtro.IdFin"
+                       class="form-control"
+                       id="txtIdFin" />
+            </div>
+            <div class="col-md-4">
+                <label>Cliente</label>
+                <input asp-for="Filtro.Cliente"
+                       class="form-control" />
+            </div>
+            <div class="col-md-4">
+                <label>Vendedor</label>
+                <input asp-for="Filtro.Empleado"
+                       class="form-control" />
+            </div>
+        </div>
+        <div class="row g-3">
+            <div class="col-md-4">
+                <label>Compañía transportista</label>
+                <input asp-for="Filtro.CompañiaT"
+                       class="form-control" />
+            </div>
+            <div class="col-md-4">
+                <label>Enviar a</label>
+                <input asp-for="Filtro.DirigidoA"
+                       class="form-control" />
+            </div>
+        </div>
+        <div class="row mt-3">
+            <div class="col-md-4">
+                <label>Fecha de venta inicial</label>
+                <input asp-for="Filtro.FVentaIni"
+                       class="form-control"
+                       type="date" />
+            </div>
+            <div class="col-md-4">
+                <label>Fecha de venta final</label>
+                <input asp-for="Filtro.FVentaFin"
+                       class="form-control"
+                       type="date" />
+            </div>
+            <div class="col-md-4">
+                <div class="mt-4">
+                    <label asp-for="Filtro.FVentaNull" class="me-2">
+                        Fecha de venta nula
+                    </label>
+                    <input asp-for="Filtro.FVentaNull"
+                           class="form-check-input" />
+                </div>
+            </div>
+        </div>
+        <div class="row mt-3">
+            <div class="col-md-4">
+                <label>Fecha de entrega inicial</label>
+                <input asp-for="Filtro.FRequeridoIni"
+                       class="form-control"
+                       type="date" />
+            </div>
+            <div class="col-md-4">
+                <label>Fecha de entrega final</label>
+                <input asp-for="Filtro.FRequeridoFin"
+                       class="form-control"
+                       type="date" />
+            </div>
+            <div class="col-md-4">
+                <div class="mt-4">
+                    <label asp-for="Filtro.FRequeridoNull" class="me-2">
+                        Fecha de entrega nula
+                    </label>
+                    <input asp-for="Filtro.FRequeridoNull"
+                           class="form-check-input" />
+                </div>
+            </div>
+        </div>
+        <div class="row mt-3">
+            <div class="col-md-4">
+                <label>Fecha de envío inicial</label>
+                <input asp-for="Filtro.FEnvioIni"
+                       class="form-control"
+                       type="date" />
+            </div>
+            <div class="col-md-4">
+                <label>Fecha de envío final</label>
+                <input asp-for="Filtro.FEnvioFin"
+                       class="form-control"
+                       type="date" />
+            </div>
+            <div class="col-md-4">
+                <div class="mt-4">
+                    <label asp-for="Filtro.FEnvioNull" class="me-2">
+                        Fecha de envío nula
+                    </label>
+                    <input asp-for="Filtro.FEnvioNull"
+                           class="form-check-input" />
+                </div>
+            </div>
+        </div>
+        <div class="mt-4">
+            <button type="submit"
+                    class="btn btn-sm btn-buscar"
+                    title="Imprimir">
+                <i class="bi bi-printer"></i>
+                <span class="d-none d-md-inline"> Imprimir</span>
+            </button>
+            <a asp-page="VentasRpt"
+               class="btn btn-sm btn-primary"
+               title="Limpiar"
+               data-show-overlay>
+                <i class="bi bi-eraser"></i>
+                <span class="d-none d-md-inline"> Limpiar</span>
+            </a>
+            <a asp-page="/Ventas/Index"
+               class="btn btn-sm btn-cancelar navigation-btn"
+               title="Cancelar">
+                <i class="bi bi-x-circle"></i>
+                <span class="d-none d-md-inline"> Cancelar</span>
+            </a>
+        </div>
+    </form>
+</div>
+<p>&nbsp;</p>
+<iframe id="visorReporte"
+@*         data-report-src="?handler=VerPdf"
+ *@        width="100%"
+        height="600"
+        style="border:1px solid #ccc;">
+</iframe>
+
+@section Scripts {
+    <script src="~/js/navigation-actions.js"></script>
+    <script src="~/js/form-buscar.js"></script>
+    <script src="~/js/loading-overlay.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+
+            // =====================================================
+            // CONFIGURAR UN GRUPO DE FECHAS
+            // =====================================================
+            function configurarFechas(idFechaIni, idFechaFin, idFechaNull) {
+
+                const fechaIni = document.getElementById(idFechaIni);
+                const fechaFin = document.getElementById(idFechaFin);
+                const fechaNull = document.getElementById(idFechaNull);
+
+                if (!fechaIni || !fechaFin || !fechaNull) {
+                    return;
+                }
+
+                // =================================================
+                // ACTUALIZAR ESTADO CUANDO SE SELECCIONA
+                // "FECHA NULA"
+                // =================================================
+                function actualizarEstadoFecha() {
+
+                    if (fechaNull.checked) {
+
+                        // Borrar ambas fechas
+                        fechaIni.value = "";
+                        fechaFin.value = "";
+
+                        // Deshabilitar ambas fechas
+                        fechaIni.disabled = true;
+                        fechaFin.disabled = true;
+
+                    } else {
+
+                        // Habilitar ambas fechas
+                        fechaIni.disabled = false;
+                        fechaFin.disabled = false;
+                    }
+                }
+
+
+                // =================================================
+                // CAMBIO DE FECHA INICIAL
+                // =================================================
+                fechaIni.addEventListener("change", function() {
+
+                    if (!fechaIni.value) {
+                        return;
+                    }
+
+                    // Si la fecha final está vacía,
+                    // copiar la fecha inicial.
+                    if (!fechaFin.value) {
+                        fechaFin.value = fechaIni.value;
+                        return;
+                    }
+
+                    // Si la fecha inicial es mayor que la final,
+                    // igualar la final a la inicial.
+                    if (fechaIni.value > fechaFin.value) {
+                        fechaFin.value = fechaIni.value;
+                    }
+                });
+
+
+                // =================================================
+                // CAMBIO DE FECHA FINAL
+                // =================================================
+                fechaFin.addEventListener("change", function() {
+
+                    if (!fechaFin.value) {
+                        return;
+                    }
+
+                    // Si la fecha inicial está vacía,
+                    // copiar la fecha final.
+                    if (!fechaIni.value) {
+                        fechaIni.value = fechaFin.value;
+                        return;
+                    }
+
+                    // Si la fecha final es menor que la inicial,
+                    // igualar la inicial a la final.
+                    if (fechaFin.value < fechaIni.value) {
+                        fechaIni.value = fechaFin.value;
+                    }
+                });
+
+
+                // =================================================
+                // CAMBIO DEL CHECKBOX "FECHA NULA"
+                // =================================================
+                fechaNull.addEventListener("change", actualizarEstadoFecha);
+
+
+                // =================================================
+                // ESTADO INICIAL AL CARGAR LA PÁGINA
+                // =================================================
+                actualizarEstadoFecha();
+            }
+
+
+            // =====================================================
+            // FECHA DE VENTA
+            // =====================================================
+            configurarFechas(
+                "Filtro_FVentaIni",
+                "Filtro_FVentaFin",
+                "Filtro_FVentaNull"
+            );
+
+
+            // =====================================================
+            // FECHA DE ENTREGA
+            // =====================================================
+            configurarFechas(
+                "Filtro_FRequeridoIni",
+                "Filtro_FRequeridoFin",
+                "Filtro_FRequeridoNull"
+            );
+
+
+            // =====================================================
+            // FECHA DE ENVÍO
+            // =====================================================
+            configurarFechas(
+                "Filtro_FEnvioIni",
+                "Filtro_FEnvioFin",
+                "Filtro_FEnvioNull"
+            );
+
+        });
+
+    </script>
+}
