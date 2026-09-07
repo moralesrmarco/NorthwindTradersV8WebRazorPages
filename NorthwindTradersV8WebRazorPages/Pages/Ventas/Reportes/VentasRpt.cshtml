@@ -121,19 +121,24 @@
         </div>
         <div class="mt-4">
             <button type="submit"
+                    id="btnImprimir"
                     class="btn btn-sm btn-buscar"
                     title="Imprimir">
                 <i class="bi bi-printer"></i>
                 <span class="d-none d-md-inline"> Imprimir</span>
             </button>
+
             <a asp-page="VentasRpt"
+               id="btnLimpiar"
                class="btn btn-sm btn-primary"
                title="Limpiar"
                data-show-overlay>
                 <i class="bi bi-eraser"></i>
                 <span class="d-none d-md-inline"> Limpiar</span>
             </a>
+
             <a asp-page="/Ventas/Index"
+               id="btnCancelar"
                class="btn btn-sm btn-cancelar navigation-btn"
                title="Cancelar">
                 <i class="bi bi-x-circle"></i>
@@ -144,18 +149,40 @@
 </div>
 <p>&nbsp;</p>
 <iframe id="visorReporte"
-@*         data-report-src="?handler=VerPdf"
- *@        width="100%"
+        width="100%"
         height="600"
         style="border:1px solid #ccc;">
 </iframe>
-
 @section Scripts {
     <script src="~/js/navigation-actions.js"></script>
     <script src="~/js/form-buscar.js"></script>
     <script src="~/js/loading-overlay.js"></script>
     <script>
         document.addEventListener("DOMContentLoaded", function() {
+
+            function disableSearchButton() {
+
+                const btnImprimir = document.getElementById("btnImprimir");
+                const btnLimpiar = document.getElementById("btnLimpiar");
+                const btnCancelar = document.getElementById("btnCancelar");
+
+                if (btnImprimir) {
+                    btnImprimir.disabled = true;
+                    btnImprimir.classList.add("disabled");
+                }
+
+                if (btnLimpiar) {
+                    btnLimpiar.classList.add("disabled");
+                    btnLimpiar.style.pointerEvents = "none";
+                }
+
+                if (btnCancelar) {
+                    btnCancelar.classList.add("disabled");
+                    btnCancelar.style.pointerEvents = "none";
+                }
+
+                return true;
+            }
 
             // =====================================================
             // CONFIGURAR UN GRUPO DE FECHAS
@@ -285,7 +312,21 @@
                 "Filtro_FEnvioNull"
             );
 
-        });
+            // =====================================================
+            // CARGAR EL REPORTE SOLO SI SE REALIZÓ UNA BÚSQUEDA
+            // =====================================================
+            const iframe = document.getElementById("visorReporte");
 
+            if (iframe && window.location.search) {
+
+                const parametros = new URLSearchParams(
+                    window.location.search
+                );
+
+                parametros.set("handler", "VerPdf");
+
+                iframe.src = "?" + parametros.toString();
+            }
+        });
     </script>
 }
