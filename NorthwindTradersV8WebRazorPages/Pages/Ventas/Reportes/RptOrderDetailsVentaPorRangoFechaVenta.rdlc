@@ -177,13 +177,13 @@
                   <Width>1.66392cm</Width>
                 </TablixColumn>
                 <TablixColumn>
-                  <Width>0.86852cm</Width>
+                  <Width>1.16485cm</Width>
                 </TablixColumn>
                 <TablixColumn>
-                  <Width>1.8015cm</Width>
+                  <Width>1.9285cm</Width>
                 </TablixColumn>
                 <TablixColumn>
-                  <Width>1.96303cm</Width>
+                  <Width>1.57892cm</Width>
                 </TablixColumn>
                 <TablixColumn>
                   <Width>2.41979cm</Width>
@@ -245,7 +245,7 @@
                   </TablixCells>
                 </TablixRow>
                 <TablixRow>
-                  <Height>0.70583cm</Height>
+                  <Height>0.9175cm</Height>
                   <TablixCells>
                     <TablixCell>
                       <CellContents>
@@ -331,7 +331,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value>Precio con IVA incluido</Value>
+                                  <Value>Precio con impuesto incluido</Value>
                                   <Style>
                                     <FontSize>6pt</FontSize>
                                     <FontWeight>Bold</FontWeight>
@@ -552,7 +552,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value>Tasa IVA</Value>
+                                  <Value>Tasa impuesto</Value>
                                   <Style>
                                     <FontSize>6pt</FontSize>
                                     <FontWeight>Bold</FontWeight>
@@ -603,7 +603,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value>sin IVA</Value>
+                                  <Value>sin impuesto</Value>
                                   <Style>
                                     <FontSize>6pt</FontSize>
                                     <FontWeight>Bold</FontWeight>
@@ -640,7 +640,7 @@
                             <Paragraph>
                               <TextRuns>
                                 <TextRun>
-                                  <Value>Importe del IVA (Incluido)</Value>
+                                  <Value>Importe del impuesto (Incluido)</Value>
                                   <Style>
                                     <FontSize>6pt</FontSize>
                                     <FontWeight>Bold</FontWeight>
@@ -780,7 +780,6 @@
                             <PaddingBottom>2pt</PaddingBottom>
                           </Style>
                         </Textbox>
-                        <rd:Selected>true</rd:Selected>
                       </CellContents>
                     </TablixCell>
                     <TablixCell>
@@ -1634,8 +1633,8 @@
             <RepeatRowHeaders>true</RepeatRowHeaders>
             <DataSetName>DataSet1</DataSetName>
             <Top>0.13175cm</Top>
-            <Height>2.18833cm</Height>
-            <Width>19.96078cm</Width>
+            <Height>2.4cm</Height>
+            <Width>20cm</Width>
             <Style>
               <Border>
                 <Style>None</Style>
@@ -1758,7 +1757,7 @@
                   <Paragraph>
                     <TextRuns>
                       <TextRun>
-                        <Value>Importe del IVA (Incluido):</Value>
+                        <Value>Importe del impuesto (Incluido):</Value>
                         <Style>
                           <FontSize>8pt</FontSize>
                           <FontWeight>Bold</FontWeight>

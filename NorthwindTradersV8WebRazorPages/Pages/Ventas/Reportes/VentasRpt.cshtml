@@ -160,30 +160,6 @@
     <script>
         document.addEventListener("DOMContentLoaded", function() {
 
-            function disableSearchButton() {
-
-                const btnImprimir = document.getElementById("btnImprimir");
-                const btnLimpiar = document.getElementById("btnLimpiar");
-                const btnCancelar = document.getElementById("btnCancelar");
-
-                if (btnImprimir) {
-                    btnImprimir.disabled = true;
-                    btnImprimir.classList.add("disabled");
-                }
-
-                if (btnLimpiar) {
-                    btnLimpiar.classList.add("disabled");
-                    btnLimpiar.style.pointerEvents = "none";
-                }
-
-                if (btnCancelar) {
-                    btnCancelar.classList.add("disabled");
-                    btnCancelar.style.pointerEvents = "none";
-                }
-
-                return true;
-            }
-
             // =====================================================
             // CONFIGURAR UN GRUPO DE FECHAS
             // =====================================================
