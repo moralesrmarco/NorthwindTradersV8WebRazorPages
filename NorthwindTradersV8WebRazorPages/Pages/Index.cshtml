@@ -3,8 +3,18 @@
 @{
     ViewData["Title"] = "Home page";
 }
-
 <div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+
+    <img src="~/images/LogoNorthwindGde.png"
+         alt="Logo Northwind Traders"
+         class="img-fluid" />
+    <p>&nbsp;</p>
+    <img src="~/images/NorthwindTradersBienvenido.png"
+         alt="Logo Northwind Traders"
+         class="img-fluid" />
+
+    <p class="mt-3 fs-5">
+        <i class="bi bi-person-circle"></i>
+        @User.Identity?.Name (@User.FindFirst("Usuario")?.Value)
+    </p>
 </div>

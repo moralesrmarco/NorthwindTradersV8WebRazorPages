@@ -1,8 +1,26 @@
 ﻿@page
 @model PrivacyModel
+@attribute [Microsoft.AspNetCore.Authorization.AllowAnonymous]
 @{
     ViewData["Title"] = "Privacy Policy";
-}
-<h1>@ViewData["Title"]</h1>
 
-<p>Use this page to detail your site's privacy policy.</p>
+    Layout = User.Identity?.IsAuthenticated == true
+        ? "_Layout"
+        : "_LoginLayout";
+}
+@section Styles
+{
+    <link rel="stylesheet"
+          href="~/css/privacy.css"
+          asp-append-version="true" />
+}
+
+<div class="container privacy-container">
+
+    <h1>@ViewData["Title"]</h1>
+
+    <p>
+        Use this page to detail your site's privacy policy.
+    </p>
+
+</div>

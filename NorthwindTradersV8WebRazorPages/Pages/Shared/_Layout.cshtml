@@ -10,6 +10,7 @@
     <link rel="stylesheet" href="~/NorthwindTradersV8WebRazorPages.styles.css" asp-append-version="true" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    @await RenderSectionAsync("Styles", required: false)
 </head>
 <body>
     <header>
@@ -328,6 +329,46 @@
                                 </li>
                             </ul>
                         </li>
+
+                        @if (User.Identity?.IsAuthenticated == true)
+                        {
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle"
+                                   href="#"
+                                   role="button"
+                                   data-bs-toggle="dropdown"
+                                   aria-expanded="false">
+
+                                    <i class="bi bi-person-circle"></i>
+                                    @User.FindFirst("Usuario")?.Value
+                                </a>
+
+                                <ul class="dropdown-menu dropdown-menu-end">
+
+                                    <li>
+                                        <a class="dropdown-item"
+                                           asp-page="/Account/CambiarPassword">
+                                            <i class="bi bi-key"></i>
+                                            Cambiar contraseña
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <hr class="dropdown-divider" />
+                                    </li>
+
+                                    <li>
+                                        <form method="post" asp-page="/Account/Logout">
+                                            <button type="submit" class="dropdown-item">
+                                                <i class="bi bi-box-arrow-right"></i>
+                                                Cerrar sesión
+                                            </button>
+                                        </form>
+                                    </li>
+
+                                </ul>
+                            </li>
+                        }
+
                     </ul>
                 </div>
             </div>
