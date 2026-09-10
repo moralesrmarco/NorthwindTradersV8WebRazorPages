@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Reporting.NETCore;
 using NorthwindTradersV8WebRazorPages.BLL;
 
-namespace NorthwindTradersV8WebRazorPages.Pages.Categorias.Reportes
+namespace NorthwindTradersV8WebRazorPages.Pages.CategoriasProductosComun.Reportes
 {
     public class CategoriasConProductosRptModel : PageModel
     {
@@ -50,7 +50,7 @@ namespace NorthwindTradersV8WebRazorPages.Pages.Categorias.Reportes
             reporte.ReportPath = Path.Combine(
                 Directory.GetCurrentDirectory(),
                 "Pages",
-                "Categorias",
+                "CategoriasProductosComun",
                 "Reportes",
                 "RptCategoriasConProductos.rdlc");
 

@@ -4,7 +4,7 @@ using NorthwindTradersV8WebRazorPages.BLL;
 using NorthwindTradersV8WebRazorPages.Entities.DTOs;
 using System.Data;
 
-namespace NorthwindTradersV8WebRazorPages.Pages.Categorias.Consultas
+namespace NorthwindTradersV8WebRazorPages.Pages.CategoriasProductosComun.Consultas
 {
     public class BuscarCategoriasProductosModel : PageModel
     {

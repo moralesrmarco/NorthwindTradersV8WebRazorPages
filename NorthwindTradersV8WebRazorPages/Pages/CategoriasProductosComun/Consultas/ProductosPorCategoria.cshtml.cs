@@ -4,7 +4,7 @@ using NorthwindTradersV8WebRazorPages.BLL;
 using NorthwindTradersV8WebRazorPages.Common;
 using NorthwindTradersV8WebRazorPages.Entities;
 
-namespace NorthwindTradersV8WebRazorPages.Pages.Categorias.Consultas
+namespace NorthwindTradersV8WebRazorPages.Pages.CategoriasProductosComun.Consultas
 {
     public class ProductosPorCategoriaModel : PageModel
     {

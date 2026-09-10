@@ -12,6 +12,7 @@ builder.Services.AddRazorPages(options =>
     options.Conventions.AuthorizeFolder("/ClientesProveedoresComun", "PermisoClientesProveedores");
     options.Conventions.AuthorizeFolder("/Categorias", "PermisoCategorias");
     options.Conventions.AuthorizeFolder("/Productos", "PermisoProductos");
+    options.Conventions.AuthorizeFolder("/CategoriasProductosComun", "PermisoCategoriasProductos");
     options.Conventions.AuthorizeFolder("/ProveedoresProductosComun", "PermisoProveedoresProductos");
     options.Conventions.AuthorizeFolder("/Ventas", "PermisoVentas");
     options.Conventions.AuthorizeFolder("/Graficas", "PermisoGraficas");
@@ -56,6 +57,13 @@ builder.Services.AddAuthorization(options =>
 
     options.AddPolicy("PermisoProductos", policy =>
         policy.RequireClaim("Permiso", Permisos.Productos.ToString()));
+
+    options.AddPolicy("PermisoCategoriasProductos", policy =>
+    {
+        policy.RequireAssertion(context =>
+            context.User.HasClaim("Permiso", Permisos.Categorias.ToString()) ||
+            context.User.HasClaim("Permiso", Permisos.Productos.ToString()));
+    });
 
     options.AddPolicy("PermisoProveedoresProductos", policy =>
     {

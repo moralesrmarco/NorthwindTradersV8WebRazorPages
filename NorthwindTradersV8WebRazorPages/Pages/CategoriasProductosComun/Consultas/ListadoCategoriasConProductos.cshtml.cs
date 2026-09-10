@@ -1,9 +1,8 @@
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using NorthwindTradersV8WebRazorPages.BLL;
 using NorthwindTradersV8WebRazorPages.Entities.DTOs;
 
-namespace NorthwindTradersV8WebRazorPages.Pages.Categorias.Consultas
+namespace NorthwindTradersV8WebRazorPages.Pages.CategoriasProductosComun.Consultas
 {
     public class ListadoCategoriasConProductosModel : PageModel
     {
