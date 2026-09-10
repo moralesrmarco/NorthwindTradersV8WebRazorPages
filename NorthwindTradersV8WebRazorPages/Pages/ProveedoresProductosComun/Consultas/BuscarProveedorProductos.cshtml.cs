@@ -6,7 +6,7 @@ using NorthwindTradersV8WebRazorPages.BLL.Services;
 using NorthwindTradersV8WebRazorPages.Entities.DTOs;
 using System.Data;
 
-namespace NorthwindTradersV8WebRazorPages.Pages.Proveedores.Consultas
+namespace NorthwindTradersV8WebRazorPages.Pages.ProveedoresProductosComun.Consultas
 {
     public class BuscarProveedorProductosModel : PageModel
     {

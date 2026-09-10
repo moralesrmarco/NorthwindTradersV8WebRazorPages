@@ -5,7 +5,7 @@ using NorthwindTradersV8WebRazorPages.Common;
 using NorthwindTradersV8WebRazorPages.Entities;
 using NorthwindTradersV8WebRazorPages.Entities.DTOs;
 
-namespace NorthwindTradersV8WebRazorPages.Pages.Proveedores.Consultas
+namespace NorthwindTradersV8WebRazorPages.Pages.ProveedoresProductosComun.Consultas
 {
     public class ProductosPorProveedorModel : PageModel
     {

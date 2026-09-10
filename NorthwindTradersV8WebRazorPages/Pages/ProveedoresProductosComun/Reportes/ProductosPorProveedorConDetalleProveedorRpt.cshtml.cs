@@ -3,12 +3,12 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Reporting.NETCore;
 using NorthwindTradersV8WebRazorPages.BLL;
 
-namespace NorthwindTradersV8WebRazorPages.Pages.Proveedores.Reportes
+namespace NorthwindTradersV8WebRazorPages.Pages.ProveedoresProductosComun.Reportes
 {
-    public class ProductosPorProveedorRptModel : PageModel
+    public class ProductosPorProveedorConDetalleProveedorRptModel : PageModel
     {
         private readonly ProveedorBLL proveedorBLL;
-        public ProductosPorProveedorRptModel(IConfiguration configuration)
+        public ProductosPorProveedorConDetalleProveedorRptModel(IConfiguration configuration)
         {
             var connectionString = configuration.GetConnectionString("NorthwindConnection")
                 ?? throw new InvalidOperationException("Connection string not found");
@@ -31,7 +31,7 @@ namespace NorthwindTradersV8WebRazorPages.Pages.Proveedores.Reportes
             return File(
                 reporte.Render("EXCELOPENXML"),
                 "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-                "ProductosPorProveedor.xlsx");
+                "ProductosPorProveedorConDetalleDelProveedor.xlsx");
         }
 
         public IActionResult OnGetWord()
@@ -40,7 +40,7 @@ namespace NorthwindTradersV8WebRazorPages.Pages.Proveedores.Reportes
             return File(
                 reporte.Render("WORDOPENXML"),
                 "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-                "ProductosPorProveedor.docx");
+                "ProductosPorProveedorConDetalleDelProveedor.docx");
         }
 
         private LocalReport CrearReporte()
@@ -50,11 +50,11 @@ namespace NorthwindTradersV8WebRazorPages.Pages.Proveedores.Reportes
             reporte.ReportPath = Path.Combine(
                 Directory.GetCurrentDirectory(),
                 "Pages",
-                "Proveedores",
+                "ProveedoresProductosComun",
                 "Reportes",
-                "RptProductosPorProveedor.rdlc");
+                "RptProdPorProvConDetProv.rdlc");
 
-            var productosPorProveedor = proveedorBLL.ObtenerProductosPorProveedorRpt();
+            var productosPorProveedor = proveedorBLL.ObtenerProductosPorProveedorConDetalleDelProveedorRpt();
 
             reporte.DataSources.Clear();
             reporte.DataSources.Add(
