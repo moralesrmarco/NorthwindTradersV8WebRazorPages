@@ -1,9 +1,22 @@
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
+using NorthwindTradersV8WebRazorPages.Common;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddRazorPages();
+builder.Services.AddRazorPages(options =>
+{
+    options.Conventions.AuthorizeFolder("/Ventas", "PermisoVentas");
+    options.Conventions.AuthorizeFolder("/Productos", "PermisoProductos");
+    options.Conventions.AuthorizeFolder("/Clientes", "PermisoClientes");
+    options.Conventions.AuthorizeFolder("/Empleados", "PermisoEmpleados");
+    options.Conventions.AuthorizeFolder("/Proveedores", "PermisoProveedores");
+    options.Conventions.AuthorizeFolder("/Categorias", "PermisoCategorias");
+    options.Conventions.AuthorizeFolder("/Administracion", "PermisoAdministracion");
+    options.Conventions.AuthorizeFolder("/Graficas", "PermisoGraficas");
+    options.Conventions.AuthorizeFolder("/Tableros/AltaDireccion", "PermisoTableroAltaDireccion");
+    options.Conventions.AuthorizeFolder("/Tableros/Vendedores", "PermisoTableroVendedores");
+});
 
 builder.Services
     .AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
@@ -20,6 +33,37 @@ builder.Services
 
 builder.Services.AddAuthorization(options =>
 {
+    options.AddPolicy("PermisoVentas", policy =>
+        policy.RequireClaim("Permiso", Permisos.Ventas.ToString()));
+
+    options.AddPolicy("PermisoProductos", policy =>
+        policy.RequireClaim("Permiso", Permisos.Productos.ToString()));
+
+    options.AddPolicy("PermisoClientes", policy =>
+        policy.RequireClaim("Permiso", Permisos.Clientes.ToString()));
+
+    options.AddPolicy("PermisoEmpleados", policy =>
+        policy.RequireClaim("Permiso", Permisos.Empleados.ToString()));
+
+    options.AddPolicy("PermisoProveedores", policy =>
+        policy.RequireClaim("Permiso", Permisos.Proveedores.ToString()));
+
+    options.AddPolicy("PermisoCategorias", policy =>
+        policy.RequireClaim("Permiso", Permisos.Categorias.ToString()));
+
+    options.AddPolicy("PermisoAdministracion", policy =>
+        policy.RequireClaim("Permiso", Permisos.Administracion.ToString()));
+
+    options.AddPolicy("PermisoGraficas", policy =>
+        policy.RequireClaim("Permiso", Permisos.Graficas.ToString()));
+
+    options.AddPolicy("PermisoTableroAltaDireccion", policy =>
+        policy.RequireClaim("Permiso", Permisos.TableroAltaDireccion.ToString()));
+
+    options.AddPolicy("PermisoTableroVendedores", policy =>
+        policy.RequireClaim("Permiso", Permisos.TableroVendedores.ToString()));
+
+    // Toda página requiere autenticación por defecto.
     options.FallbackPolicy =
         new AuthorizationPolicyBuilder()
             .RequireAuthenticatedUser()

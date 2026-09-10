@@ -1,4 +1,6 @@
-﻿<!DOCTYPE html>
+﻿@using NorthwindTradersV8WebRazorPages.Common
+
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
@@ -28,307 +30,398 @@
                         </li>
 
                         <!-- Menú  empleados con submenús -->
-                        <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle text-dark" href="#" id="empleadosDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                Empleados
-                            </a>
-                            <ul class="dropdown-menu" aria-labelledby="empleadosDropdown">
+                        @if (User.HasClaim("Permiso", Permisos.Empleados.ToString()))
+                        {
+                            <!-- Menú Empleados con submenús -->
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle text-dark"
+                                   href="#"
+                                   id="empleadosDropdown"
+                                   role="button"
+                                   data-bs-toggle="dropdown"
+                                   aria-expanded="false">
+                                    Empleados
+                                </a>
 
-                                <!-- Gestión de empleados -->
-                                <li><a class="dropdown-item" asp-area="" asp-page="/Empleados/Index">Gestión de empleados</a></li>
-                                <li><hr class="dropdown-divider" /></li>
+                                <ul class="dropdown-menu" aria-labelledby="empleadosDropdown">
 
-                                <!-- Submenú Reportes -->
-                                <li class="dropdown-submenu">
-                                    <a class="dropdown-item dropdown-toggle" href="#">Reportes</a>
-                                    <ul class="dropdown-menu">
-                                        <li>
-                                            <a class="dropdown-item"
-                                                asp-page="/Empleados/Reportes/RptEmpleados">
-                                                Reporte de empleados
-                                            </a>
-                                        </li>
-                                        <li>
-                                            <a class="dropdown-item" 
-                                                asp-page="/Empleados/Reportes/RptEmpleadosConFoto">
-                                                Reporte de empleados con foto
-                                            </a>
-                                        </li>
-                                        <li>
-                                            <a class="dropdown-item" 
-                                                asp-page="/Empleados/Reportes/RptEmpleadosConFoto2">
-                                                Reporte de empleados con foto 2
-                                            </a>
-                                        </li>
-                                    </ul>
-                                </li>
-                            </ul>
-                        </li>
+                                    <!-- Gestión de empleados -->
+                                    <li>
+                                        <a class="dropdown-item"
+                                           asp-area=""
+                                           asp-page="/Empleados/Index">
+                                            Gestión de empleados
+                                        </a>
+                                    </li>
 
-                        <!-- Menú  clientes con submenús -->
-                        <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle text-dark" href="#" id="clientesDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                Clientes
-                            </a>
-                            <ul class="dropdown-menu" aria-labelledby="clientesDropdown">
-
-                                <!-- Gestión de clientes -->
-                                <li><a class="dropdown-item" asp-area="" asp-page="/Clientes/Index">Gestión de clientes</a></li>
-                                <li><hr class="dropdown-divider" /></li>
-
-                                <!-- Submenú Consultas -->
-                                <li class="dropdown-submenu">
-                                    <a class="dropdown-item dropdown-toggle" href="#">Consultas</a>
-                                    <ul class="dropdown-menu">
-                                        <li>
-                                            <a class="dropdown-item"
-                                               asp-page="/Clientes/Consultas/DirectorioClientesProveedores">
-                                                Directorio de clientes y proveedores
-                                            </a>
-                                        </li>
-                                        <li>
-                                            <a class="dropdown-item"
-                                               asp-page="/Clientes/Consultas/DirectorioPorCiudadClientesProveedores">
-                                                Directorio de clientes y proveedores por ciudad
-                                            </a>
-                                        </li>
-                                        <li>
-                                            <a class="dropdown-item"
-                                               asp-page="/Clientes/Consultas/DirectorioPorPaisClientesProveedores">
-                                                Directorio de clientes y proveedores por país
-                                            </a>
-                                        </li>
-                                    </ul>
-                                </li>
+                                    <li>
+                                        <hr class="dropdown-divider" />
+                                    </li>
 
                                     <!-- Submenú Reportes -->
-                                <li class="dropdown-submenu">
-                                    <a class="dropdown-item dropdown-toggle" href="#">Reportes</a>
-                                    <ul class="dropdown-menu">
-                                        <li>
-                                            <a class="dropdown-item"
-                                               asp-page="/Clientes/Reportes/DirectorioClientesRpt">
-                                                Directorio de clientes
-                                            </a>
-                                        </li>
-                                        <li>
-                                            <a class="dropdown-item"
-                                               asp-page="/Clientes/Reportes/DirectorioClientesProveedoresRpt">
-                                                Directorio de clientes y proveedores
-                                            </a>
-                                        </li>
-                                        <li>
-                                            <a class="dropdown-item"
-                                               asp-page="/Clientes/Reportes/DirectorioPorCiudadClientesProveedoresRpt">
-                                                Directorio de clientes y proveedores por ciudad
-                                            </a>
-                                        </li>
-                                        <li>
-                                            <a class="dropdown-item"
-                                               asp-page="/Clientes/Reportes/DirectorioPorPaisClientesProveedoresRpt">
-                                                Directorio de clientes y proveedores por país
-                                            </a>
-                                        </li>
-                                    </ul>
-                                </li>   
-                            </ul>
-                        </li>
+                                    <li class="dropdown-submenu">
+                                        <a class="dropdown-item dropdown-toggle" href="#">
+                                            Reportes
+                                        </a>
+
+                                        <ul class="dropdown-menu">
+                                            <li>
+                                                <a class="dropdown-item"
+                                                   asp-page="/Empleados/Reportes/RptEmpleados">
+                                                    Reporte de empleados
+                                                </a>
+                                            </li>
+
+                                            <li>
+                                                <a class="dropdown-item"
+                                                   asp-page="/Empleados/Reportes/RptEmpleadosConFoto">
+                                                    Reporte de empleados con foto
+                                                </a>
+                                            </li>
+
+                                            <li>
+                                                <a class="dropdown-item"
+                                                   asp-page="/Empleados/Reportes/RptEmpleadosConFoto2">
+                                                    Reporte de empleados con foto 2
+                                                </a>
+                                            </li>
+                                        </ul>
+                                    </li>
+                                </ul>
+                            </li>
+                        }
+                        else
+                        {
+                            <!-- Empleados sin permiso: visible pero deshabilitado -->
+                            <li class="nav-item">
+                                <span class="nav-link text-dark menu-deshabilitado">
+                                    Empleados
+                                </span>
+                            </li>
+                        }
+
+                        <!-- Menú  clientes con submenús -->
+                        @if (User.HasClaim("Permiso", Permisos.Clientes.ToString()))
+                        {
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle text-dark" href="#" id="clientesDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                    Clientes
+                                </a>
+                                <ul class="dropdown-menu" aria-labelledby="clientesDropdown">
+
+                                    <!-- Gestión de clientes -->
+                                    <li><a class="dropdown-item" asp-area="" asp-page="/Clientes/Index">Gestión de clientes</a></li>
+                                    <li><hr class="dropdown-divider" /></li>
+
+                                    <!-- Submenú Consultas -->
+                                    <li class="dropdown-submenu">
+                                        <a class="dropdown-item dropdown-toggle" href="#">Consultas</a>
+                                        <ul class="dropdown-menu">
+                                            <li>
+                                                <a class="dropdown-item"
+                                                   asp-page="/Clientes/Consultas/DirectorioClientesProveedores">
+                                                    Directorio de clientes y proveedores
+                                                </a>
+                                            </li>
+                                            <li>
+                                                <a class="dropdown-item"
+                                                   asp-page="/Clientes/Consultas/DirectorioPorCiudadClientesProveedores">
+                                                    Directorio de clientes y proveedores por ciudad
+                                                </a>
+                                            </li>
+                                            <li>
+                                                <a class="dropdown-item"
+                                                   asp-page="/Clientes/Consultas/DirectorioPorPaisClientesProveedores">
+                                                    Directorio de clientes y proveedores por país
+                                                </a>
+                                            </li>
+                                        </ul>
+                                    </li>
+
+                                        <!-- Submenú Reportes -->
+                                    <li class="dropdown-submenu">
+                                        <a class="dropdown-item dropdown-toggle" href="#">Reportes</a>
+                                        <ul class="dropdown-menu">
+                                            <li>
+                                                <a class="dropdown-item"
+                                                   asp-page="/Clientes/Reportes/DirectorioClientesRpt">
+                                                    Directorio de clientes
+                                                </a>
+                                            </li>
+                                            <li>
+                                                <a class="dropdown-item"
+                                                   asp-page="/Clientes/Reportes/DirectorioClientesProveedoresRpt">
+                                                    Directorio de clientes y proveedores
+                                                </a>
+                                            </li>
+                                            <li>
+                                                <a class="dropdown-item"
+                                                   asp-page="/Clientes/Reportes/DirectorioPorCiudadClientesProveedoresRpt">
+                                                    Directorio de clientes y proveedores por ciudad
+                                                </a>
+                                            </li>
+                                            <li>
+                                                <a class="dropdown-item"
+                                                   asp-page="/Clientes/Reportes/DirectorioPorPaisClientesProveedoresRpt">
+                                                    Directorio de clientes y proveedores por país
+                                                </a>
+                                            </li>
+                                        </ul>
+                                    </li>   
+                                </ul>
+                            </li>
+                        }
+                        else
+                        {
+                            <li class="nav-item">
+                                <span class="nav-link text-dark menu-deshabilitado">
+                                    Clientes
+                                </span>
+                            </li>
+                        }
 
                         <!-- Menú  proveedores con submenús -->
-                        <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle text-dark" href="#" id="proveedoresDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                Proveedores
-                            </a>
-                            <ul class="dropdown-menu" aria-labelledby="proveedoresDropdown">
+                        @if (User.HasClaim("Permiso", Permisos.Proveedores.ToString()))
+                        {
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle text-dark" href="#" id="proveedoresDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                    Proveedores
+                                </a>
+                                <ul class="dropdown-menu" aria-labelledby="proveedoresDropdown">
 
-                                <!-- Gestión de proveedores -->
-                                <li><a class="dropdown-item" asp-area="" asp-page="/Proveedores/Index">Gestión de proveedores</a></li>
-                                <li><hr class="dropdown-divider" /></li>
+                                    <!-- Gestión de proveedores -->
+                                    <li><a class="dropdown-item" asp-area="" asp-page="/Proveedores/Index">Gestión de proveedores</a></li>
+                                    <li><hr class="dropdown-divider" /></li>
 
-                                <!-- Submenú Consultas -->
-                                <li class="dropdown-submenu">
-                                    <a class="dropdown-item dropdown-toggle" href="#">Consultas</a>
-                                    <ul class="dropdown-menu">
-                                        <li>
-                                            <a class="dropdown-item"
-                                               asp-page="/Clientes/Consultas/DirectorioClientesProveedores">
-                                                Directorio de clientes y proveedores
-                                            </a>
-                                        </li>
-                                        <li>
-                                            <a class="dropdown-item"
-                                               asp-page="/Clientes/Consultas/DirectorioPorCiudadClientesProveedores">
-                                                Directorio de clientes y proveedores por ciudad
-                                            </a>
-                                        </li>
-                                        <li>
-                                            <a class="dropdown-item"
-                                               asp-page="/Clientes/Consultas/DirectorioPorPaisClientesProveedores">
-                                                Directorio de clientes y proveedores por país
-                                            </a>
-                                        </li>
-                                        <li>
-                                            <a class="dropdown-item"
-                                               asp-page="/Proveedores/Consultas/BuscarProveedorProductos">
-                                                Consulta de productos por proveedor
-                                            </a>
-                                        </li>
-                                    </ul>
-                                </li>
+                                    <!-- Submenú Consultas -->
+                                    <li class="dropdown-submenu">
+                                        <a class="dropdown-item dropdown-toggle" href="#">Consultas</a>
+                                        <ul class="dropdown-menu">
+                                            <li>
+                                                <a class="dropdown-item"
+                                                   asp-page="/Clientes/Consultas/DirectorioClientesProveedores">
+                                                    Directorio de clientes y proveedores
+                                                </a>
+                                            </li>
+                                            <li>
+                                                <a class="dropdown-item"
+                                                   asp-page="/Clientes/Consultas/DirectorioPorCiudadClientesProveedores">
+                                                    Directorio de clientes y proveedores por ciudad
+                                                </a>
+                                            </li>
+                                            <li>
+                                                <a class="dropdown-item"
+                                                   asp-page="/Clientes/Consultas/DirectorioPorPaisClientesProveedores">
+                                                    Directorio de clientes y proveedores por país
+                                                </a>
+                                            </li>
+                                            <li>
+                                                <a class="dropdown-item"
+                                                   asp-page="/Proveedores/Consultas/BuscarProveedorProductos">
+                                                    Consulta de productos por proveedor
+                                                </a>
+                                            </li>
+                                        </ul>
+                                    </li>
 
-                                <!-- Submenú Reportes -->
-                                <li class="dropdown-submenu">
-                                    <a class="dropdown-item dropdown-toggle" href="#">Reportes</a>
-                                    <ul class="dropdown-menu">
-                                        <li>
-                                            <a class="dropdown-item"
-                                               asp-page="/Proveedores/Reportes/DirectorioProveedoresRpt">
-                                                Directorio de proveedores
-                                            </a>
-                                        </li>
-                                        <li>
-                                            <a class="dropdown-item"
-                                               asp-page="/Clientes/Reportes/DirectorioClientesProveedoresRpt">
-                                                Directorio de clientes y proveedores
-                                            </a>
-                                        </li>
-                                        <li>
-                                            <a class="dropdown-item"
-                                               asp-page="/Clientes/Reportes/DirectorioPorCiudadClientesProveedoresRpt">
-                                                Directorio de clientes y proveedores por ciudad
-                                            </a>
-                                        </li>
-                                        <li>
-                                            <a class="dropdown-item"
-                                               asp-page="/Clientes/Reportes/DirectorioPorPaisClientesProveedoresRpt">
-                                                Directorio de clientes y proveedores por país
-                                            </a>
-                                        </li>
-                                        <li>
-                                            <a class="dropdown-item"
-                                               asp-page="/Proveedores/Reportes/ProductosPorProveedorRpt">
-                                                Reporte de productos por proveedor
-                                            </a>
-                                        </li>
-                                        <li>
-                                            <a class="dropdown-item"
-                                               asp-page="/Proveedores/Reportes/ProductosPorProveedorConDetalleProveedorRpt">
-                                                Reporte de productos por proveedor con detalle del proveedor
-                                            </a>
-                                        </li>
-                                    </ul>
-                                </li>
-                            </ul>
-                        </li>
+                                    <!-- Submenú Reportes -->
+                                    <li class="dropdown-submenu">
+                                        <a class="dropdown-item dropdown-toggle" href="#">Reportes</a>
+                                        <ul class="dropdown-menu">
+                                            <li>
+                                                <a class="dropdown-item"
+                                                   asp-page="/Proveedores/Reportes/DirectorioProveedoresRpt">
+                                                    Directorio de proveedores
+                                                </a>
+                                            </li>
+                                            <li>
+                                                <a class="dropdown-item"
+                                                   asp-page="/Clientes/Reportes/DirectorioClientesProveedoresRpt">
+                                                    Directorio de clientes y proveedores
+                                                </a>
+                                            </li>
+                                            <li>
+                                                <a class="dropdown-item"
+                                                   asp-page="/Clientes/Reportes/DirectorioPorCiudadClientesProveedoresRpt">
+                                                    Directorio de clientes y proveedores por ciudad
+                                                </a>
+                                            </li>
+                                            <li>
+                                                <a class="dropdown-item"
+                                                   asp-page="/Clientes/Reportes/DirectorioPorPaisClientesProveedoresRpt">
+                                                    Directorio de clientes y proveedores por país
+                                                </a>
+                                            </li>
+                                            <li>
+                                                <a class="dropdown-item"
+                                                   asp-page="/Proveedores/Reportes/ProductosPorProveedorRpt">
+                                                    Reporte de productos por proveedor
+                                                </a>
+                                            </li>
+                                            <li>
+                                                <a class="dropdown-item"
+                                                   asp-page="/Proveedores/Reportes/ProductosPorProveedorConDetalleProveedorRpt">
+                                                    Reporte de productos por proveedor con detalle del proveedor
+                                                </a>
+                                            </li>
+                                        </ul>
+                                    </li>
+                                </ul>
+                            </li>
+                        }
+                        else
+                        {
+                            <li class="nav-item">
+                                <span class="nav-link text-dark menu-deshabilitado">
+                                    Proveedores
+                                </span>
+                            </li>
+                        }
+
                         <!-- Menú Categorías con submenús -->
-                        <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle text-dark" href="#" id="categoriasDropDown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                Categorías
-                            </a>
-                            <ul class="dropdown-menu" aria-labelledby="categoriasDropDown">
-                                <!-- Gestión de categorías -->
-                                <li>
-                                    <a class="dropdown-item" 
-                                        asp-area="" 
-                                        asp-page="/Categorias/Index">
-                                            Gestión de categorías
-                                    </a>
-                                </li>
-                                <li><hr class="dropdown-divider" /></li>
-                                <!-- Submenú Consultas -->
-                                <li class="dropdown-submenu">
-                                    <a class="dropdown-item dropdown-toggle" href="#">Consultas</a>
-                                    <ul class="dropdown-menu">
-                                        <li>
-                                            <a class="dropdown-item"
-                                                asp-page="/Categorias/Consultas/BuscarCategoriasProductos">
-                                                Consulta de productos por categoría
-                                            </a>
-                                        </li>
-                                        <li>
-                                            <a class="dropdown-item"
-                                               asp-page="/Categorias/Consultas/ListadoCategoriasConProductos">
-                                                Listado de categorías con productos
-                                            </a>
-                                        </li>
-                                    </ul>
-                                </li>
-                                <!-- Submenú Reportes -->
-                                <li class="dropdown-submenu">
-                                    <a class="dropdown-item dropdown-toggle" href="#">Reportes</a>
-                                    <ul class="dropdown-menu">
-                                        <li>
-                                            <a class="dropdown-item"
-                                               asp-page="/Categorias/Reportes/CategoriasRpt">
-                                                Reporte de categorías
-                                            </a>
-                                        </li>
-                                        <li>
-                                            <a class="dropdown-item"
-                                               asp-page="/Categorias/Reportes/CategoriasConProductosRpt">
-                                                Reporte de categorías con productos
-                                            </a>
-                                        </li>
-                                    </ul>
-                                </li>
-                            </ul>
-                        </li>
+                        @if (User.HasClaim("Permiso", Permisos.Categorias.ToString()))
+                        {
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle text-dark" href="#" id="categoriasDropDown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                    Categorías
+                                </a>
+                                <ul class="dropdown-menu" aria-labelledby="categoriasDropDown">
+                                    <!-- Gestión de categorías -->
+                                    <li>
+                                        <a class="dropdown-item" 
+                                            asp-area="" 
+                                            asp-page="/Categorias/Index">
+                                                Gestión de categorías
+                                        </a>
+                                    </li>
+                                    <li><hr class="dropdown-divider" /></li>
+                                    <!-- Submenú Consultas -->
+                                    <li class="dropdown-submenu">
+                                        <a class="dropdown-item dropdown-toggle" href="#">Consultas</a>
+                                        <ul class="dropdown-menu">
+                                            <li>
+                                                <a class="dropdown-item"
+                                                    asp-page="/Categorias/Consultas/BuscarCategoriasProductos">
+                                                    Consulta de productos por categoría
+                                                </a>
+                                            </li>
+                                            <li>
+                                                <a class="dropdown-item"
+                                                   asp-page="/Categorias/Consultas/ListadoCategoriasConProductos">
+                                                    Listado de categorías con productos
+                                                </a>
+                                            </li>
+                                        </ul>
+                                    </li>
+                                    <!-- Submenú Reportes -->
+                                    <li class="dropdown-submenu">
+                                        <a class="dropdown-item dropdown-toggle" href="#">Reportes</a>
+                                        <ul class="dropdown-menu">
+                                            <li>
+                                                <a class="dropdown-item"
+                                                   asp-page="/Categorias/Reportes/CategoriasRpt">
+                                                    Reporte de categorías
+                                                </a>
+                                            </li>
+                                            <li>
+                                                <a class="dropdown-item"
+                                                   asp-page="/Categorias/Reportes/CategoriasConProductosRpt">
+                                                    Reporte de categorías con productos
+                                                </a>
+                                            </li>
+                                        </ul>
+                                    </li>
+                                </ul>
+                            </li>
+                        }
+                        else
+                        {
+                            <li class="nav-item">
+                                <span class="nav-link text-dark menu-deshabilitado">
+                                    Categorías
+                                </span>
+                            </li>
+                        }
+
                         <!-- Menú Productos con submenús -->
-                        <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle text-dark" href="#" id="productosDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                Productos
-                            </a>
-                            <ul class="dropdown-menu" aria-labelledby="productosDropdown">
+                        @if (User.HasClaim("Permiso", Permisos.Productos.ToString()))
+                        {
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle text-dark" href="#" id="productosDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                    Productos
+                                </a>
+                                <ul class="dropdown-menu" aria-labelledby="productosDropdown">
 
-                                <!-- Gestión de productos -->
-                                <li><a class="dropdown-item" asp-area="" asp-page="/Productos/Index">Gestión de productos</a></li>
-                                <li><hr class="dropdown-divider" /></li>
+                                    <!-- Gestión de productos -->
+                                    <li><a class="dropdown-item" asp-area="" asp-page="/Productos/Index">Gestión de productos</a></li>
+                                    <li><hr class="dropdown-divider" /></li>
 
-                                <!-- Consultas con submenú -->
-                                <li class="dropdown-submenu">
-                                    <a class="dropdown-item dropdown-toggle" href="#">Consultas</a>
-                                    <ul class="dropdown-menu">
-                                        <li><a class="dropdown-item" asp-page="/Productos/Consultas/ListadoProductos">Listado de productos</a></li>
-                                        <li><a class="dropdown-item" asp-page="/Categorias/Consultas/BuscarCategoriasProductos">Consulta de productos por categoría</a></li>
-                                        <li><a class="dropdown-item" asp-page="/Proveedores/Consultas/BuscarProveedorProductos">Consulta de productos por proveedor</a></li>
-                                        <li><a class="dropdown-item" asp-page="/Productos/Consultas/ListadoAlfabeticoProductos">Consulta alfabética de productos</a></li>
-                                        <li><a class="dropdown-item" asp-page="/Categorias/Consultas/ListadoCategoriasConProductos">Listado de categorías con productos</a></li>
-                                        <li><a class="dropdown-item" asp-page="/Productos/Consultas/ProductosPorEncimaDelPrecioPromedio">Productos por encima del precio promedio</a></li>
-                                    </ul>
-                                </li>
+                                    <!-- Consultas con submenú -->
+                                    <li class="dropdown-submenu">
+                                        <a class="dropdown-item dropdown-toggle" href="#">Consultas</a>
+                                        <ul class="dropdown-menu">
+                                            <li><a class="dropdown-item" asp-page="/Productos/Consultas/ListadoProductos">Listado de productos</a></li>
+                                            <li><a class="dropdown-item" asp-page="/Categorias/Consultas/BuscarCategoriasProductos">Consulta de productos por categoría</a></li>
+                                            <li><a class="dropdown-item" asp-page="/Proveedores/Consultas/BuscarProveedorProductos">Consulta de productos por proveedor</a></li>
+                                            <li><a class="dropdown-item" asp-page="/Productos/Consultas/ListadoAlfabeticoProductos">Consulta alfabética de productos</a></li>
+                                            <li><a class="dropdown-item" asp-page="/Categorias/Consultas/ListadoCategoriasConProductos">Listado de categorías con productos</a></li>
+                                            <li><a class="dropdown-item" asp-page="/Productos/Consultas/ProductosPorEncimaDelPrecioPromedio">Productos por encima del precio promedio</a></li>
+                                        </ul>
+                                    </li>
 
-                                <!-- Reportes con submenú -->
-                                <li class="dropdown-submenu">
-                                    <a class="dropdown-item dropdown-toggle" href="#">Reportes</a>
-                                    <ul class="dropdown-menu">
-                                        <li><a class="dropdown-item" asp-page="/Productos/Reportes/ProductosRpt">Reporte de productos</a></li>
-                                        <li><a class="dropdown-item" asp-page="/Productos/Reportes/ProductosAlfabeticoRpt">Reporte de productos en orden alfabético</a></li>
-                                        <li><a class="dropdown-item" asp-page="/Proveedores/Reportes/ProductosPorProveedorRpt">Reporte de productos por proveedor</a></li>
-                                        <li><a class="dropdown-item" asp-page="/Proveedores/Reportes/ProductosPorProveedorConDetalleProveedorRpt">Reporte de productos por proveedor con detalle del proveedor</a></li>
-                                        <li><a class="dropdown-item" asp-page="/Categorias/Reportes/CategoriasConProductosRpt">Reporte de categorías con productos</a></li>
-                                    </ul>
-                                </li>
-                            </ul>
-                        </li>
+                                    <!-- Reportes con submenú -->
+                                    <li class="dropdown-submenu">
+                                        <a class="dropdown-item dropdown-toggle" href="#">Reportes</a>
+                                        <ul class="dropdown-menu">
+                                            <li><a class="dropdown-item" asp-page="/Productos/Reportes/ProductosRpt">Reporte de productos</a></li>
+                                            <li><a class="dropdown-item" asp-page="/Productos/Reportes/ProductosAlfabeticoRpt">Reporte de productos en orden alfabético</a></li>
+                                            <li><a class="dropdown-item" asp-page="/Proveedores/Reportes/ProductosPorProveedorRpt">Reporte de productos por proveedor</a></li>
+                                            <li><a class="dropdown-item" asp-page="/Proveedores/Reportes/ProductosPorProveedorConDetalleProveedorRpt">Reporte de productos por proveedor con detalle del proveedor</a></li>
+                                            <li><a class="dropdown-item" asp-page="/Categorias/Reportes/CategoriasConProductosRpt">Reporte de categorías con productos</a></li>
+                                        </ul>
+                                    </li>
+                                </ul>
+                            </li>
+                        }
+                        else
+                        {
+                            <li class="nav-item">
+                                <span class="nav-link text-dark menu-deshabilitado">
+                                    Productos
+                                </span>
+                            </li>
+                        }
 
-                        <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle text-dark" href="#" id="ventasDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                Ventas
-                            </a>
-                            <ul class="dropdown-menu" aria-labelledby="ventasDropdown">
-                                <!-- Gestión de ventas -->
-                                <li><a class="dropdown-item" asp-area="" asp-page="/Ventas/Index">Gestión de ventas</a></li>
-                                <li><hr class="dropdown-divider" /></li>
+                        <!-- Menú Ventas con submenús -->
+                        @if (User.HasClaim("Permiso", Permisos.Ventas.ToString()))
+                        {
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle text-dark" href="#" id="ventasDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                    Ventas
+                                </a>
+                                <ul class="dropdown-menu" aria-labelledby="ventasDropdown">
+                                    <!-- Gestión de ventas -->
+                                    <li><a class="dropdown-item" asp-area="" asp-page="/Ventas/Index">Gestión de ventas</a></li>
+                                    <li><hr class="dropdown-divider" /></li>
 
-                                <!-- Reportes con submenú -->
-                                <li class="dropdown-submenu">
-                                    <a class="dropdown-item dropdown-toggle" href="#">Reportes</a>
-                                    <ul class="dropdown-menu">
-                                        <li><a class="dropdown-item" asp-page="/Ventas/Reportes/VentasRpt">Reporte de ventas</a></li>
-                                    </ul>
-                                </li>
-                            </ul>
-                        </li>
+                                    <!-- Reportes con submenú -->
+                                    <li class="dropdown-submenu">
+                                        <a class="dropdown-item dropdown-toggle" href="#">Reportes</a>
+                                        <ul class="dropdown-menu">
+                                            <li><a class="dropdown-item" asp-page="/Ventas/Reportes/VentasRpt">Reporte de ventas</a></li>
+                                        </ul>
+                                    </li>
+                                </ul>
+                            </li>
+                        }
+                        else
+                        {
+                            <li class="nav-item">
+                                <span class="nav-link text-dark menu-deshabilitado">
+                                    Ventas
+                                </span>
+                            </li>
+                        }
 
                         @if (User.Identity?.IsAuthenticated == true)
                         {

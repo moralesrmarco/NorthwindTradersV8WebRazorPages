@@ -11,6 +11,7 @@ namespace NorthwindTradersV8WebRazorPages.Pages.Account
     public class LoginModel : PageModel
     {
         private readonly UsuarioBLL usuarioBLL;
+        private readonly PermisoBLL permisoBLL;
         [BindProperty]
         public string Usuario { get; set; } = string.Empty;
         [BindProperty]
@@ -22,6 +23,7 @@ namespace NorthwindTradersV8WebRazorPages.Pages.Account
             string connectionString = configuration.GetConnectionString("NorthwindConnection")
                 ?? throw new InvalidOperationException("Connection string not found");
             this.usuarioBLL = new UsuarioBLL(connectionString);
+            this.permisoBLL = new PermisoBLL(connectionString);
         }
         public void OnGet()
         {
@@ -77,25 +79,39 @@ namespace NorthwindTradersV8WebRazorPages.Pages.Account
                 return Page();
             }
 
+            HashSet<int> permisosIds =
+                permisoBLL.ObtenerPermisosPorUsuarioId(idUsuario);
+
             // =====================================
             // CREAR LOS CLAIMS DEL USUARIO
             // =====================================
 
             var claims = new List<Claim>
-                {
-                    new Claim(
-                        ClaimTypes.NameIdentifier,
-                        idUsuario.ToString()),
+            {
+                new Claim(
+                    ClaimTypes.NameIdentifier,
+                    idUsuario.ToString()),
 
-                    new Claim(
-                        ClaimTypes.Name,
-                        nombreUsuarioAutenticado),
+                new Claim(
+                    ClaimTypes.Name,
+                    nombreUsuarioAutenticado),
 
-                    new Claim(
-                        "Usuario",
-                        Usuario)
-                };
+                new Claim(
+                    "Usuario",
+                    Usuario)
+            };
 
+            // =====================================
+            // AGREGAR CLAIMS DE PERMISOS
+            // =====================================
+
+            foreach (int permisoId in permisosIds)
+            {
+                claims.Add(
+                    new Claim(
+                        "Permiso",
+                        permisoId.ToString()));
+            }
 
             // =====================================
             // CREAR LA IDENTIDAD
