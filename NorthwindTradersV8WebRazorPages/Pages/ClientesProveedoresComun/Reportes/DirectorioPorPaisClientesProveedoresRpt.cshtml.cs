@@ -8,7 +8,7 @@ using NorthwindTradersV8WebRazorPages.Common;
 using NorthwindTradersV8WebRazorPages.Entities.DTOs;
 
 
-namespace NorthwindTradersV8WebRazorPages.Pages.Clientes.Reportes
+namespace NorthwindTradersV8WebRazorPages.Pages.ClientesProveedoresComun.Reportes
 {
     public class DirectorioPorPaisClientesProveedoresRptModel : PageModel
     {
@@ -130,7 +130,7 @@ namespace NorthwindTradersV8WebRazorPages.Pages.Clientes.Reportes
             reporte.ReportPath = Path.Combine(
                 Directory.GetCurrentDirectory(),
                 "Pages",
-                "Clientes",
+                "ClientesProveedoresComun",
                 "Reportes",
                 "RptClientesyProveedoresDirectorioxPais.rdlc");
 

@@ -4,15 +4,15 @@ using NorthwindTradersV8WebRazorPages.Common;
 using NorthwindTradersV8WebRazorPages.Entities.DTOs;
 using NorthwindTradersV8WebRazorPages.Infrastructure;
 
-namespace NorthwindTradersV8WebRazorPages.Pages.Clientes.Consultas
+namespace NorthwindTradersV8WebRazorPages.Pages.ClientesProveedoresComun.Consultas
 {
-    public class ClientesProveedoresModel : PagedPageModel
+    public class DirectorioClientesProveedoresModel : PagedPageModel
     {
         private readonly ClienteBLL clienteBLL;
         public int TotalRecords { get; private set; }
         public int TotalClientes { get; private set; }
         public int TotalProveedores { get; private set; }
-        public override string PageName => "/Clientes/Consultas/DirectorioClientesProveedores";
+        public override string PageName => "/ClientesProveedoresComun/Consultas/DirectorioClientesProveedores";
         [BindProperty(SupportsGet = true)]
         public bool MostrarClientes { get; set; } = true;
         [BindProperty(SupportsGet = true)]
@@ -65,7 +65,7 @@ namespace NorthwindTradersV8WebRazorPages.Pages.Clientes.Consultas
                 return $"Se encontraron {TotalClientes} cliente(s) y {TotalProveedores} proveedor(es), Total: {TotalRecords} registro(s)";
             }
         }
-        public ClientesProveedoresModel(IConfiguration configuration) : base(configuration)
+        public DirectorioClientesProveedoresModel(IConfiguration configuration) : base(configuration)
         {
             var connectionString = configuration.GetConnectionString("NorthwindConnection")
                 ?? throw new InvalidOperationException("Connection string not found");

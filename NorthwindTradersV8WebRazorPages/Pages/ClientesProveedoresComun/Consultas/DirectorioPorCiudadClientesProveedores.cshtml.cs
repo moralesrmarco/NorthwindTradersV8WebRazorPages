@@ -6,7 +6,7 @@ using NorthwindTradersV8WebRazorPages.Common;
 using NorthwindTradersV8WebRazorPages.Entities.DTOs;
 using NorthwindTradersV8WebRazorPages.Infrastructure;
 
-namespace NorthwindTradersV8WebRazorPages.Pages.Clientes.Consultas
+namespace NorthwindTradersV8WebRazorPages.Pages.ClientesProveedoresComun.Consultas
 {
     public class DirectorioPorCiudadClientesProveedoresModel : PagedPageModel
     {
@@ -15,7 +15,7 @@ namespace NorthwindTradersV8WebRazorPages.Pages.Clientes.Consultas
         public int TotalRecords { get; private set; }
         public int TotalClientes { get; private set; }
         public int TotalProveedores { get; private set; }
-        public override string PageName => "/Clientes/Consultas/DirectorioPorCiudadClientesProveedores";
+        public override string PageName => "/ClientesProveedoresComun/Consultas/DirectorioPorCiudadClientesProveedores";
         [BindProperty(SupportsGet = true)]
         public bool MostrarClientes { get; set; } = true;
         [BindProperty(SupportsGet = true)]
