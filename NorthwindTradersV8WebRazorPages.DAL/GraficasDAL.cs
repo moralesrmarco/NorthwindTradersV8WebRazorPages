@@ -62,6 +62,49 @@ namespace NorthwindTradersV8WebRazorPages.DAL
             }
             return lista;
         }
+        public int ObtenerTotalAñosConVentas()
+        {
+            using (SqlConnection cn = new SqlConnection(connectionString))
+            {
+                cn.Open();
+                string sql = @"SELECT COUNT(DISTINCT YEAR(OrderDate))
+                               FROM Orders 
+                               WHERE OrderDate IS NOT NULL";
+                using (SqlCommand cmd = new SqlCommand(sql, cn))
+                {
+                    return Convert.ToInt32(cmd.ExecuteScalar());
+                }
+            }
+        }
+        public List<DtoVentasMensualesPorAños> ObtenerVentasMensualesPorAños(int years)
+        {
+            var lista = new List<DtoVentasMensualesPorAños>();
 
+            using (SqlConnection cn = new SqlConnection(connectionString))
+            {
+                cn.Open();
+
+                using (SqlCommand cmd = new SqlCommand("SpVentasObtenerMensualesPorAnios", cn))
+                {
+                    cmd.CommandType = CommandType.StoredProcedure;
+                    cmd.Parameters.AddWithValue("@years", years);
+
+                    using (SqlDataReader dr = cmd.ExecuteReader())
+                    {
+                        while (dr.Read())
+                        {
+                            lista.Add(new DtoVentasMensualesPorAños
+                            {
+                                Year = Convert.ToInt32(dr["Year"]),
+                                Mes = Convert.ToInt32(dr["Mes"]),
+                                NombreMes = Convert.ToString(dr["NombreMes"]),
+                                Total = Convert.ToDecimal(dr["Total"])
+                            });
+                        }
+                    }
+                }
+            }
+            return lista;
+        }
     }
 }
