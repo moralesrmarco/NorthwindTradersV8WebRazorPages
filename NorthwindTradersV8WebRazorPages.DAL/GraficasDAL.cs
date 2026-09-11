@@ -106,5 +106,54 @@ namespace NorthwindTradersV8WebRazorPages.DAL
             }
             return lista;
         }
+        public DataTable ObtenerTopProductos(int cantidad, int anio)
+        {
+            var dt = new DataTable();
+            try
+            {
+                using (var cn = new SqlConnection(connectionString))
+                using (var cmd = new SqlCommand("SpVentasObtenerTopProductos", cn))
+                using (var da = new SqlDataAdapter(cmd))
+                {
+                    cmd.Parameters.AddWithValue("@Cantidad", cantidad);
+                    cmd.Parameters.AddWithValue("@Anio", anio);
+                    cmd.CommandType = CommandType.StoredProcedure;
+                    da.Fill(dt);
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Error al obtener los productos más vendidos: " + ex.Message);
+            }
+            return dt;
+        }
+        public List<(string Vendedor, decimal TotalVentas)> ObtenerVentasPorVendedores(int anio)
+        {
+            var resultados = new List<(string Vendedor, decimal TotalVentas)>();
+            try
+            {
+                using (SqlConnection cn = new SqlConnection(connectionString))
+                using (SqlCommand cmd = new SqlCommand("SpVentasObtenerPorVendedor", cn))
+                {
+                    cmd.CommandType = CommandType.StoredProcedure;
+                    cmd.Parameters.AddWithValue("@Anio", anio);
+                    cn.Open();
+                    using (SqlDataReader rdr = cmd.ExecuteReader())
+                    {
+                        while (rdr.Read())
+                        {
+                            string vendedor = rdr["Vendedor"].ToString();
+                            decimal totalVentas = Convert.ToDecimal(rdr["TotalVentas"]);
+                            resultados.Add((vendedor, totalVentas));
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Error al obtener las ventas por vendedor: " + ex.Message);
+            }
+            return resultados;
+        }
     }
 }
