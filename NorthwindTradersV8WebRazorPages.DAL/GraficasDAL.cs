@@ -155,5 +155,25 @@ namespace NorthwindTradersV8WebRazorPages.DAL
             }
             return resultados;
         }
+        public DataTable ObtenerVentasMensualesPorVendedoresPorAño(int anio)
+        {
+            var dt = new DataTable();
+            try
+            {
+                using (SqlConnection cn = new SqlConnection(connectionString))
+                using (SqlCommand cmd = new SqlCommand("SpVentasObtenerMensualesPorVendedoresPorAnio", cn))
+                using (SqlDataAdapter dap = new SqlDataAdapter(cmd))
+                {
+                    cmd.CommandType = CommandType.StoredProcedure;
+                    cmd.Parameters.AddWithValue("@Anio", anio);
+                    dap.Fill(dt);
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Error al obtener las ventas mensuales: " + ex.Message);
+            }
+            return dt;
+        }
     }
 }
