@@ -1,7 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using NorthwindTradersV8WebRazorPages.BLL;
-using NorthwindTradersV8WebRazorPages.Entities.DTOs;
 using System.Data;
 
 namespace NorthwindTradersV8WebRazorPages.Pages.Graficas.Consultas
@@ -19,7 +18,7 @@ namespace NorthwindTradersV8WebRazorPages.Pages.Graficas.Consultas
         }
         public void OnGet()
         {
-            Años = graficasBLL.ObtenerTop10AñosDeVentas();
+            Años = graficasBLL.ObtenerTop10AñosDeVentas(false);
             AñoActual = DateTime.Now.Year;
         }
         public IActionResult OnGetVentasMensuales(int year)
