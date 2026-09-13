@@ -51,5 +51,11 @@ namespace NorthwindTradersV8WebRazorPages.BLL
         {
             return graficasDAL.ObtenerVentasMensualesPorVendedoresPorAño(anio);
         }
+        public DataTable ObtenerTopProductosRpt(int cantidad, int anio)
+        {
+            return graficasDAL.ObtenerTopProductosRpt(cantidad, anio);
+        }
+
+
     }
 }
