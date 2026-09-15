@@ -8,7 +8,7 @@ namespace NorthwindTradersV8WebRazorPages.Pages.Tableros.AltaDireccion
 
     public class TableroControlAltaDireccionModel : PageModel
     {
-        private readonly GraficasBLL _graficasBLL;
+        private readonly GraficasBLL graficasBLL;
 
         public DataTable Anios { get; private set; } = new();
         public int AnioInicial { get; private set; } = -1;
@@ -18,13 +18,13 @@ namespace NorthwindTradersV8WebRazorPages.Pages.Tableros.AltaDireccion
         {
             var connectionString = configuration.GetConnectionString("NorthwindConnection")
                 ?? throw new InvalidOperationException("No se encontró la cadena de conexión NorthwindConnection.");
-            _graficasBLL = new GraficasBLL(connectionString);
+            graficasBLL = new GraficasBLL(connectionString);
         }
 
         public void OnGet()
         {
-            Anios = _graficasBLL.ObtenerTop10AñosDeVentas(false);
-            TotalAniosDisponibles = _graficasBLL.ObtenerTotalAñosConVentas();
+            Anios = graficasBLL.ObtenerTop10AñosDeVentas(false);
+            TotalAniosDisponibles = graficasBLL.ObtenerTotalAñosConVentas();
 
             var aniosDisponibles = Anios.AsEnumerable()
                 .Select(row => row.Field<int>("Valor"))
@@ -34,15 +34,15 @@ namespace NorthwindTradersV8WebRazorPages.Pages.Tableros.AltaDireccion
         }
 
         public IActionResult OnGetVentasMensuales(int anio) =>
-            new JsonResult(_graficasBLL.ObtenerVentasMensuales(anio));
+            new JsonResult(graficasBLL.ObtenerVentasMensuales(anio));
 
         public IActionResult OnGetComparativoVentas(int anios) =>
-            new JsonResult(_graficasBLL.ObtenerVentasMensualesPorAños(Math.Max(2, anios)));
+            new JsonResult(graficasBLL.ObtenerVentasMensualesPorAños(Math.Max(2, anios)));
 
         public IActionResult OnGetTopProductos(int cantidad, int anio)
         {
             cantidad = Math.Clamp(cantidad, 10, 50);
-            var datos = _graficasBLL.ObtenerTopProductos(cantidad, anio);
+            var datos = graficasBLL.ObtenerTopProductos(cantidad, anio);
             var productos = datos.AsEnumerable().Select(row => new
             {
                 nombreProducto = Convert.ToString(row["NombreProducto"]) ?? string.Empty,
@@ -54,7 +54,7 @@ namespace NorthwindTradersV8WebRazorPages.Pages.Tableros.AltaDireccion
 
         public IActionResult OnGetVentasPorVendedores(int anio)
         {
-            var vendedores = _graficasBLL.ObtenerVentasPorVendedores(anio)
+            var vendedores = graficasBLL.ObtenerVentasPorVendedores(anio)
                 .Select(x => new { vendedor = x.Vendedor, totalVentas = x.TotalVentas })
                 .ToList();
             return new JsonResult(new { vendedores, totalVentas = vendedores.Sum(x => x.totalVentas) });
@@ -62,7 +62,7 @@ namespace NorthwindTradersV8WebRazorPages.Pages.Tableros.AltaDireccion
 
         public IActionResult OnGetVentasMensualesPorVendedor(int anio)
         {
-            var datos = _graficasBLL.ObtenerVentasMensualesPorVendedoresPorAño(anio)
+            var datos = graficasBLL.ObtenerVentasMensualesPorVendedoresPorAño(anio)
                 .AsEnumerable()
                 .Select(row => new
                 {
