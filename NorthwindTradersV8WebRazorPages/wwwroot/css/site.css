@@ -94,3 +94,12 @@ body {
     cursor: not-allowed;
     opacity: 0.65;
 }
+/* Tablero de alta dirección */
+.chart-container {
+    height: 390px;
+    position: relative;
+}
+
+@media (max-width: 575.98px) {
+    .chart-container { height: 320px; }
+}
