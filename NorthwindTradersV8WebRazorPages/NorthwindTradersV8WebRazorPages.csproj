@@ -14,6 +14,7 @@
     
     <!-- Paquetes NuGet -->
     <Folder Include="NewFolder\" />
+    <Folder Include="Pages\Administracion\" />
     <PackageReference Include="PdfSharpCore" Version="1.3.67" />
     <PackageReference Include="ReportViewerCore.NETCore" Version="15.1.33" />
 
