@@ -483,7 +483,7 @@
                         {
                             <li class="nav-item dropdown">
                                 <a class="nav-link dropdown-toggle text-dark" href="#" id="tableroDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                    Tableros de control
+                                    Tableros
                                 </a>
                                 <ul class="dropdown-menu" aria-labelledby="tableroDropdown">
                                     <li>
@@ -525,7 +525,45 @@
                         {
                             <li class="nav-item">
                                 <span class="nav-link text-dark menu-deshabilitado">
-                                    Tableros de control
+                                    Tableros
+                                </span>
+                            </li>
+                        }
+
+                        @if (User.HasClaim("Permiso", Permisos.Administracion.ToString()))
+                        {
+                            <ul class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle text-dark"
+                                   href="#"
+                                   id="administracionDropdown"
+                                   role="button"
+                                   data-bs-toggle="dropdown"
+                                   aria-expanded="false">
+                                    Administración
+                                </a>
+                                <ul class="dropdown-menu" aria-labelledby="administracionDropdown">
+                                    <li>
+                                        <a class="dropdown-item"
+                                           asp-area=""
+                                           asp-page="/Empleados/Index">
+                                            Gestión de usuarios
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a class="dropdown-item"
+                                           asp-area=""
+                                           asp-page="/Empleados/Index">
+                                            Gestión de permisos
+                                        </a>
+                                    </li>
+                                </ul>
+                            </ul>
+                        }
+                        else
+                        {
+                            <li class="nav-item">
+                                <span class="nav-link text-dark menu-deshabilitado">
+                                    Administración
                                 </span>
                             </li>
                         }
@@ -544,18 +582,18 @@
                                 </a>
 
                                 <ul class="dropdown-menu dropdown-menu-end">
-
                                     <li>
-                                        <a class="dropdown-item"
-                                           asp-page="/Account/CambiarPassword">
+                                        <button type="button"
+                                                class="dropdown-item"
+                                                data-bs-toggle="modal"
+                                                data-bs-target="#modalCambiarContrasena">
                                             <i class="bi bi-key"></i>
                                             Cambiar contraseña
-                                        </a>
+                                        </button>
                                     </li>
                                     <li>
                                         <hr class="dropdown-divider" />
                                     </li>
-
                                     <li>
                                         <form method="post" asp-page="/Account/Logout">
                                             <button type="submit" class="dropdown-item">
@@ -564,7 +602,6 @@
                                             </button>
                                         </form>
                                     </li>
-
                                 </ul>
                             </li>
                         }
@@ -578,6 +615,180 @@
         <main role="main" class="pb-3">
             @RenderBody()
         </main>
+    </div>
+
+    <!-- ========================================================= -->
+    <!-- Modal Cambiar contraseña                                  -->
+    <!-- ========================================================= -->
+
+    <div class="modal fade"
+         id="modalCambiarContrasena"
+         tabindex="-1"
+         aria-labelledby="modalCambiarContrasenaLabel"
+         aria-hidden="true">
+
+        <div class="modal-dialog modal-dialog-centered">
+
+            <div class="modal-content">
+
+                <!-- Encabezado -->
+                <div class="modal-header">
+
+                    <h5 class="modal-title" id="modalCambiarContrasenaLabel">
+                        <i class="bi bi-key"></i>
+                        Cambiar contraseña
+                    </h5>
+
+                    <button type="button"
+                            class="btn-close"
+                            data-bs-dismiss="modal"
+                            aria-label="Cerrar">
+                    </button>
+
+                </div>
+
+
+                <!-- Cuerpo -->
+                <div class="modal-body">
+
+                    @Html.AntiForgeryToken()
+
+                    <!-- Usuario -->
+                    <div class="mb-3">
+
+                        <label class="form-label fw-bold">
+                            Usuario
+                        </label>
+
+                        <input type="text"
+                               class="form-control"
+                               value="@User.FindFirst("Usuario")?.Value"
+                               readonly />
+
+                    </div>
+
+
+                    <!-- Contraseña actual -->
+                    <div class="mb-3">
+
+                        <label for="txtContrasenaActual"
+                               class="form-label fw-bold">
+                            Contraseña actual
+                        </label>
+
+                        <div class="input-group">
+
+                            <input type="password"
+                                   id="txtContrasenaActual"
+                                   class="form-control"
+                                   autocomplete="off"
+                                   value="" />
+
+                            <button type="button"
+                                    class="btn btn-outline-secondary"
+                                    id="btnMostrarContrasenaActual"
+                                    title="Mostrar contraseña">
+
+                                <i class="bi bi-eye"></i>
+
+                            </button>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- Nueva contraseña -->
+                    <div class="mb-3">
+
+                        <label for="txtNuevaContrasena"
+                               class="form-label fw-bold">
+                            Nueva contraseña
+                        </label>
+
+                        <div class="input-group">
+
+                            <input type="password"
+                                   id="txtNuevaContrasena"
+                                   class="form-control"
+                                   autocomplete="new-password" />
+
+                            <button type="button"
+                                    class="btn btn-outline-secondary"
+                                    id="btnMostrarNuevaContrasena"
+                                    title="Mostrar contraseña">
+
+                                <i class="bi bi-eye"></i>
+
+                            </button>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- Confirmar contraseña -->
+                    <div class="mb-3">
+
+                        <label for="txtConfirmarContrasena"
+                               class="form-label fw-bold">
+                            Confirmar contraseña
+                        </label>
+
+                        <div class="input-group">
+
+                            <input type="password"
+                                   id="txtConfirmarContrasena"
+                                   class="form-control"
+                                   autocomplete="new-password" />
+
+                            <button type="button"
+                                    class="btn btn-outline-secondary"
+                                    id="btnMostrarConfirmarContrasena"
+                                    title="Mostrar contraseña">
+
+                                <i class="bi bi-eye"></i>
+
+                            </button>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- Área de mensajes -->
+                    <div id="mensajeCambiarContrasena"
+                         class="alert d-none"
+                         role="alert">
+                    </div>
+
+                </div>
+
+
+                <!-- Pie -->
+                <div class="modal-footer">
+
+                    <button type="button"
+                            class="btn btn-secondary"
+                            data-bs-dismiss="modal">
+                        Cancelar
+                    </button>
+
+                    <button type="button"
+                            class="btn btn-primary"
+                            id="btnCambiarContrasena">
+
+                        <i class="bi bi-key"></i>
+                        Cambiar contraseña
+
+                    </button>
+
+                </div>
+
+            </div>
+
+        </div>
+
     </div>
 
     <footer class="border-top footer text-muted">
@@ -594,6 +805,7 @@
     <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
 
+    <script src="~/js/cambiar-contrasena.js"></script>
     <script src="~/js/loading-overlay.js" asp-append-version="true"></script>
 
     <partial name="_LoadingOverlay" />

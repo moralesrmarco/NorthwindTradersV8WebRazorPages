@@ -13,5 +13,14 @@ namespace NorthwindTradersV8WebRazorPages.BLL
         {
             return usuarioDAL.ValidarUsuario(usuario, password, out nombreUsuarioAutenticado);
         }
+        public byte ValidarContraseñaActual(string usuario, string contrasenaActual)
+        {
+            return usuarioDAL.ValidarContraseñaActual(usuario, contrasenaActual);
+        }
+        public byte ActualizarContraseña(string usuario, string nuevaContrasena)
+        {
+            return usuarioDAL.ActualizarContraseña(usuario, nuevaContrasena);
+        }
+
     }
 }

@@ -49,5 +49,48 @@ namespace NorthwindTradersV8WebRazorPages.DAL
             }
             return idUsuario;
         }
+        public byte ValidarContraseñaActual(string usuario, string contrasenaActual)
+        {
+            byte numRegs = 0;
+            try
+            {
+                using (var cn = new SqlConnection(connectionString))
+                using (var cmd = new SqlCommand("SpUsuarioValidarContrasenaActual", cn))
+                {
+                    cmd.CommandType = CommandType.StoredProcedure;
+                    cmd.Parameters.AddWithValue("@Usuario", usuario);
+                    cmd.Parameters.AddWithValue("@Password", contrasenaActual);
+                    cn.Open();
+                    numRegs = Convert.ToByte(cmd.ExecuteScalar());
+                }
+            }
+            catch (SqlException ex)
+            {
+                throw new Exception("Error al validar la contraseña actual: " + ex.Message);
+            }
+            return numRegs;
+        }
+        public byte ActualizarContraseña(string usuario, string nuevaContrasena)
+        {
+            byte numRegs = 0;
+            try
+            {
+                using (var cn = new SqlConnection(connectionString))
+                using (var cmd = new SqlCommand("SpUsuarioActualizarContrasena", cn))
+                {
+                    cmd.CommandType = CommandType.StoredProcedure;
+                    cmd.Parameters.AddWithValue("@Usuario", usuario);
+                    cmd.Parameters.AddWithValue("@password", nuevaContrasena);
+                    cn.Open();
+                    numRegs = Convert.ToByte(cmd.ExecuteNonQuery());
+                }
+            }
+            catch (SqlException ex)
+            {
+                throw new Exception("Error al cambiar la contraseña: " + ex.Message);
+            }
+            return numRegs;
+        }
+
     }
 }
