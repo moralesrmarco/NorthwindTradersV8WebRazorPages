@@ -1,0 +1,371 @@
+@page
+@model NorthwindTradersV8WebRazorPages.Pages.Administracion.AdministracionUsuariosModel
+
+@{
+    ViewData["Title"] = "Gestión de usuarios";
+    var esEliminacion = Model.Modo == "eliminar";
+    var esEdicion = Model.Modo == "editar";
+}
+
+<h2>Gestión de usuarios</h2>
+
+@if (TempData["Exito"] is string exito)
+{
+    <div class="alert alert-success">@exito</div>
+}
+
+@if (TempData["Error"] is string error)
+{
+    <div class="alert alert-danger">@error</div>
+}
+
+<div class="card mb-4">
+    <div class="card-body">
+
+        <form method="get" class="row g-2 align-items-end">
+
+            <div class="col-md-1">
+                <label asp-for="Filtro.IdIni" class="form-label">Id inicial</label>
+                <input asp-for="Filtro.IdIni" class="form-control" min="1" />
+            </div>
+
+            <div class="col-md-1">
+                <label asp-for="Filtro.IdFin" class="form-label">Id final</label>
+                <input asp-for="Filtro.IdFin" class="form-control" min="1" />
+            </div>
+
+            <div class="col-md-2">
+                <label asp-for="Filtro.Paterno" class="form-label">Apellido paterno</label>
+                <input asp-for="Filtro.Paterno" class="form-control" />
+            </div>
+
+            <div class="col-md-2">
+                <label asp-for="Filtro.Materno" class="form-label">Apellido materno</label>
+                <input asp-for="Filtro.Materno" class="form-control" />
+            </div>
+
+            <div class="col-md-2">
+                <label asp-for="Filtro.Nombres" class="form-label">Nombres</label>
+                <input asp-for="Filtro.Nombres" class="form-control" />
+            </div>
+
+            <div class="col-md-2">
+                <label asp-for="Filtro.NombreUsuario" class="form-label">Usuario</label>
+                <input asp-for="Filtro.NombreUsuario" class="form-control" />
+            </div>
+
+            <div class="col-md-2">
+                <button class="btn btn-sm btn-buscar" title="Buscar">
+                    <i class="bi bi-search"></i>
+                    Buscar
+                </button>
+
+                <a asp-page="./AdministracionUsuarios"
+                   class="btn btn-sm btn-primary">
+                   <i class="bi bi-eraser"></i>
+                    Limpiar
+                </a>
+            </div>
+
+        </form>
+
+    </div>
+</div>
+
+<div class="row">
+
+    <div class="col-lg-7">
+
+        <div class="d-flex justify-content-between align-items-center mb-2">
+
+            <h4 class="mb-0">
+                Usuarios
+            </h4>
+
+
+        </div>
+
+        <div class="table-responsive">
+
+            <table class="table table-striped table-hover">
+
+                <thead>
+                    <tr>
+                        <th>Id</th>
+                        <th>Nombre</th>
+                        <th>Usuario</th>
+                        <th>Estatus</th>
+                        <th class="text-center">Acciones</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+
+                    @foreach (System.Data.DataRow usuario in Model.Usuarios.Rows)
+                    {
+                        <tr>
+
+                            <td>
+                                @usuario["Id"]
+                            </td>
+
+                            <td>
+                                @($"{usuario["Nombres"]} {usuario["Paterno"]} {usuario["Materno"]}".Trim())
+                            </td>
+
+                            <td>
+                                @usuario["Usuario"]
+                            </td>
+
+                            <td>
+                                <span class="badge @(Convert.ToBoolean(usuario["Estatus"]) ? "bg-success" : "bg-danger")">
+                                    @(Convert.ToBoolean(usuario["Estatus"]) ? "Activo" : "Inactivo")
+                                </span>
+                            </td>
+
+                            <td class="text-center text-nowrap">
+
+                                <a asp-page="./AdministracionUsuarios"
+                                   asp-route-id="@usuario["Id"]"
+                                   asp-route-modo="editar"
+                                   class="btn btn-sm btn-warning"
+                                   title="Editar">
+                                    <i class="bi bi-pencil"></i>
+                                </a>
+
+                                <a asp-page="./AdministracionUsuarios"
+                                   asp-route-id="@usuario["Id"]"
+                                   asp-route-modo="eliminar"
+                                   class="btn btn-sm btn-danger"
+                                   title="Eliminar">
+                                    <i class="bi bi-trash"></i>
+                                </a>
+
+                            </td>
+
+                        </tr>
+                    }
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+    <div class="col-lg-5">
+        <div class="card">
+            <div class="card-header">
+
+                <div class="row align-items-center">
+
+                    <div class="col">
+                        <h4>
+                        @(esEliminacion
+                            ? "Eliminar usuario"
+                            : esEdicion
+                                ? "Modificar usuario"
+                                : "Registrar usuario")
+                        </h4>
+                    </div>
+
+                    <div class="col-auto">
+                        <a asp-page="./AdministracionUsuarios"
+                           class="btn btn-sm btn-primary">
+                            <i class="bi bi-plus-circle"></i>
+                            Nuevo usuario
+                        </a>
+                    </div>
+
+                </div>
+
+            </div>
+
+            <div class="card-body">
+
+                <form method="post"
+                      asp-page-handler="@(esEliminacion ? "Eliminar" : "Guardar")"
+                      id="frmAdministracionUsuarios">
+
+                    <div asp-validation-summary="ModelOnly"
+                         class="text-danger">
+                    </div>
+
+                    <input asp-for="Usuario.Id" type="hidden" />
+                    <input asp-for="Usuario.RowVersionStr" type="hidden" />
+
+                    <div class="row g-2">
+
+                        <div class="col-md-6">
+
+                            <label asp-for="Usuario.Paterno"
+                                   class="form-label">
+                                Apellido paterno
+                            </label>
+
+                            <input asp-for="Usuario.Paterno"
+                                   class="form-control"
+                                   readonly="@(esEliminacion ? "readonly" : null)" />
+
+                        </div>
+
+                        <div class="col-md-6">
+
+                            <label asp-for="Usuario.Materno"
+                                   class="form-label">
+                                Apellido materno
+                            </label>
+
+                            <input asp-for="Usuario.Materno"
+                                   class="form-control"
+                                   readonly="@(esEliminacion ? "readonly" : null)" />
+
+                        </div>
+
+                    </div>
+
+                    <div class="mb-2">
+
+                        <label asp-for="Usuario.Nombres"
+                               class="form-label">
+                            Nombres
+                        </label>
+
+                        <input asp-for="Usuario.Nombres"
+                               class="form-control"
+                               readonly="@(esEliminacion ? "readonly" : null)" />
+
+                        <span asp-validation-for="Usuario.Nombres"
+                              class="text-danger fs-5 fw-bold">
+                        </span>
+
+                    </div>
+
+                    <div class="mb-2">
+
+                        <label asp-for="Usuario.NombreUsuario"
+                               class="form-label">
+                            Usuario
+                        </label>
+
+                        <input asp-for="Usuario.NombreUsuario"
+                               class="form-control"
+                               readonly="@(esEliminacion ? "readonly" : null)" />
+
+                        <span asp-validation-for="Usuario.NombreUsuario"
+                              class="text-danger fs-5 fw-bold">
+                        </span>
+
+                    </div>
+
+                    @if (!esEliminacion)
+                    {
+                        <div class="mb-2">
+
+                            <label asp-for="Usuario.Password"
+                                   class="form-label">
+                                @(esEdicion
+                                    ? "Nueva contraseña (opcional)"
+                                    : "Contraseña")
+                            </label>
+
+                            <input asp-for="Usuario.Password"
+                                   type="password"
+                                   class="form-control"
+                                   autocomplete="new-password" />
+
+                            <span asp-validation-for="Usuario.Password"
+                                  class="text-danger fs-5 fw-bold">
+                            </span>
+
+                        </div>
+
+                        <div class="mb-2">
+
+                            <label asp-for="ConfirmarPassword"
+                                   class="form-label">
+                                Confirmar contraseña
+                            </label>
+
+                            <input asp-for="ConfirmarPassword"
+                                   type="password"
+                                   class="form-control"
+                                   autocomplete="new-password" />
+
+                            <span asp-validation-for="ConfirmarPassword"
+                                  class="text-danger fs-5 fw-bold">
+                            </span>
+
+                        </div>
+                    }
+
+                    <div class="form-check mb-3">
+
+                        <input asp-for="Usuario.Estatus"
+                               class="form-check-input"
+                               disabled="@esEliminacion" />
+
+                        <label asp-for="Usuario.Estatus"
+                               class="form-check-label">
+                            Activo
+                        </label>
+
+                    </div>
+
+                    @if (esEliminacion)
+                    {
+                        <p class="text-danger">
+                            También se eliminarán los permisos asignados a este usuario.
+                        </p>
+                    }
+
+                    <button type="submit"
+                            class="btn btn-sm @(esEliminacion ? "btn-danger" : "btn-primary")">
+
+                        <i class="bi @(esEliminacion ? "bi-trash" : "bi-save")"></i>
+
+                        @(esEliminacion ? "Eliminar" : "Guardar")
+
+                    </button>
+
+                    <a asp-page="./AdministracionUsuarios"
+                       class="btn btn-sm btn-cancelar">
+                       <i class="bi bi-x-circle"></i>
+                        Cancelar
+                    </a>
+
+                </form>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+@section Scripts
+{
+    <partial name="_ValidationScriptsPartial" />
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+
+            const formulario = document.getElementById("frmAdministracionUsuarios");
+
+            if (!formulario) {
+                return;
+            }
+
+            formulario.addEventListener("submit", function () {
+
+                // El loading-overlay.js global ya mostró el overlay.
+                // Lo ocultamos nuevamente al procesar esta página.
+                ocultarLoadingOverlay();
+
+            });
+
+        });
+    </script>
+}
