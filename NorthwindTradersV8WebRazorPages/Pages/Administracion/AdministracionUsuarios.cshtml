@@ -26,12 +26,18 @@
 
             <div class="col-md-1">
                 <label asp-for="Filtro.IdIni" class="form-label">Id inicial</label>
-                <input asp-for="Filtro.IdIni" class="form-control" min="1" />
+                <input asp-for="Filtro.IdIni"
+                   id="txtIdIni"
+                   class="form-control"
+                   min="1" />
             </div>
 
             <div class="col-md-1">
                 <label asp-for="Filtro.IdFin" class="form-label">Id final</label>
-                <input asp-for="Filtro.IdFin" class="form-control" min="1" />
+                <input asp-for="Filtro.IdFin"
+                    id="txtIdFin"
+                    class="form-control"
+                    min="1" />
             </div>
 
             <div class="col-md-2">
@@ -348,7 +354,7 @@
 @section Scripts
 {
     <partial name="_ValidationScriptsPartial" />
-
+    <script src="~/js/form-buscar.js"></script>
     <script>
         document.addEventListener("DOMContentLoaded", function () {
 
