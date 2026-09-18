@@ -31,14 +31,22 @@ public class AdministracionUsuariosModel : PageModel
         Modo = modo is "editar" or "eliminar" 
             ? modo 
             : "crear";
-        if (id.HasValue) 
+        if (id.HasValue)
+        {
             Usuario = usuarioBLL.ObtenerPorId(id.Value) ?? new Usuario();
+
+            if (Modo == "editar")
+            {
+                Usuario.Password = string.Empty;
+            }
+        }
         CargarUsuarios();
     }
 
     public IActionResult OnPostGuardar()
     {
         Modo = Usuario.Id == 0 ? "crear" : "editar";
+
         ValidarUsuario();
         if (!ModelState.IsValid) 
         { 
@@ -47,20 +55,31 @@ public class AdministracionUsuariosModel : PageModel
         }
         try
         {
-            if (Usuario.Id != 0 && string.IsNullOrWhiteSpace(Usuario.Password))
+            if (Usuario.Id == 0)
             {
+                // Nuevo usuario: la contraseña es obligatoria y se genera su hash.
+                Usuario.Password = PasswordHelper.GenerarHash(Usuario.Password.Trim());
+            }
+            else if (string.IsNullOrWhiteSpace(Usuario.Password))
+            {
+                // Modificación sin cambio de contraseña:
+                // conservar el hash que ya existe en la BD.
                 var usuarioActual = usuarioBLL.ObtenerPorId(Usuario.Id);
-                if (usuarioActual == null) 
-                { 
-                    ModelState.AddModelError(string.Empty, "El usuario ya no existe."); 
-                    CargarUsuarios(); 
-                    return Page(); 
+
+                if (usuarioActual == null)
+                {
+                    ModelState.AddModelError(string.Empty, "El usuario ya no existe.");
+                    CargarUsuarios();
+                    return Page();
                 }
+
                 Usuario.Password = usuarioActual.Password;
             }
             else
             {
-            Usuario.Password = PasswordHelper.GenerarHash(Usuario.Password.Trim());
+                // Modificación con cambio de contraseña:
+                // generar un nuevo hash.
+                Usuario.Password = PasswordHelper.GenerarHash(Usuario.Password.Trim());
             }
             var registros = Usuario.Id == 0
                 ? usuarioBLL.Insertar(Usuario)
