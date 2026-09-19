@@ -1,0 +1,853 @@
+﻿@page
+@model NorthwindTradersV8WebRazorPages.Pages.Administracion.AdministracionPermisosModel
+
+@{
+    ViewData["Title"] = "Gestión de permisos de usuarios";
+}
+
+<h2>Gestión de permisos de usuarios</h2>
+
+<!-- ========================================================= -->
+<!-- BÚSQUEDA DE USUARIOS                                     -->
+<!-- ========================================================= -->
+
+<ul class="nav nav-tabs mb-0">
+    <li class="nav-item">
+        <span class="nav-link active">
+            <i class="bi bi-search"></i>
+            Buscar un usuario
+        </span>
+    </li>
+</ul>
+
+<div class="border border-top-0 p-3 mb-4">
+
+        <form method="get" class="row g-2 align-items-end" id="frmBuscarUsuarios">
+
+            <div class="col-md-1">
+                <label asp-for="Filtro.IdIni" class="form-label">
+                    Id inicial
+                </label>
+                <input asp-for="Filtro.IdIni"
+                       id="txtIdIni"
+                       class="form-control"
+                       min="1" />
+            </div>
+
+            <div class="col-md-1">
+                <label asp-for="Filtro.IdFin" class="form-label">
+                    Id final
+                </label>
+                <input asp-for="Filtro.IdFin"
+                       id="txtIdFin"
+                       class="form-control"
+                       min="1" />
+            </div>
+
+            <div class="col-md-2">
+                <label asp-for="Filtro.Paterno" class="form-label">
+                    Apellido paterno
+                </label>
+                <input asp-for="Filtro.Paterno"
+                       class="form-control" />
+            </div>
+
+            <div class="col-md-2">
+                <label asp-for="Filtro.Materno" class="form-label">
+                    Apellido materno
+                </label>
+                <input asp-for="Filtro.Materno"
+                       class="form-control" />
+            </div>
+
+            <div class="col-md-2">
+                <label asp-for="Filtro.Nombres" class="form-label">
+                    Nombres
+                </label>
+                <input asp-for="Filtro.Nombres"
+                       class="form-control" />
+            </div>
+
+            <div class="col-md-2">
+                <label asp-for="Filtro.NombreUsuario" class="form-label">
+                    Usuario
+                </label>
+                <input asp-for="Filtro.NombreUsuario"
+                       class="form-control" />
+            </div>
+
+            <div class="col-md-2">
+                <button type="submit"
+                        class="btn btn-sm btn-buscar"
+                        title="Buscar">
+                    <i class="bi bi-search"></i>
+                    Buscar
+                </button>
+
+                <a asp-page="./AdministracionPermisos"
+                   class="btn btn-sm btn-primary">
+                    <i class="bi bi-eraser"></i>
+                    Limpiar
+                </a>
+
+            </div>
+
+        </form>
+
+</div>
+
+
+<div class="row">
+
+    <!-- Usuarios -->
+    <div class="col-lg-6">
+
+        <div class="d-flex justify-content-between align-items-center mb-2">
+
+            <h4 class="mb-0">
+                Usuarios
+            </h4>
+
+        </div>
+
+        <div class="table-responsive">
+
+            <table class="table table-striped table-hover">
+
+                <thead>
+
+                    <tr>
+
+                        <th>Id</th>
+                        <th>Nombre</th>
+                        <th>Usuario</th>
+                        <th>Estatus</th>
+                        <th class="text-center">
+                            Acciones
+                        </th>
+
+                    </tr>
+
+                </thead>
+
+                <tbody>
+
+                    @foreach (System.Data.DataRow usuario in Model.Usuarios.Rows)
+                    {
+                        <tr>
+
+                            <td>
+                                @usuario["Id"]
+                            </td>
+
+                            <td>
+                                @($"{usuario["Nombres"]} {usuario["Paterno"]} {usuario["Materno"]}".Trim())
+                            </td>
+
+                            <td>
+                                @usuario["Usuario"]
+                            </td>
+
+                            <td>
+
+                                <span class="badge @(Convert.ToBoolean(usuario["Estatus"])
+                                    ? "bg-success"
+                                    : "bg-danger")">
+
+                                    @(Convert.ToBoolean(usuario["Estatus"])
+                                        ? "Activo"
+                                        : "Inactivo")
+
+                                </span>
+
+                            </td>
+
+                            <td class="text-center text-nowrap">
+
+                                @{
+                                    bool usuarioActivo = Convert.ToBoolean(usuario["Estatus"]);
+                                }
+
+                                <button type="button"
+                                        class="btn btn-sm @(usuarioActivo ? "btn-primary" : "btn-secondary") btn-seleccionar-usuario"
+                                        data-id="@usuario["Id"]"
+                                        title="@(usuarioActivo ? "Seleccionar" : "Usuario inactivo")"
+                                        @(usuarioActivo ? "" : "disabled")>
+
+                                    @if (usuarioActivo)
+                                    {
+                                        <i class="bi bi-check-circle"></i>
+                                    }
+                                    else
+                                    {
+                                        <i class="bi bi-x-circle"></i>
+                                    }
+
+                                </button>
+
+                            </td>
+
+                        </tr>
+                    }
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+
+    <!-- Permisos -->
+    <div class="col-lg-6">
+
+        <div class="card">
+
+            <div class="card-header">
+
+                <div class="row align-items-center">
+
+                    <div class="col">
+
+                        <h4 class="mb-0">
+                            Permisos
+                        </h4>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <div class="card-body">
+
+                <div id="panelUsuarioSeleccionado">
+
+                    <div class="alert alert-secondary">
+                        Seleccione un usuario para administrar sus permisos.
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+<form id="formAntiforgery">
+    @Html.AntiForgeryToken()
+</form>
+
+
+@section Scripts
+{
+    <script src="~/js/form-buscar.js"></script>
+
+    <script>
+
+        let usuarioSeleccionadoId = null;
+
+        document.addEventListener("DOMContentLoaded", function () {
+
+            const botonesSeleccionar =
+                document.querySelectorAll(".btn-seleccionar-usuario");
+
+            botonesSeleccionar.forEach(function (boton) {
+
+                boton.addEventListener("click", function () {
+
+                    const idUsuario = this.dataset.id;
+
+                    seleccionarUsuario(idUsuario);
+
+                });
+
+            });
+
+        });
+
+
+        async function seleccionarUsuario(idUsuario) {
+
+            try {
+
+                mostrarLoadingOverlay();
+
+                const respuesta = await fetch(
+                    `?handler=SeleccionarUsuario&id=${idUsuario}`,
+                    {
+                        method: "GET",
+                        headers: {
+                            "X-Requested-With": "XMLHttpRequest"
+                        }
+                    }
+                );
+
+                if (!respuesta.ok) {
+
+                    throw new Error(
+                        "No fue posible obtener la información del usuario."
+                    );
+
+                }
+
+                const resultado = await respuesta.json();
+
+                if (!resultado.exito) {
+
+                    ocultarLoadingOverlay();
+
+                    alert(resultado.mensaje);
+
+                    return;
+
+                }
+
+                usuarioSeleccionadoId = resultado.usuario.id;
+
+                mostrarUsuarioSeleccionado(resultado);
+
+            }
+            catch (error) {
+
+                console.error(error);
+
+                alert(
+                    "Ocurrió un error al seleccionar el usuario."
+                );
+
+            }
+            finally {
+
+                ocultarLoadingOverlay();
+
+            }
+
+        }
+
+
+function mostrarUsuarioSeleccionado(resultado) {
+
+    const panel =
+        document.getElementById("panelUsuarioSeleccionado");
+
+    panel.innerHTML = `
+
+        <div class="mb-3">
+
+            <label class="form-label">
+                Usuario seleccionado
+            </label>
+
+            <div class="form-control bg-light">
+
+                <strong>
+                    ${resultado.usuario.nombre}
+                </strong>
+
+                (${resultado.usuario.nombreUsuario})
+
+            </div>
+
+        </div>
+
+        <div class="row">
+
+            <div class="col-md-5">
+
+                <label class="form-label">
+                    Catálogo de permisos
+                </label>
+
+                <select class="form-select"
+                        id="lstCatalogoPermisos"
+                        size="15">
+
+                </select>
+
+            </div>
+
+            <div class="col-md-2 d-flex flex-column justify-content-center align-items-center gap-2">
+
+                <button type="button"
+                        class="btn btn-sm btn-primary"
+                        id="btnConcederPermiso"
+                        title="Conceder permiso">
+
+                    <i class="bi bi-chevron-right"></i>
+
+                </button>
+
+                <button type="button"
+                        class="btn btn-sm btn-secondary"
+                        id="btnQuitarPermiso"
+                        title="Quitar permiso">
+
+                    <i class="bi bi-chevron-left"></i>
+
+                </button>
+
+                <button type="button"
+                            class="btn btn-sm btn-primary"
+                            id="btnConcederTodos"
+                            title="Conceder todos los permisos">
+
+                        <i class="bi bi-chevron-double-right"></i>
+
+                    </button>
+
+                    <button type="button"
+                            class="btn btn-sm btn-secondary"
+                            id="btnQuitarTodos"
+                            title="Quitar todos los permisos">
+
+                        <i class="bi bi-chevron-double-left"></i>
+
+                    </button>
+
+
+            </div>
+
+            <div class="col-md-5">
+
+                <label class="form-label">
+                    Permisos concedidos
+                </label>
+
+                <select class="form-select"
+                        id="lstPermisosConcedidos"
+                        size="15">
+
+                </select>
+
+            </div>
+
+        </div>
+
+    `;
+
+    // ==========================================
+    // Catálogo de permisos
+    // ==========================================
+
+    const listaCatalogo =
+        document.getElementById("lstCatalogoPermisos");
+
+    resultado.catalogoPermisos.forEach(function (permiso) {
+
+        const option =
+            document.createElement("option");
+
+        option.value = permiso.permisoId;
+        option.textContent = permiso.descripcion;
+
+        listaCatalogo.appendChild(option);
+
+    });
+
+
+    // ==========================================
+    // Permisos concedidos
+    // ==========================================
+
+    const listaConcedidos =
+        document.getElementById("lstPermisosConcedidos");
+
+    resultado.permisos.forEach(function (permiso) {
+
+        const option =
+            document.createElement("option");
+
+        option.value = permiso.permisoId;
+        option.textContent = permiso.descripcion;
+
+        listaConcedidos.appendChild(option);
+
+    });
+
+    document.getElementById("btnConcederPermiso")
+    .addEventListener("click", concederPermiso);
+
+    document.getElementById("btnQuitarPermiso")
+        .addEventListener("click", quitarPermiso);
+
+    document.getElementById("btnConcederTodos")
+        .addEventListener("click", concederTodos);
+
+    document.getElementById("btnQuitarTodos")
+        .addEventListener("click", quitarTodos);
+
+}
+
+async function concederPermiso() {
+
+    const listaCatalogo =
+        document.getElementById("lstCatalogoPermisos");
+
+    if (!listaCatalogo) {
+        return;
+    }
+
+    if (listaCatalogo.selectedIndex === -1) {
+
+        alert("Seleccione un permiso del catálogo.");
+
+        return;
+    }
+
+    const opcionSeleccionada =
+        listaCatalogo.options[listaCatalogo.selectedIndex];
+
+    const permisoId =
+        opcionSeleccionada.value;
+
+    try {
+
+        mostrarLoadingOverlay();
+
+        const token =
+            document.querySelector(
+                '#formAntiforgery input[name="__RequestVerificationToken"]'
+            ).value;
+
+        const respuesta = await fetch(
+            `?handler=ConcederPermiso&idUsuario=${usuarioSeleccionadoId}&permisoId=${permisoId}`,
+            {
+                method: "POST",
+                headers: {
+                    "X-Requested-With": "XMLHttpRequest",
+                    "RequestVerificationToken": token
+                }
+            }
+        );
+
+        if (!respuesta.ok) {
+
+            throw new Error(
+                "No fue posible conceder el permiso."
+            );
+
+        }
+
+        const resultado =
+            await respuesta.json();
+
+        if (!resultado.exito) {
+
+            alert(resultado.mensaje);
+
+            return;
+        }
+
+        await cargarPermisosConcedidos();
+
+    }
+    catch (error) {
+
+        console.error(error);
+
+        alert(
+            "Ocurrió un error al conceder el permiso."
+        );
+
+    }
+    finally {
+
+        ocultarLoadingOverlay();
+
+    }
+
+}
+
+async function cargarPermisosConcedidos() {
+
+    try {
+
+        const respuesta = await fetch(
+            `?handler=PermisosConcedidos&idUsuario=${usuarioSeleccionadoId}`,
+            {
+                method: "GET",
+                headers: {
+                    "X-Requested-With": "XMLHttpRequest"
+                }
+            }
+        );
+
+        if (!respuesta.ok) {
+
+            throw new Error(
+                "No fue posible consultar los permisos concedidos."
+            );
+
+        }
+
+        const resultado =
+            await respuesta.json();
+
+        if (!resultado.exito) {
+
+            alert(resultado.mensaje);
+
+            return;
+
+        }
+
+        const listaConcedidos =
+            document.getElementById("lstPermisosConcedidos");
+
+        listaConcedidos.innerHTML = "";
+
+        resultado.permisos.forEach(function (permiso) {
+
+            const option =
+                document.createElement("option");
+
+            option.value =
+                permiso.permisoId;
+
+            option.textContent =
+                permiso.descripcion;
+
+            listaConcedidos.appendChild(option);
+
+        });
+
+    }
+    catch (error) {
+
+        console.error(error);
+
+        alert(
+            "Ocurrió un error al consultar los permisos concedidos."
+        );
+
+    }
+
+}
+
+async function quitarPermiso() {
+
+    const listaConcedidos =
+        document.getElementById("lstPermisosConcedidos");
+
+    if (!listaConcedidos) {
+        return;
+    }
+
+    if (listaConcedidos.selectedIndex === -1) {
+
+        alert("Seleccione un permiso concedido.");
+
+        return;
+    }
+
+    const opcionSeleccionada =
+        listaConcedidos.options[listaConcedidos.selectedIndex];
+
+    const permisoId =
+        opcionSeleccionada.value;
+
+    try {
+
+        mostrarLoadingOverlay();
+
+        const token =
+            document.querySelector(
+                '#formAntiforgery input[name="__RequestVerificationToken"]'
+            ).value;
+
+        const respuesta = await fetch(
+            `?handler=QuitarPermiso&idUsuario=${usuarioSeleccionadoId}&permisoId=${permisoId}`,
+            {
+                method: "POST",
+                headers: {
+                    "X-Requested-With": "XMLHttpRequest",
+                    "RequestVerificationToken": token
+                }
+            }
+        );
+
+        if (!respuesta.ok) {
+
+            const textoError =
+                await respuesta.text();
+
+            console.error(
+                "Error HTTP:",
+                respuesta.status,
+                textoError
+            );
+
+            throw new Error(
+                `No fue posible eliminar el permiso. Código HTTP: ${respuesta.status}`
+            );
+        }
+
+        const resultado =
+            await respuesta.json();
+
+        if (!resultado.exito) {
+
+            alert(resultado.mensaje);
+
+            return;
+        }
+
+        await cargarPermisosConcedidos();
+
+    }
+    catch (error) {
+
+        console.error(error);
+
+        alert(error.message);
+
+    }
+    finally {
+
+        ocultarLoadingOverlay();
+
+    }
+
+}
+
+async function quitarTodos() {
+
+    try {
+
+        mostrarLoadingOverlay();
+
+        const token =
+            document.querySelector(
+                '#formAntiforgery input[name="__RequestVerificationToken"]'
+            ).value;
+
+        const respuesta = await fetch(
+            `?handler=QuitarTodosPermisos&idUsuario=${usuarioSeleccionadoId}`,
+            {
+                method: "POST",
+                headers: {
+                    "X-Requested-With": "XMLHttpRequest",
+                    "RequestVerificationToken": token
+                }
+            }
+        );
+
+        if (!respuesta.ok) {
+
+            const textoError = await respuesta.text();
+
+            console.error(
+                "Error HTTP:",
+                respuesta.status,
+                textoError
+            );
+
+            throw new Error(
+                `No fue posible quitar todos los permisos. Código HTTP: ${respuesta.status}`
+            );
+        }
+
+        const resultado =
+            await respuesta.json();
+
+        if (!resultado.exito) {
+
+            alert(resultado.mensaje);
+
+            return;
+        }
+
+        await cargarPermisosConcedidos();
+
+        alert(resultado.mensaje);
+
+    }
+    catch (error) {
+
+        console.error(error);
+
+        alert(error.message);
+
+    }
+    finally {
+
+        ocultarLoadingOverlay();
+
+    }
+
+}
+
+async function concederTodos() {
+
+    try {
+
+        mostrarLoadingOverlay();
+
+        const token =
+            document.querySelector(
+                '#formAntiforgery input[name="__RequestVerificationToken"]'
+            ).value;
+
+        const respuesta = await fetch(
+            `?handler=ConcederTodosPermisos&idUsuario=${usuarioSeleccionadoId}`,
+            {
+                method: "POST",
+                headers: {
+                    "X-Requested-With": "XMLHttpRequest",
+                    "RequestVerificationToken": token
+                }
+            }
+        );
+
+        if (!respuesta.ok) {
+
+            const textoError = await respuesta.text();
+
+            console.error(
+                "Error HTTP:",
+                respuesta.status,
+                textoError
+            );
+
+            throw new Error(
+                `No fue posible conceder todos los permisos. Código HTTP: ${respuesta.status}`
+            );
+        }
+
+        const resultado =
+            await respuesta.json();
+
+        if (!resultado.exito) {
+
+            alert(resultado.mensaje);
+
+            return;
+        }
+
+        await cargarPermisosConcedidos();
+
+        alert(resultado.mensaje);
+
+    }
+    catch (error) {
+
+        console.error(error);
+
+        alert(error.message);
+
+    }
+    finally {
+
+        ocultarLoadingOverlay();
+
+    }
+
+}
+
+    </script>
+}

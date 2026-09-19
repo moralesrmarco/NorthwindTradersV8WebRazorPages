@@ -19,63 +19,124 @@
     <div class="alert alert-danger">@error</div>
 }
 
-<div class="card mb-4">
-    <div class="card-body">
+<!-- ========================================================= -->
+<!-- BÚSQUEDA DE USUARIOS                                     -->
+<!-- ========================================================= -->
 
-        <form method="get" class="row g-2 align-items-end">
+<ul class="nav nav-tabs mb-0">
+    <li class="nav-item">
+        <span class="nav-link active">
+            <i class="bi bi-search"></i>
+            Buscar un usuario
+        </span>
+    </li>
+</ul>
+
+<div class="border border-top-0 p-3 mb-4">
+
+        <form method="get"
+              class="row g-2 align-items-end"
+              id="frmBuscarUsuarios">
 
             <div class="col-md-1">
-                <label asp-for="Filtro.IdIni" class="form-label">Id inicial</label>
+
+                <label asp-for="Filtro.IdIni"
+                       class="form-label">
+                    Id inicial
+                </label>
+
                 <input asp-for="Filtro.IdIni"
-                   id="txtIdIni"
-                   class="form-control"
-                   min="1" />
+                       id="txtIdIni"
+                       class="form-control"
+                       min="1" />
+
             </div>
 
             <div class="col-md-1">
-                <label asp-for="Filtro.IdFin" class="form-label">Id final</label>
+
+                <label asp-for="Filtro.IdFin"
+                       class="form-label">
+                    Id final
+                </label>
+
                 <input asp-for="Filtro.IdFin"
-                    id="txtIdFin"
-                    class="form-control"
-                    min="1" />
+                       id="txtIdFin"
+                       class="form-control"
+                       min="1" />
+
             </div>
 
             <div class="col-md-2">
-                <label asp-for="Filtro.Paterno" class="form-label">Apellido paterno</label>
-                <input asp-for="Filtro.Paterno" class="form-control" />
+
+                <label asp-for="Filtro.Paterno"
+                       class="form-label">
+                    Apellido paterno
+                </label>
+
+                <input asp-for="Filtro.Paterno"
+                       class="form-control" />
+
             </div>
 
             <div class="col-md-2">
-                <label asp-for="Filtro.Materno" class="form-label">Apellido materno</label>
-                <input asp-for="Filtro.Materno" class="form-control" />
+
+                <label asp-for="Filtro.Materno"
+                       class="form-label">
+                    Apellido materno
+                </label>
+
+                <input asp-for="Filtro.Materno"
+                       class="form-control" />
+
             </div>
 
             <div class="col-md-2">
-                <label asp-for="Filtro.Nombres" class="form-label">Nombres</label>
-                <input asp-for="Filtro.Nombres" class="form-control" />
+
+                <label asp-for="Filtro.Nombres"
+                       class="form-label">
+                    Nombres
+                </label>
+
+                <input asp-for="Filtro.Nombres"
+                       class="form-control" />
+
             </div>
 
             <div class="col-md-2">
-                <label asp-for="Filtro.NombreUsuario" class="form-label">Usuario</label>
-                <input asp-for="Filtro.NombreUsuario" class="form-control" />
+
+                <label asp-for="Filtro.NombreUsuario"
+                       class="form-label">
+                    Usuario
+                </label>
+
+                <input asp-for="Filtro.NombreUsuario"
+                       class="form-control" />
+
             </div>
 
             <div class="col-md-2">
-                <button class="btn btn-sm btn-buscar" title="Buscar">
+
+                <button type="submit"
+                        class="btn btn-sm btn-buscar"
+                        title="Buscar">
+
                     <i class="bi bi-search"></i>
                     Buscar
+
                 </button>
 
                 <a asp-page="./AdministracionUsuarios"
                    class="btn btn-sm btn-primary">
-                   <i class="bi bi-eraser"></i>
+
+                    <i class="bi bi-eraser"></i>
                     Limpiar
+
                 </a>
+
             </div>
 
         </form>
 
-    </div>
 </div>
 
 <div class="row">
