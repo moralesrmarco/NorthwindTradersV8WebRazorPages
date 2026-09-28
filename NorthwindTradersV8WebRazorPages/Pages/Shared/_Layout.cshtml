@@ -532,13 +532,13 @@
 
                         @if (User.HasClaim("Permiso", Permisos.Administracion.ToString()))
                         {
-                            <ul class="nav-item dropdown">
+                            <li class="nav-item dropdown">
                                 <a class="nav-link dropdown-toggle text-dark"
-                                   href="#"
-                                   id="administracionDropdown"
-                                   role="button"
-                                   data-bs-toggle="dropdown"
-                                   aria-expanded="false">
+                                    href="#"
+                                    id="administracionDropdown"
+                                    role="button"
+                                    data-bs-toggle="dropdown"
+                                    aria-expanded="false">
                                     Administración
                                 </a>
                                 <ul class="dropdown-menu" aria-labelledby="administracionDropdown">
@@ -557,7 +557,7 @@
                                         </a>
                                     </li>
                                 </ul>
-                            </ul>
+                            </li>
                         }
                         else
                         {
