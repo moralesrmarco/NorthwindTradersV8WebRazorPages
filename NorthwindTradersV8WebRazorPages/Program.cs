@@ -28,9 +28,9 @@ builder.Services
         options.LoginPath = "/Account/Login";
         options.AccessDeniedPath = "/Account/AccessDenied";
 
-        options.Cookie.Name = "NorthwindTraders.Auth";
+        options.Cookie.Name = "NorthwindTradersV8.Auth";
 
-        options.ExpireTimeSpan = TimeSpan.FromMinutes(30);
+        options.ExpireTimeSpan = TimeSpan.FromDays(30);
         options.SlidingExpiration = true;
     });
 
